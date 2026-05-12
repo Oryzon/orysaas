@@ -1,0 +1,22 @@
+{
+  "name": "orysaas",
+  "author": "OryScorp and Ugo Bretbeil",
+  "private": true,
+  "workspaces": [
+    "core",
+    "webapp",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:core": "npm --workspace core run dev",
+    "dev:webapp": "npm --workspace webapp run dev",
+    "build": "npm --workspace core run build && npm --workspace webapp run build",
+    "lint": "npm --workspace core run lint && npm --workspace webapp run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {}
+}

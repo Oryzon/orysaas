@@ -1,0 +1,1 @@
+docker run -p 3306:3306 --name orysaas -e MARIADB_USER=orysaas -e MARIADB_PASSWORD=orysaas -e MARIADB_DATABASE=orysaas -e MARIADB_ROOT_PASSWORD=root -d mariadb:latest
