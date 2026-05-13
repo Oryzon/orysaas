@@ -1,7 +1,7 @@
 <template>
     <NuxtLayout name="auth">
         <template #left>
-            <h2 class="mt-n4 text-primary font-weight-black text-headline-small">Heureux de vous revoir.</h2>
+            <h2 class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase">Heureux de vous revoir.</h2>
 
             <h1 class="mt-n4 text-white font-weight-bold text-display-large">Reprenez là où vous l'avez laissé.</h1>
 
@@ -55,6 +55,8 @@
                             variant="outlined"
                             :rules="[ rules.required() ]"
                             v-model="user.email"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         ></v-text-field>
                     </v-col>
 
@@ -66,11 +68,18 @@
                             :rules="[ rules.required() ]"
                             type="password"
                             v-model="user.password"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         ></v-text-field>
                     </v-col>
 
                     <v-col md="6" class="mt-n6 ml-n3">
-                        <v-checkbox label="Resté connecté ?" color="primary"></v-checkbox>
+                        <v-checkbox
+                            label="Resté connecté ?"
+                            color="primary"
+                            :loading="isLoading"
+                            :disabled="isLoading"
+                        ></v-checkbox>
                     </v-col>
 
                     <v-col md="6" class="mt-n3 text-right">
@@ -86,6 +95,8 @@
                             height="48"
                             append-icon="mdi-arrow-right"
                             @click="handleLogin"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         >
                             Se connecter
                         </v-btn>
@@ -109,6 +120,8 @@ definePageMeta({
 
 const route = useRoute();
 const router = useRouter();
+
+const isLoading = computed(() => api.isLoading('auth:login'));
 
 const { login, loggedIn } = useAuth();
 const form = ref();

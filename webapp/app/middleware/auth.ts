@@ -1,4 +1,7 @@
+import { useNuxtApp } from "nuxt/app";
+
 export default defineNuxtRouteMiddleware(async (to) => {
+    const nuxtApp = useNuxtApp();
     const { loggedIn, user, refreshUser } = useAuth();
 
     if (!loggedIn.value) {
@@ -6,6 +9,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
 
     if (!user.value) {
-        await refreshUser();
+        nuxtApp.runWithContext(() => { refreshUser()});
     }
 });

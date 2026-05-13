@@ -24,7 +24,6 @@ export const RefreshTokenRepository = dataSource.getRepository(RefreshTokenEntit
 
         return rToken;
     },
-
     async findValid(clientToken: string) {
         const hash = this.calculateServer(clientToken);
 
@@ -36,7 +35,6 @@ export const RefreshTokenRepository = dataSource.getRepository(RefreshTokenEntit
             },
         });
     },
-
     async revoke(clientToken: string) {
         const hash = this.calculateServer(clientToken);
 

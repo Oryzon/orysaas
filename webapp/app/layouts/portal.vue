@@ -2,7 +2,7 @@
     <v-app>
         <v-navigation-drawer
             :rail="isCollapsed"
-            class="bg-portal"
+            class="bg-brand-dark"
             :class="{ 'drawer-collapsed': isCollapsed }"
             :width="300"
             @mouseenter="isHovering = true"
@@ -17,24 +17,33 @@
                 <v-spacer></v-spacer>
                 <v-spacer></v-spacer>
 
-                <v-btn variant="tonal" :color="menuIsOpen ? '' : 'primary'" @click="toggleMenu" :width="48" :height="48" :min-width="0" rounded="lg">
+                <v-btn variant="tonal" :color="!!menuIsOpen ? 'surface' : 'primary'" @click="toggleMenu" :width="48" :height="48" :min-width="0" rounded="lg">
                     <v-icon>mdi-menu</v-icon>
                 </v-btn>
             </div>
 
             <v-divider />
 
-            <v-list color="primary" nav>
+            <v-list color="primary" base-color="white" nav>
                 <v-list-item
                     rounded="xl"
                     prepend-icon="mdi-view-dashboard"
                     title="Tableau de bord"
                     to="/portal/dashboard"
                 />
+
+                <v-list-subheader class="mt-2 text-uppercase text-label-large" color="grey-lighten-2">Pilotage SaaS</v-list-subheader>
+
+                <v-list-item
+                    rounded="xl"
+                    prepend-icon="mdi-file-tree"
+                    title="Jobs"
+                    to="/portal/jobs"
+                />
             </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar height="82">
+        <v-app-bar height="82" color="navbar">
             <v-app-bar-title class="font-weight-black">{{ pageTitle }}</v-app-bar-title>
 
             <v-spacer></v-spacer>
@@ -76,7 +85,7 @@
                     </v-list-item-title>
                 </v-list-item>
 
-                <v-list-item @click="logout">
+                <v-list-item @click="logout()">
                     <v-list-item-title>
                         <v-icon color="red">mdi-logout</v-icon>
                         Déconnexion
@@ -121,7 +130,7 @@ const userName = computed(() => {
         return '';
     }
 
-    const parts = [user.value.firstname, user.value.lastname?.[0] ? `${user.value.lastname[0]}.` : null].filter(Boolean);
+    const parts = [user.value.firstname, user.value.lastname ? `${user.value.lastname[0]}.` : null].filter(Boolean);
 
     return parts.length ? parts.join(' ') : user.value.email;
 });
@@ -205,7 +214,7 @@ const userRole = computed(() => {
     transform: translateY(-50%);
     width: 3px;
     height: 55%;
-    background: linear-gradient(to bottom, #A855F7, #EC4899);
+    background: linear-gradient(to bottom, var(--brand-primary), var(--brand-accent));
     border-radius: 0 3px 3px 0;
     z-index: 10;
 }

@@ -3,22 +3,20 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
 import { fr } from 'vuetify/locale';
+import { brand } from '~/config/brand';
 
-// ─── Couleurs du thème — modifie uniquement les valeurs hex ───────────────────
 const colors = {
-    // Marque
-    primary:    '#A855F7',
-    secondary:  '#71717A',
-
-    // Sémantique
-    success:    '#10B981',
-    info:       '#3B82F6',
-    warning:    '#F59E0B',
-    error:      '#EF4444',
-
-    // Surfaces
-    background: '#FFFFFF',
-    surface:    '#1A1827',
+    primary:    brand.primary,
+    secondary:  brand.secondary,
+    success:    brand.success,
+    info:       brand.info,
+    warning:    brand.warning,
+    error:      brand.error,
+    surface:           brand.surface,
+    'surface-light':   brand['surface-light'],
+    'surface-variant': brand['surface-variant'],
+    background:        brand.background,
+    navbar:            brand.navbar,
 };
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -40,7 +38,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             defaultTheme: 'dark',
             themes: {
                 dark: {
-                    dark: true,
+                    dark: false,
                     colors,
                 },
             },

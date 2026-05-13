@@ -9,7 +9,7 @@ interface JobInput {
 }
 
 export class AccountantBridgeJobs {
-    //@Cron('accountant-bridge', '0 * * * *')
+    @Cron('accountant-bridge', '0 0 1 12 1')
     async run(log: JobHistoryEntity, input: JobInput = {}) {
         const from = input.from ?? DateTime.now().minus({ month: 1 }).startOf('month').toJSDate();
         const to = input.to ?? DateTime.now().minus({ month: 1 }).endOf('month').toJSDate();

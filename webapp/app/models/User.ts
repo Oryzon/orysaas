@@ -1,8 +1,3 @@
-export interface Role {
-    uuid: string;
-    name: string;
-}
-
 export interface User {
     uuid: string;
     email: string;
@@ -13,7 +8,6 @@ export interface User {
     canLogIn: boolean;
     isSaasAdmin: boolean;
     lastLogin: Date | null;
-    roles: Role[];
     createdAt: Date;
     updatedAt: Date | null;
 }

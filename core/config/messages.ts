@@ -43,4 +43,10 @@ export default class Messages {
     // Emails
     // -------------------------
     static MAIL_SUCCESS = "L'e-mail a bien été envoyé.";
+
+    // -------------------------
+    // Jobs
+    // -------------------------
+    static JOB_UPDATED = "Le job a été mis à jour.";
+    static JOB_RUNNED = "Le job vient d'être lancé.";
 }

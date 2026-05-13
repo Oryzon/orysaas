@@ -5,18 +5,12 @@
 }
 
 .gradient-primary {
-    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%) !important;
     color: white !important;
 }
-
-.bg-portal {
+.bg-brand-dark {
     position: relative;
-    background: linear-gradient(135deg, #0B0A12 0%, #2A1F3D 50%, #6D28D9 100%)
-}
-
-.bg-login {
-    position: relative;
-    background: linear-gradient(135deg, #0B0A12 0%, #2A1F3D 50%, #6D28D9 100%)
+    background: linear-gradient(135deg, var(--brand-bg-dark) 0%, var(--brand-bg-mid) 50%, var(--brand-bg-deep) 100%);
 }
 
 .bg-blob_top {
@@ -26,7 +20,7 @@
     width: 380px;
     height: 380px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(236,72,153,0.45), transparent 60%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--brand-accent) 45%, transparent), transparent 60%);
     filter: blur(20px);
 }
 
@@ -37,7 +31,7 @@
     width: 360px;
     height: 360px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(168,85,247,0.55), transparent 60%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--brand-primary) 55%, transparent), transparent 60%);
     filter: blur(20px);
 }
 
@@ -61,4 +55,8 @@
     font-size: 30px;
     letter-spacing: 0.05em;
     color: white;
+}
+
+.v-switch .v-switch__thumb {
+    background: white !important;
 }

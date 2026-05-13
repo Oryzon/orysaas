@@ -1,7 +1,7 @@
 <template>
     <NuxtLayout name="auth">
         <template #left>
-            <h2 class="mt-n4 text-primary font-weight-black text-headline-small">Bienvenue à bord</h2>
+            <h2 class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase">Bienvenue à bord.</h2>
 
             <h1 class="mt-n4 text-white font-weight-bold text-display-large">Lancez votre Saas en quelque jours.</h1>
 
@@ -24,6 +24,8 @@
                             variant="outlined"
                             :rules="[ rules.required() ]"
                             v-model="user.lastname"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         ></v-text-field>
                     </v-col>
 
@@ -34,6 +36,8 @@
                             variant="outlined"
                             :rules="[ rules.required() ]"
                             v-model="user.firstname"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         ></v-text-field>
                     </v-col>
 
@@ -44,6 +48,8 @@
                             variant="outlined"
                             :rules="[ rules.required() ]"
                             v-model="user.email"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         ></v-text-field>
                     </v-col>
 
@@ -55,6 +61,8 @@
                             variant="outlined"
                             :rules="[ rules.required() ]"
                             type="password"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         ></v-text-field>
 
                         <auth-password-strength
@@ -63,7 +71,12 @@
                     </v-col>
 
                     <v-col md="12" class="mt-n6 ml-n3">
-                        <v-checkbox label="J'accepte les CGU et la politique de confidentialité." color="primary"></v-checkbox>
+                        <v-checkbox
+                            label="J'accepte les CGU et la politique de confidentialité."
+                            color="primary"
+                            :loading="isLoading"
+                            :disabled="isLoading"
+                        ></v-checkbox>
                     </v-col>
 
                     <v-col md="12" class="mt-n8">
@@ -75,6 +88,8 @@
                             height="48"
                             append-icon="mdi-rocket-launch"
                             @click="handleRegister"
+                            :loading="isLoading"
+                            :disabled="isLoading"
                         >
                             Créer mon compte gratuit
                         </v-btn>
@@ -95,6 +110,8 @@ useConfigPage('Inscription');
 definePageMeta({
     layout: false
 });
+
+const isLoading = computed(() => api.isLoading('auth:register'));
 
 const router = useRouter();
 const form = ref();

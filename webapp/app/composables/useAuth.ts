@@ -3,7 +3,7 @@ import type { User } from "~/models/User";
 import { useNuxtApp } from "#app";
 
 type LoginDto = { email: string; password: string }
-type ResetDto = { uuidUser: string, newPassword: string, confNewPassword: string, username: string, password: string }
+type ResetDto = { uuidUser: string, newPassword: string, confNewPassword: string, password: string }
 type TokenPair = { token: string; refreshToken: string; message?: string }
 type ForgotPasswordDto = { email: string }
 type ResetPasswordDto = { token: string, newPassword: string, confNewPassword: string }
@@ -25,11 +25,10 @@ export const useAuth = () => {
     });
 
     const user = useState<User | null>('auth:user', () => null);
-    const permissionsLoaded = useState<boolean>('auth:permissionsLoaded', () => false); // 👈 NOUVEAU
     const loggedIn = computed(() => !!token.value);
 
     async function login(payload: LoginDto) {
-        const res = <TokenPair><unknown>await api.post<TokenPair>('/auth/login', payload, {
+        const res = await api.post<TokenPair>('/auth/login', payload, {
             auth: false,
             loadingKey: 'auth:login',
             toast: true,
@@ -46,13 +45,12 @@ export const useAuth = () => {
     }
 
     async function refreshUser(forceToken: string = '') {
-        permissionsLoaded.value = false;
         user.value = null;
 
         let datToken = forceToken || token.value;
 
         try {
-            user.value = <User><unknown>await api.get<User>('/user/me', {
+            user.value = await api.get<User>('/user/me', {
                 toast: false,
                 loadingKey: 'auth:login',
                 headers: {
@@ -62,13 +60,11 @@ export const useAuth = () => {
         } catch (error) {
             console.error('Failed to load user', error);
             nuxtApp.runWithContext(() => navigateTo('/login'));
-        } finally {
-            permissionsLoaded.value = true;
         }
     }
 
     async function logout(toast: boolean = true) {
-        const res = <unknown>await api.post<TokenPair>('/auth/logout', { refreshToken: rToken.value }, {
+        const res = await api.post<TokenPair>('/auth/logout', { refreshToken: rToken.value }, {
             toast: toast,
             auth: true,
             loadingKey: 'auth:logout'
@@ -77,7 +73,6 @@ export const useAuth = () => {
         token.value = null;
         rToken.value = null;
         user.value = null;
-        permissionsLoaded.value = false;
 
         nuxtApp.runWithContext(() => navigateTo('/login'));
     }
@@ -86,11 +81,12 @@ export const useAuth = () => {
         if (!rToken.value) {
             token.value = null;
             user.value = null;
+
             throw new Error('No refresh token');
         }
 
         try {
-            const res = <TokenPair><unknown>await api.post<TokenPair>('/auth/refresh', { refreshToken: rToken.value }, {
+            const res = await api.post<TokenPair>('/auth/refresh', { refreshToken: rToken.value }, {
                 auth: false,
                 toast: false,
                 loadingKey: 'auth:refresh'
@@ -101,6 +97,7 @@ export const useAuth = () => {
             token.value = null;
             rToken.value = null;
             user.value = null;
+
             throw err;
         }
     }
@@ -124,7 +121,6 @@ export const useAuth = () => {
     return {
         user,
         loggedIn,
-        permissionsLoaded,
         login,
         logout,
         refresh,

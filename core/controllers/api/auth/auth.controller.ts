@@ -84,7 +84,7 @@ export default class AuthController {
         }
 
         if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-            throw Messages.INCORRECT_PASSWORD;
+            throw Messages.USER_INCORRECT_DATA;
         }
 
         if (!user.isActive) {
@@ -148,7 +148,9 @@ export default class AuthController {
 
         return res
             .status(HttpCode.OK)
-            .send({ message: Messages.LOGOUT_DONE });
+            .send({
+                message: Messages.LOGOUT_DONE
+            });
     }
 
     @Post('/refresh')
@@ -159,7 +161,9 @@ export default class AuthController {
         if (!refreshToken) {
             return res
                 .status(HttpCode.UNAUTHORIZED)
-                .send({ message: Messages.REFRESH_TOKEN_NOT_FOUND });
+                .send({
+                    message: Messages.REFRESH_TOKEN_NOT_FOUND
+                });
         }
 
         const entity = await RefreshTokenRepository.findValid(refreshToken);
@@ -167,23 +171,36 @@ export default class AuthController {
         if (!entity) {
             return res
                 .status(HttpCode.UNAUTHORIZED)
-                .send({ message: Messages.REFRESH_TOKEN_EXPIRED });
+                .send({
+                    message: Messages.REFRESH_TOKEN_EXPIRED
+                });
         }
 
         const user = await UserRepository.findOne({
-            where: { uuid: Equal(entity.userUuid) },
-            select: { uuid: true, email: true, isActive: true, canLogIn: true },
+            where: {
+                uuid: Equal(entity.userUuid)
+            },
+            select: {
+                uuid: true,
+                email: true,
+                isActive: true,
+                canLogIn: true
+            },
         });
 
         if (!user || !user.isActive || !user.canLogIn) {
             return res
                 .status(HttpCode.FORBIDDEN)
-                .send({ message: Messages.USER_CAN_T_LOG_IN });
+                .send({
+                    message: Messages.USER_CAN_T_LOG_IN
+                });
         }
 
         return res
             .status(HttpCode.OK)
-            .send({ token: UserRepository.generateJwtToken(user) });
+            .send({
+                token: UserRepository.generateJwtToken(user)
+            });
     }
 
     @Post('/forgot-password')
@@ -191,7 +208,11 @@ export default class AuthController {
     async forgotPassword(req: Request, res: Response) {
         const { email } = req.body;
 
-        const user = await UserRepository.findOne({ where: { email: Equal(email) } });
+        const user = await UserRepository.findOne({
+            where: {
+                email: Equal(email)
+            }
+        });
 
         if (user && user.isActive) {
             const tokenEntity = await TokenRepository.createToken(user, 'reset_password', 1);
@@ -215,18 +236,26 @@ export default class AuthController {
     @Post('/reset-password')
     @Error()
     async resetPassword(req: Request, res: Response) {
-        const { token, newPassword, confNewPassword } = req.body;
+        const {
+            token,
+            newPassword,
+            confNewPassword
+        } = req.body;
 
         if (!newPassword || newPassword.length < 8) {
             return res
                 .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({ message: Messages.RESET_PASSWORD_TOO_SHORT });
+                .send({
+                    message: Messages.RESET_PASSWORD_TOO_SHORT
+                });
         }
 
         if (newPassword !== confNewPassword) {
             return res
                 .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({ message: Messages.RESET_PASSWORD_PASSWORDS_DONT_MATCH });
+                .send({
+                    message: Messages.RESET_PASSWORD_PASSWORDS_DONT_MATCH
+                });
         }
 
         const tokenEntity = await TokenRepository.findValid(token, 'reset_password');
@@ -234,16 +263,21 @@ export default class AuthController {
         if (!tokenEntity || tokenEntity.isExpired()) {
             return res
                 .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({ message: Messages.RESET_PASSWORD_INVALID_TOKEN });
+                .send({
+                    message: Messages.RESET_PASSWORD_INVALID_TOKEN
+                });
         }
 
         if (tokenEntity.isUsed()) {
             return res
                 .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({ message: Messages.RESET_PASSWORD_INVALID_TOKEN });
+                .send({
+                    message: Messages.RESET_PASSWORD_INVALID_TOKEN
+                });
         }
 
         const user = tokenEntity.user;
+
         user.password = newPassword;
         user.hashPassword();
 
@@ -252,6 +286,8 @@ export default class AuthController {
 
         return res
             .status(HttpCode.OK)
-            .send({ message: Messages.RESET_PASSWORD_DONE });
+            .send({
+                message: Messages.RESET_PASSWORD_DONE
+            });
     }
 }

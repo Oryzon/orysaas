@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <v-row no-gutters style="min-height: 100vh">
-            <v-col md="6" class="bg-login">
+            <v-col md="6" class="bg-brand-dark">
                 <div class="bg-blob_top"></div>
                 <div class="bg-blob_bottom"></div>
 
