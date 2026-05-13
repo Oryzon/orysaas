@@ -33,9 +33,9 @@ async function getUserPermissionKeys(userUuid: string): Promise<Set<string>> {
     });
 
     const keys = new Set<string>(
-        (dbUser?.roles ?? []).flatMap(role =>
-            (role.permissions ?? []).map(p => p.key)
-        )
+        // (dbUser?.roles ?? []).flatMap(role =>
+        //     (role.permissions ?? []).map(p => p.key)
+        // )
     );
 
     permissionCache.set(userUuid, { keys, expiresAt: Date.now() + CACHE_TTL_MS });

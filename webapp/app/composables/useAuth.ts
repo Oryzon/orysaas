@@ -1,7 +1,8 @@
 // composables/useAuth.ts
 import type { User } from "~/models/User";
+import { useNuxtApp } from "#app";
 
-type LoginDto = { username: string; password: string }
+type LoginDto = { email: string; password: string }
 type ResetDto = { uuidUser: string, newPassword: string, confNewPassword: string, username: string, password: string }
 type TokenPair = { token: string; refreshToken: string; message?: string }
 type ForgotPasswordDto = { email: string }
@@ -9,6 +10,7 @@ type ResetPasswordDto = { token: string, newPassword: string, confNewPassword: s
 
 export const useAuth = () => {
     const api = useApi();
+    const nuxtApp = useNuxtApp();
 
     const token = useCookie<string | null>('token', {
         sameSite: 'lax',
@@ -59,7 +61,7 @@ export const useAuth = () => {
             });
         } catch (error) {
             console.error('Failed to load user', error);
-            navigateTo('/admin/login');
+            nuxtApp.runWithContext(() => navigateTo('/login'));
         } finally {
             permissionsLoaded.value = true;
         }
@@ -68,7 +70,7 @@ export const useAuth = () => {
     async function logout(toast: boolean = true) {
         const res = <unknown>await api.post<TokenPair>('/auth/logout', { refreshToken: rToken.value }, {
             toast: toast,
-            auth: false,
+            auth: true,
             loadingKey: 'auth:logout'
         });
 
@@ -77,36 +79,30 @@ export const useAuth = () => {
         user.value = null;
         permissionsLoaded.value = false;
 
-        navigateTo('/admin/login');
-    }
-
-    async function resetAndLogin(payload: ResetDto) {
-        const res = <TokenPair><unknown>await api.post<TokenPair>('/auth/login-reset', payload, {
-            auth: false,
-            loadingKey: 'auth:login-reset',
-            toast: true,
-        });
-
-        token.value = res.token;
-        rToken.value = res.refreshToken;
-
-        await refreshUser();
-
-        return res;
+        nuxtApp.runWithContext(() => navigateTo('/login'));
     }
 
     async function refresh() {
         if (!rToken.value) {
-            return;
+            token.value = null;
+            user.value = null;
+            throw new Error('No refresh token');
         }
 
-        const res = <TokenPair><unknown>await api.post<TokenPair>('/auth/refresh', { refreshToken: rToken.value }, {
-            auth: false,
-            toast: false,
-            loadingKey: 'auth:refresh'
-        });
+        try {
+            const res = <TokenPair><unknown>await api.post<TokenPair>('/auth/refresh', { refreshToken: rToken.value }, {
+                auth: false,
+                toast: false,
+                loadingKey: 'auth:refresh'
+            });
 
-        token.value = res.token;
+            token.value = res.token;
+        } catch (err) {
+            token.value = null;
+            rToken.value = null;
+            user.value = null;
+            throw err;
+        }
     }
 
     async function forgotPassword(payload: ForgotPasswordDto) {
@@ -131,7 +127,6 @@ export const useAuth = () => {
         permissionsLoaded,
         login,
         logout,
-        resetAndLogin,
         refresh,
         refreshUser,
         forgotPassword,

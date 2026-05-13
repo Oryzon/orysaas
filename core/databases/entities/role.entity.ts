@@ -44,9 +44,6 @@ export class RoleEntity {
     })
     permissions: PermissionEntity[];
 
-    @ManyToMany(() => UserEntity, (user) => user.roles)
-    users: UserEntity[];
-
     @Column()
     @CreateDateColumn()
     createdAt: Date;

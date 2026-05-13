@@ -5,6 +5,7 @@ export default class Messages {
     // -------------------------
     static LOGIN_DONE = "Bienvenue.";
     static LOGOUT_DONE = "Vous avez bien été déconnecté.";
+    static USER_EMAIL_EXIST = 'Cette adresse e-mail est déjà utilisée.';
     static INCORRECT_PASSWORD = "Votre mot de passe est incorrect.";
     static USER_INCORRECT_DATA = "Merci de vérifier vos identifiants.";
     static USER_CAN_T_LOG_IN = "Vous ne pouvez pas vous connecter.";
@@ -15,6 +16,9 @@ export default class Messages {
     static REFRESH_TOKEN_REVOKED = "Cette session de connexion a été révoquée.";
     static REFRESH_TOKEN_EXPIRED = "Cette session de connexion a expiré, merci de vous reconnecter.";
     static REGISTER_IS_DISABLE = "Les inscriptions sont fermées.";
+    static ACCOUNT_VERIFIED = "Votre compte a été activé, vous pouvez maintenant vous connecter.";
+    static TOKEN_INVALID = "Ce lien d'activation est invalide ou a expiré.";
+    static TOKEN_ALREADY_USED = "Ce compte est déjà activé.";
     static FORGOT_PASSWORD_SENT = "Si cet e-mail est associé à un compte, vous recevrez un lien de réinitialisation dans quelques instants.";
     static RESET_PASSWORD_INVALID_TOKEN = "Ce lien de réinitialisation est invalide ou a expiré.";
     static RESET_PASSWORD_PASSWORDS_DONT_MATCH = "Les mots de passe ne correspondent pas.";

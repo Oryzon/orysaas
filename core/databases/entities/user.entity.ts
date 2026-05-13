@@ -19,28 +19,11 @@ export class UserEntity {
     @PrimaryGeneratedColumn('uuid')
     uuid: string;
 
-    @Column({ unique: true })
-    username: string;
-
     @Column()
     password: string;
 
     @Column({ unique: true })
     email: string;
-
-    @ManyToMany(() => RoleEntity, (role) => role.users, { cascade: true })
-    @JoinTable({
-        name: 'user_roles', // Name of the join table
-        joinColumn: {
-            name: 'userUuid',
-            referencedColumnName: 'uuid',
-        },
-        inverseJoinColumn: {
-            name: 'roleUuid',
-            referencedColumnName: 'uuid',
-        },
-    })
-    roles: RoleEntity[];
 
     @Column({ nullable: true })
     firstname: string;
@@ -54,11 +37,11 @@ export class UserEntity {
     @Column()
     canLogIn: boolean;
 
-    @Column()
-    needPasswordReset: boolean;
-
     @Column({ nullable: true })
     lastLogin: Date;
+
+    @Column()
+    isSaasAdmin: boolean;
 
     @Column()
     @CreateDateColumn()
@@ -96,7 +79,6 @@ export class UserEntity {
     @BeforeSoftRemove()
     setDeletedAt() {
         this.email = `deleted_${this.uuid}_${this.email}`;
-        this.username = `deleted_${this.uuid}_${this.username}`;
         this.deletedAt = DateTime.now().toJSDate();
         this.deletedBy = getUserUuid()
     }

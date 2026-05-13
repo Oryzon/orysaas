@@ -18,10 +18,6 @@ export interface ApiOptions<TBody = any> {
     json?: boolean
 }
 
-type ApiEnvelope<T> =
-    | { message: string; entity: T }
-    | Array<T>
-    | T;
 
 export const useApi = () => {
     // Global maps live across components
@@ -121,7 +117,7 @@ export const useApi = () => {
         method: HttpMethod,
         url: string,
         opts: ApiOptions<TBody> = {}
-    ): Promise<ApiEnvelope<T>> => {
+    ): Promise<T> => {
         const baseURL = opts.baseURL ?? runtime.public.apiBase ?? '/api';
         const key = opts.loadingKey ?? `${method}:${url}`;
         const dedupeKey = opts.dedupeKey;
@@ -142,18 +138,17 @@ export const useApi = () => {
         const headers = makeHeaders(opts);
 
         try {
-            const data = await $fetch<ApiEnvelope<T>>(url, {
+            const data = await $fetch<any>(url, {
                 method,
                 baseURL,
                 params: opts.params,
                 body: opts.body as any,
                 headers,
                 signal: controller.signal,
-            });
+            }) as T;
 
             if (opts.toast) {
-                // @ts-ignore
-                showToast('success', data?.message ?? 'Action OK.')
+                showToast('success', (data as any)?.message ?? 'Action OK.')
             }
 
             return data;
@@ -170,33 +165,44 @@ export const useApi = () => {
             const status = err?.status ?? err?.response?.status;
 
             if (status === 403) {
-                await navigateTo('/admin/dashboard');
+                await nuxtApp.runWithContext(() => navigateTo('/login'));
                 showToast('error', "Vous n'avez pas accès a cette page.");
 
                 throw status;
             }
 
             if (status === 401) {
-                await useAuth().refresh();
+                try {
+                    await nuxtApp.runWithContext(() => useAuth().refresh());
+                } catch {
+                    await nuxtApp.runWithContext(() => navigateTo('/login'));
+                    throw err;
+                }
 
                 try {
                     const replayHeaders = makeHeaders(opts);
-                    const data = await $fetch<ApiEnvelope<T>>(url, {
+                    const data = await $fetch<any>(url, {
                         method,
                         baseURL,
                         params: opts.params,
                         body: opts.body as any,
                         headers: replayHeaders,
                         signal: controller.signal,
-                    });
+                    }) as T;
 
                     if (opts.toast) {
-                        // @ts-ignore
-                        showToast('success', data?.message ?? 'Action OK.')
+                        showToast('success', (data as any)?.message ?? 'Action OK.')
                     }
 
                     return data;
                 } catch (err: any) {
+                    const replayStatus = err?.status ?? err?.response?.status;
+
+                    if (replayStatus === 401) {
+                        await nuxtApp.runWithContext(() => navigateTo('/login'));
+                        throw err;
+                    }
+
                     const apiMsg =
                         err?.data?.message ||
                         err?.response?._data?.message ||

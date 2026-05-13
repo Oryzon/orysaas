@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     build: {
         transpile: [
             'vuetify',
+            'toast',
         ]
     },
     vite: {
@@ -38,7 +39,7 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         public: {
-            title: 'OryScorp',
+            title: 'OrySaas',
             // @ts-ignore
             apiBase: process.env.API_URL || 'http://localhost:3001/v1/'
         }
