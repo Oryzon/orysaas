@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath } from 'node:url';
+
 export default defineNuxtConfig({
+    alias: {
+        '#shared': fileURLToPath(new URL('../shared', import.meta.url)),
+    },
     compatibilityDate: '2025-07-15',
     devtools: {
         enabled: true
