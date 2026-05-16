@@ -34,13 +34,10 @@ export class UserEntity {
     @Column()
     isActive: boolean;
 
-    @Column()
-    canLogIn: boolean;
-
     @Column({ nullable: true })
     lastLogin: Date;
 
-    @Column()
+    @Column({ default: false })
     isSaasAdmin: boolean;
 
     @Column()

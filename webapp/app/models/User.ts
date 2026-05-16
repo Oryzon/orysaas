@@ -5,7 +5,6 @@ export interface User {
     firstname: string | null;
     lastname: string | null;
     isActive: boolean;
-    canLogIn: boolean;
     isSaasAdmin: boolean;
     lastLogin: Date | null;
     createdAt: Date;

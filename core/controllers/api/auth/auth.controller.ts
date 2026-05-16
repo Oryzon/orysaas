@@ -9,6 +9,7 @@ import HttpCode from "../../../config/http-code";
 import { Equal } from "typeorm";
 import { DateTime } from "luxon";
 import { RefreshTokenRepository } from "../../../databases/repositories/refresh-token.repository";
+import { TokenType } from "../../../databases/entities/token.entity";
 
 @Controller('auth')
 export default class AuthController {
@@ -42,13 +43,12 @@ export default class AuthController {
         user.email = email;
         user.password = password;
         user.isActive = false;
-        user.canLogIn = false;
 
         user.hashPassword();
 
         await UserRepository.save(user);
 
-        const tokenEntity = await TokenRepository.createToken(user, 'verify_account', 24);
+        const tokenEntity = await TokenRepository.createToken(user, TokenType.verify_account, 24);
 
         await new MailService().send({
             to: email,
@@ -91,10 +91,6 @@ export default class AuthController {
             throw Messages.USER_NOT_ENABLE;
         }
 
-        if (!user.canLogIn) {
-            throw Messages.USER_CAN_T_LOG_IN;
-        }
-
         user.lastLogin = DateTime.now().toJSDate();
         await UserRepository.save(user);
 
@@ -110,7 +106,7 @@ export default class AuthController {
     async verify(req: Request, res: Response) {
         const { token } = req.query as { token: string };
 
-        const tokenEntity = await TokenRepository.findValid(token, 'verify_account');
+        const tokenEntity = await TokenRepository.findValid(token, TokenType.verify_account);
 
         if (!tokenEntity || tokenEntity.isExpired()) {
             return res
@@ -126,7 +122,6 @@ export default class AuthController {
 
         const user = tokenEntity.user;
         user.isActive = true;
-        user.canLogIn = true;
 
         await UserRepository.save(user);
         await TokenRepository.markAsUsed(tokenEntity);
@@ -184,11 +179,10 @@ export default class AuthController {
                 uuid: true,
                 email: true,
                 isActive: true,
-                canLogIn: true
             },
         });
 
-        if (!user || !user.isActive || !user.canLogIn) {
+        if (!user || !user.isActive) {
             return res
                 .status(HttpCode.FORBIDDEN)
                 .send({
@@ -215,7 +209,7 @@ export default class AuthController {
         });
 
         if (user && user.isActive) {
-            const tokenEntity = await TokenRepository.createToken(user, 'reset_password', 1);
+            const tokenEntity = await TokenRepository.createToken(user, TokenType.reset_password, 1);
 
             await new MailService().send({
                 to: email,
@@ -258,7 +252,7 @@ export default class AuthController {
                 });
         }
 
-        const tokenEntity = await TokenRepository.findValid(token, 'reset_password');
+        const tokenEntity = await TokenRepository.findValid(token, TokenType.reset_password);
 
         if (!tokenEntity || tokenEntity.isExpired()) {
             return res
