@@ -26,10 +26,19 @@
                         </template>
 
                         <template v-slot:item.actions="{ item }">
+                            <portal-jobs-run
+                                :entity="item"
+                            ></portal-jobs-run>
+
                             <portal-jobs-edit
                                 :entity="item"
                                 @updated="updateToJobs"
                             ></portal-jobs-edit>
+
+                            <portal-jobs-enable-disable
+                                :entity="item"
+                                @updated="updateToJobs"
+                            ></portal-jobs-enable-disable>
                             
                             <portal-jobs-history
                                 :entity="item"
