@@ -9,7 +9,11 @@ import {
 import { DateTime } from "luxon";
 import { UserEntity } from "./user.entity";
 
-export type TokenType = 'verify_account' | 'reset_password' | 'invite';
+export enum TokenType {
+    verify_account = 'verify_account',
+    reset_password = 'reset_password',
+    invite = 'invite'
+}
 
 @Entity()
 export class TokenEntity {
@@ -19,7 +23,7 @@ export class TokenEntity {
     @Column({ unique: true })
     token: string;
 
-    @Column()
+    @Column({ type: "enum", enum: TokenType })
     type: TokenType;
 
     @Column()

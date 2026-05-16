@@ -75,10 +75,11 @@
 
                     <v-col md="6" class="mt-n6 ml-n3">
                         <v-checkbox
-                            label="Resté connecté ?"
+                            label="Rester connecté ?"
                             color="primary"
                             :loading="isLoading"
                             :disabled="isLoading"
+                            v-model="stayConnected"
                         ></v-checkbox>
                     </v-col>
 
@@ -128,6 +129,7 @@ const form = ref();
 const isFormValid = ref(false);
 const rules = useValidationRules();
 const user = ref<Partial<User>>({});
+const stayConnected = ref<Boolean>(false);
 
 const verification = reactive({ success: false, message: '' });
 
@@ -151,9 +153,10 @@ onMounted(async () => {
 });
 
 const handleLogin = async () => {
-    let res = <any><unknown>await login({
+    let res = await login({
         email: user.value.email,
-        password: user.value.password
+        password: user.value.password,
+        stayConnected: stayConnected.value
     });
 
     await router.replace('/portal/dashboard/'); // fast, replaces history

@@ -2,7 +2,7 @@
 import type { User } from "~/models/User";
 import { useNuxtApp } from "#app";
 
-type LoginDto = { email: string; password: string }
+type LoginDto = { email: string; password: string, stayConnected: boolean }
 type ResetDto = { uuidUser: string, newPassword: string, confNewPassword: string, password: string }
 type TokenPair = { token: string; refreshToken: string; message?: string }
 type ForgotPasswordDto = { email: string }
@@ -21,7 +21,6 @@ export const useAuth = () => {
     const rToken = useCookie<string | null>('refreshToken', {
         sameSite: 'lax',
         secure: !import.meta.dev,
-        maxAge: 60 * 60 * 24 * 30
     });
 
     const user = useState<User | null>('auth:user', () => null);
@@ -35,7 +34,18 @@ export const useAuth = () => {
         });
 
         token.value = res.token;
-        rToken.value = res.refreshToken;
+
+        const maxAge = payload.stayConnected ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
+
+        const rTokenWithExpiry = await nuxtApp.runWithContext(() =>
+            useCookie<string | null>('refreshToken', {
+                sameSite: 'lax',
+                secure: !import.meta.dev,
+                maxAge,
+            })
+        );
+
+        rTokenWithExpiry.value = res.refreshToken;
 
         if (res.token) {
             await refreshUser(res.token);
