@@ -1,12 +1,122 @@
 <template>
-    <div class="d-flex flex-column align-items-center" style="gap: 10px">
-        <google-auth />
-        <facebook-auth />
-        <github-auth />
-    </div>
+    <v-row>
+        <v-col v-for="provider in providers" :key="provider.name" md="4">
+            <v-btn
+                block
+                variant="outlined"
+                color="grey-darken-1"
+                @click="provider.action"
+            >
+                <template v-slot:prepend>
+                    <svg
+                        v-if="provider.key === 'google'"
+                        style="width: 20px; height: 20px"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            xmlns="http://www.w3.org/2000/svg"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4"
+                        />
+                        <path
+                            xmlns="http://www.w3.org/2000/svg"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853"
+                        />
+                        <path
+                            xmlns="http://www.w3.org/2000/svg"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            fill="#FBBC05"
+                        />
+                        <path
+                            xmlns="http://www.w3.org/2000/svg"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335"
+                        />
+                    </svg>
+
+                    <svg
+                        v-else
+                        style="width: 20px; height: 20px"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            :fill="provider.iconColor"
+                            :d="brandIcons[provider.key]"
+                        />
+                    </svg>
+                </template>
+
+                {{ provider.name }}
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
+
 <script setup lang="ts">
-import GoogleAuth from "~/components/auth/google-auth.vue";
-import FacebookAuth from "~/components/auth/facebook-auth.vue";
-import GithubAuth from "~/components/auth/github-auth.vue";
+const config = useRuntimeConfig();
+
+const brandIcons: Record<string, string> = {
+    facebook: `M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z`,
+    microsoft: `M0 0h11.422v11.422H0zm12.578 0H24v11.422H12.578zM0 12.578h11.422V24H0zm12.578 0H24V24H12.578z`,
+};
+
+const loginWithGoogle = () => {
+    const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+
+    const options = {
+        redirect_uri: `${config.public.apiBase}auth/callback/google`,
+        client_id: config.public.googleClientId,
+        access_type: "offline",
+        response_type: "code",
+        prompt: "consent",
+        scope: [
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email",
+        ].join(" "),
+    };
+
+    const qs = new URLSearchParams(options).toString();
+    window.location.href = `${rootUrl}?${qs}`;
+};
+
+const loginWithFacebook = () => {
+    alert("Not implemented yet");
+};
+
+const loginWithMicrosoft = () => {
+    alert("Not implemented yet");
+};
+
+const providers: {
+    name: string;
+    key: string;
+    iconColor?: string;
+    action: () => void;
+}[] = [
+    {
+        name: "Google",
+        key: "google",
+        action: loginWithGoogle,
+    },
+    {
+        name: "Facebook",
+        key: "facebook",
+        iconColor: "#1877F2",
+        action: loginWithFacebook,
+    },
+    {
+        name: "Microsoft",
+        key: "microsoft",
+        iconColor: "#00A4EF",
+        action: loginWithMicrosoft,
+    },
+];
 </script>
+
+<style scoped>
+.custom-btn {
+    border: 1px solid #cacaca !important;
+    color: #333333 !important;
+}
+</style>

@@ -63,14 +63,14 @@
 
             <h1>Connexion</h1>
 
-            <providers-banner />
-
             <h4>
                 Vous n'avez pas encore de compte ?
                 <v-btn color="primary" variant="text" to="register"
                     >S'inscrire.</v-btn
                 >
             </h4>
+
+            <providers-banner />
 
             <v-divider>OU</v-divider>
 

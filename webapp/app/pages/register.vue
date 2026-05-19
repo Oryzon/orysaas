@@ -20,14 +20,14 @@
         <template #right>
             <h1>Créer un compte</h1>
 
-            <providers-banner />
-
             <h4>
                 Déjà inscrit ?
                 <v-btn color="primary" variant="text" to="login"
                     >Se connecter</v-btn
                 >
             </h4>
+
+            <providers-banner />
 
             <v-divider>OU</v-divider>
 
