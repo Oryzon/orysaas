@@ -5,5 +5,6 @@ useConfigPage("Tableau de bord");
 
 definePageMeta({
     layout: "portal",
+    middleware: "auth",
 });
 </script>

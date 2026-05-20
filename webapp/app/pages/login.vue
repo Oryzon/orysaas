@@ -164,12 +164,18 @@ const verification = reactive({ success: false, message: "" });
 
 onMounted(async () => {
     const token = route.query.token as string;
-
-    if (!token) {
-        return;
-    }
+    const error = route.query.error as string;
 
     await router.replace({ query: {} });
+
+    if (error) {
+        verification.success = false;
+        verification.message = error;
+
+        return;
+    } else if (!token) {
+        return;
+    }
 
     let res = <any>(<unknown>await api.get(`auth/verify?token=${token}`, {
         loadingKey: "auth:verify",

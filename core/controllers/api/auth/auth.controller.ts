@@ -13,6 +13,33 @@ import { Equal } from "typeorm";
 import { DateTime } from "luxon";
 import { RefreshTokenRepository } from "../../../databases/repositories/refresh-token.repository";
 import crypto from "crypto";
+import { TokenEntity } from "../../../databases/entities/token.entity";
+
+type OAuthUserData = {
+    email?: string;
+    firstname?: string;
+    lastname?: string;
+    name?: string;
+};
+
+type OAuthCallbackOptions = {
+    origin: UserOrigin;
+    code: unknown;
+    authError?: unknown;
+    getAccessToken: (code: string) => Promise<string | null>;
+    getUserData: (accessToken: string) => Promise<OAuthUserData | null>;
+};
+
+type OAuthLoginResult =
+    | {
+          ok: true;
+          user: UserEntity;
+      }
+    | {
+          ok: false;
+          status: number;
+          message: string;
+      };
 
 @Controller("auth")
 export default class AuthController {
@@ -103,6 +130,54 @@ export default class AuthController {
             message: "Bon retour parmis nous !",
             token: UserRepository.generateJwtToken(user),
             refreshToken: await RefreshTokenRepository.createToken(user.uuid),
+        });
+    }
+
+    @Post("/social-login")
+    @Error()
+    async socialLogin(req: Request, res: Response) {
+        const { token } = req.body;
+
+        if (typeof token !== "string") {
+            return res.status(HttpCode.BAD_REQUEST).send({
+                message: "Token manquant",
+            });
+        }
+
+        const tokenEntity = await TokenRepository.findValid(
+            token,
+            "social_login",
+        );
+
+        if (!tokenEntity || tokenEntity.isExpired()) {
+            return res
+                .status(HttpCode.OK)
+                .send({ message: Messages.TOKEN_INVALID });
+        }
+
+        if (tokenEntity.isUsed()) {
+            return res
+                .status(HttpCode.OK)
+                .send({ message: Messages.TOKEN_ALREADY_USED });
+        }
+
+        const user = tokenEntity.user;
+        if (!user || !user.isActive || !user.canLogIn) {
+            return res.status(HttpCode.FORBIDDEN).send({
+                message: Messages.USER_CAN_T_LOG_IN,
+            });
+        }
+
+        const jwt = UserRepository.generateJwtToken(user);
+        const refreshToken = await RefreshTokenRepository.createToken(
+            user.uuid,
+        );
+
+        await TokenRepository.markAsUsed(tokenEntity);
+
+        return res.status(HttpCode.OK).send({
+            token: jwt,
+            refreshToken,
         });
     }
 
@@ -281,77 +356,285 @@ export default class AuthController {
     @Get("/callback/google")
     @Error()
     async googleCallback(req: Request, res: Response) {
-        const code = req.query.code;
-        const error = req.query.error;
+        return this.handleOAuthCallback(req, res, {
+            origin: UserOrigin.GOOGLE,
+            code: req.query.code,
+            authError: req.query.error,
+            getAccessToken: async (code: string) => {
+                const redirectUri =
+                    process.env.GOOGLE_REDIRECT_URI ||
+                    `${process.env.API_URL}/auth/callback/google`;
 
-        if (error) {
+                const params = new URLSearchParams();
+                params.append("code", code);
+                params.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
+                params.append(
+                    "client_secret",
+                    process.env.GOOGLE_CLIENT_SECRET || "",
+                );
+                params.append("redirect_uri", redirectUri);
+                params.append("grant_type", "authorization_code");
+
+                const tokenResponse = await fetch(
+                    "https://oauth2.googleapis.com/token",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: params.toString(),
+                    },
+                );
+
+                const tokenData = (await tokenResponse.json()) as {
+                    access_token?: string;
+                };
+
+                if (!tokenResponse.ok || !tokenData.access_token) {
+                    return null;
+                }
+
+                return tokenData.access_token;
+            },
+            getUserData: async (accessToken: string) => {
+                const userResponse = await fetch(
+                    "https://www.googleapis.com/oauth2/v2/userinfo",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    },
+                );
+
+                const userData = (await userResponse.json()) as {
+                    email?: string;
+                    given_name?: string;
+                    family_name?: string;
+                    name?: string;
+                };
+
+                if (!userResponse.ok) {
+                    return null;
+                }
+
+                return {
+                    email: userData.email,
+                    firstname: userData.given_name,
+                    lastname: userData.family_name,
+                    name: userData.name,
+                };
+            },
+        });
+    }
+
+    @Get("/callback/facebook")
+    @Error()
+    async facebookCallback(req: Request, res: Response) {
+        return this.handleOAuthCallback(req, res, {
+            origin: UserOrigin.FACEBOOK,
+            code: req.query.code,
+            authError: req.query.error,
+            getAccessToken: async (code: string) => {
+                const tokenUrl = new URL(
+                    "https://graph.facebook.com/v20.0/oauth/access_token",
+                );
+                tokenUrl.searchParams.append(
+                    "client_id",
+                    process.env.FACEBOOK_APP_ID || "",
+                );
+                tokenUrl.searchParams.append(
+                    "client_secret",
+                    process.env.FACEBOOK_APP_SECRET || "",
+                );
+                tokenUrl.searchParams.append(
+                    "redirect_uri",
+                    `${process.env.API_URL}/auth/callback/facebook`,
+                );
+                tokenUrl.searchParams.append("code", code);
+
+                const tokenResponse = await fetch(tokenUrl.toString());
+                const tokenData = (await tokenResponse.json()) as {
+                    access_token?: string;
+                };
+
+                if (!tokenResponse.ok || !tokenData.access_token) {
+                    return null;
+                }
+
+                return tokenData.access_token;
+            },
+            getUserData: async (accessToken: string) => {
+                const userUrl = new URL("https://graph.facebook.com/me");
+                userUrl.searchParams.append(
+                    "fields",
+                    "id,name,email,first_name,last_name",
+                );
+                userUrl.searchParams.append("access_token", accessToken);
+
+                const userResponse = await fetch(userUrl.toString());
+                const userData = (await userResponse.json()) as {
+                    email?: string;
+                    first_name?: string;
+                    last_name?: string;
+                    name?: string;
+                };
+
+                if (!userResponse.ok) {
+                    return null;
+                }
+
+                return {
+                    email: userData.email,
+                    firstname: userData.first_name,
+                    lastname: userData.last_name,
+                    name: userData.name,
+                };
+            },
+        });
+    }
+
+    @Get("/callback/microsoft")
+    @Error()
+    async microsoftCallback(req: Request, res: Response) {
+        return this.handleOAuthCallback(req, res, {
+            origin: UserOrigin.MICROSOFT,
+            code: req.query.code,
+            authError: req.query.error,
+            getAccessToken: async (code: string) => {
+                const tokenParams = new URLSearchParams({
+                    client_id: process.env.MICROSOFT_CLIENT_ID || "",
+                    client_secret: process.env.MICROSOFT_CLIENT_SECRET || "",
+                    code,
+                    redirect_uri: `${process.env.API_URL}/auth/callback/microsoft`,
+                    grant_type: "authorization_code",
+                });
+
+                const tokenResponse = await fetch(
+                    `https://login.microsoftonline.com/${process.env.MICROSOFT_TENANT_ID}/oauth2/v2.0/token`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: tokenParams.toString(),
+                    },
+                );
+
+                const tokenData = (await tokenResponse.json()) as {
+                    access_token?: string;
+                };
+
+                if (!tokenResponse.ok || !tokenData.access_token) {
+                    return null;
+                }
+
+                return tokenData.access_token;
+            },
+            getUserData: async (accessToken: string) => {
+                const userResponse = await fetch(
+                    "https://graph.microsoft.com/v1.0/me",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    },
+                );
+
+                const userData = (await userResponse.json()) as {
+                    userPrincipalName?: string;
+                    mail?: string;
+                    givenName?: string;
+                    surname?: string;
+                    displayName?: string;
+                };
+
+                if (!userResponse.ok) {
+                    return null;
+                }
+
+                return {
+                    email: userData.userPrincipalName || userData.mail,
+                    firstname: userData.givenName,
+                    lastname: userData.surname,
+                    name: userData.displayName,
+                };
+            },
+        });
+    }
+
+    private async handleOAuthCallback(
+        req: Request,
+        res: Response,
+        options: OAuthCallbackOptions,
+    ) {
+        const { origin, code, authError, getAccessToken, getUserData } =
+            options;
+
+        if (authError) {
             return res.redirect(`${process.env.HTTP_URL}/login`);
         }
 
-        if (!code || typeof code !== "string") {
+        if (typeof code !== "string") {
             return res.status(HttpCode.BAD_REQUEST).send({
                 message: "Code d'autorisation manquant",
             });
         }
 
-        const redirectUri =
-            process.env.GOOGLE_REDIRECT_URI ||
-            `${process.env.API_URL}/auth/callback/google`;
+        const accessToken = await getAccessToken(code);
 
-        const params = new URLSearchParams();
-        params.append("code", code);
-        params.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
-        params.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
-        params.append("redirect_uri", redirectUri);
-        params.append("grant_type", "authorization_code");
-
-        const tokenResponse = await fetch(
-            "https://oauth2.googleapis.com/token",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: params.toString(),
-            },
-        );
-
-        const tokenData = (await tokenResponse.json()) as {
-            access_token?: string;
-            error_description?: string;
-        };
-
-        if (!tokenResponse.ok || !tokenData.access_token) {
+        if (!accessToken) {
             return res.status(HttpCode.INTERNAL_ERROR).send({
-                message:
-                    tokenData.error_description ||
-                    "Erreur lors de la récupération du token Google",
+                message: "Erreur lors de la récupération du token",
             });
         }
 
-        const userResponse = await fetch(
-            "https://www.googleapis.com/oauth2/v2/userinfo",
+        const userData = await getUserData(accessToken);
+
+        if (!userData?.email) {
+            return res.status(HttpCode.INTERNAL_ERROR).send({
+                message: "Impossible de récupérer les informations utilisateur",
+            });
+        }
+
+        const userLoginResponse = await this.handleOriginUserLogin(
+            res,
             {
-                headers: {
-                    Authorization: `Bearer ${tokenData.access_token}`,
-                },
+                email: userData.email,
+                firstname: userData.firstname,
+                lastname: userData.lastname,
+                name: userData.name,
             },
+            origin,
         );
 
-        const userData = (await userResponse.json()) as {
-            email?: string;
-            given_name?: string;
-            family_name?: string;
+        if (userLoginResponse.ok === false) {
+            return (
+                res
+                    .status(userLoginResponse.status)
+                    // .send({
+                    //     message: userLoginResponse.message,
+                    // })
+                    .redirect(
+                        `${process.env.HTTP_URL}/login?error=${encodeURIComponent(userLoginResponse.message)}`,
+                    )
+            );
+        }
+
+        return res.redirect(
+            await this.buildPortalRedirectUrl(userLoginResponse.user),
+        );
+    }
+
+    private async handleOriginUserLogin(
+        res: Response,
+        userData: {
+            email: string;
+            firstname?: string;
+            lastname?: string;
             name?: string;
-        };
-
-        if (!userResponse.ok || !userData.email) {
-            return res.status(HttpCode.INTERNAL_ERROR).send({
-                message:
-                    "Impossible de récupérer les informations utilisateur Google",
-            });
-        }
-
+        },
+        origin: UserOrigin,
+    ): Promise<OAuthLoginResult> {
         let user = await UserRepository.findOne({
             where: {
                 email: Equal(userData.email),
@@ -365,39 +648,54 @@ export default class AuthController {
 
             user = new UserEntity();
             user.email = userData.email;
-            user.firstname = userData.given_name || firstnameFromName;
-            user.lastname = userData.family_name || lastnameFromName;
-            user.origin = UserOrigin.GOOGLE;
+            user.firstname = userData.firstname || firstnameFromName;
+            user.lastname = userData.lastname || lastnameFromName;
+            user.origin = origin;
             user.password = crypto.randomBytes(32).toString("hex");
             user.isActive = true;
             user.canLogIn = true;
             user.hashPassword();
 
             await UserRepository.save(user);
-        } else if (user.origin && user.origin !== UserOrigin.GOOGLE) {
-            throw Messages.USER_INCORRECT_ORIGIN;
+        } else if (user.origin && user.origin !== origin) {
+            return {
+                ok: false,
+                status: HttpCode.BAD_REQUEST,
+                message: Messages.USER_INCORRECT_ORIGIN,
+            };
         }
 
         if (!user.isActive) {
             throw Messages.USER_NOT_ENABLE;
         }
 
-        if (!user.canLogIn) {
-            throw Messages.USER_CAN_T_LOG_IN;
-        }
-
         user.lastLogin = DateTime.now().toJSDate();
-        await UserRepository.save(user);
+        const savedUser = await UserRepository.save(user);
 
-        const token = UserRepository.generateJwtToken(user);
-        const refreshToken = await RefreshTokenRepository.createToken(
-            user.uuid,
-        );
+        return { ok: true, user: savedUser };
+    }
 
+    private async buildPortalRedirectUrl(user: UserEntity): Promise<string> {
         const redirectUrl = new URL(`${process.env.HTTP_URL}/portal/dashboard`);
-        redirectUrl.searchParams.set("token", token);
-        redirectUrl.searchParams.set("refreshToken", refreshToken);
 
-        return res.redirect(redirectUrl.toString());
+        const accessToken = await this.generateAccessDataToken(user);
+
+        redirectUrl.searchParams.set("social_token", accessToken);
+
+        return redirectUrl.toString();
+    }
+
+    private async generateAccessDataToken(user: UserEntity): Promise<string> {
+        const expiresAt = DateTime.now().plus({ minutes: 10 }).toJSDate();
+
+        const tokenEntity = new TokenEntity();
+        tokenEntity.token = crypto.randomUUID();
+        tokenEntity.type = "social_login";
+        tokenEntity.expiresAt = expiresAt;
+        tokenEntity.user = user;
+
+        const savedToken = await TokenRepository.save(tokenEntity);
+
+        return savedToken.token;
     }
 }

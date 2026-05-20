@@ -2,18 +2,14 @@ import { useNuxtApp } from "nuxt/app";
 
 export default defineNuxtRouteMiddleware(async (to) => {
     const nuxtApp = useNuxtApp();
-    const { loggedIn, user, refreshUser, token, rToken } = useAuth();
+    const { loggedIn, user, refreshUser, socialLogin } = useAuth();
 
-    const queryToken = typeof to.query.token === "string" ? to.query.token : "";
-    const queryRefreshToken =
-        typeof to.query.refreshToken === "string" ? to.query.refreshToken : "";
+    if (to.query.social_token) {
+        await socialLogin(to.query.social_token as string);
 
-    if (queryToken) {
-        token.value = queryToken;
-    }
+        to.query = {};
 
-    if (queryRefreshToken) {
-        rToken.value = queryRefreshToken;
+        return navigateTo(to, { replace: true });
     }
 
     if (!loggedIn.value) {

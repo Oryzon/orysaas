@@ -36,6 +36,9 @@ export default defineNuxtConfig({
             // @ts-ignore
             apiBase: process.env.API_URL || "http://localhost:3001/v1/",
             googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+            facebookAppId: process.env.FACEBOOK_APP_ID || "",
+            microsoftClientId: process.env.MICROSOFT_CLIENT_ID || "",
+            microsoftTenantId: process.env.MICROSOFT_TENANT_ID || "common",
         },
     },
     ogImage: { zeroRuntime: true },

@@ -76,6 +76,7 @@ useConfigPage("Jobs");
 
 definePageMeta({
     layout: "portal",
+    middleware: "auth",
 });
 
 const isLoading = computed(() => {

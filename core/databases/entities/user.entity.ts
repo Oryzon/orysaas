@@ -18,6 +18,8 @@ import { getUserUuid } from "../../helpers/request-context.helper";
 export enum UserOrigin {
     LOCAL = "local",
     GOOGLE = "google",
+    FACEBOOK = "facebook",
+    MICROSOFT = "microsoft",
 }
 
 @Entity()

@@ -53,6 +53,25 @@ export const useAuth = () => {
         return res;
     }
 
+    async function socialLogin(socialLoginToken: string) {
+        const res = await api.post<TokenPair>(
+            "/auth/social-login",
+            { token: socialLoginToken },
+            {
+                auth: false,
+                loadingKey: "auth:social-login",
+                toast: true,
+            },
+        );
+
+        token.value = res.token;
+        rToken.value = res.refreshToken;
+
+        if (res.token) {
+            await refreshUser(res.token);
+        }
+    }
+
     async function refreshUser(forceToken: string = "") {
         user.value = null;
 
@@ -144,7 +163,6 @@ export const useAuth = () => {
         refreshUser,
         forgotPassword,
         resetPassword,
-        token,
-        rToken,
+        socialLogin,
     };
 };
