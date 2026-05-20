@@ -28,7 +28,7 @@ export class JobHistoryEntity {
     @ManyToOne(() => JobSettingEntity)
     job: JobSettingEntity;
 
-    @Column()
+    @Column({ type: 'enum', enum: JobHistoryStatus, default: JobHistoryStatus.RUNNING })
     status: JobHistoryStatus;
 
     @Column({ nullable: true })

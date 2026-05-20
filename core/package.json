@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
-    "dev:load": "npm run tsc && node ./build/server.js",
+    "dev:load": "npm run tsc && node ./build/core/server.js",
     "tsc": "tsc ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

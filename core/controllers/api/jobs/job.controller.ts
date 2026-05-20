@@ -6,6 +6,7 @@ import { Runner } from "../../../jobs/runner";
 import HttpCode from "../../../config/http-code";
 import Messages from "../../../config/messages";
 import { JobHistoryRepository } from "../../../databases/repositories/job-history.repository";
+import { JobHistoryEntity } from "../../../databases/entities/job-history.entity";
 
 @Controller('job')
 export default class JobController {
@@ -57,6 +58,50 @@ export default class JobController {
         return res.status(HttpCode.OK).send({
             message: Messages.JOB_UPDATED,
             entity: job,
+        });
+    }
+
+    @Get('/:uuid/last-run')
+    @CheckJwt()
+    @Error()
+    async getLastRun(req: Request, res: Response) {
+        let uuidJob = req.params.uuid;
+
+        const lastRun = await JobHistoryRepository.findOne({
+            where: {
+                jobUuid: Equal(uuidJob)
+            },
+            order: {
+                createdAt: 'DESC'
+            }
+        });
+
+        if (lastRun) {
+            return res.status(HttpCode.OK).send(lastRun)
+        }
+
+        // No last run ? so give empty
+        return res.status(HttpCode.OK).send(new JobHistoryEntity());
+    }
+
+    @Post('/:uuid/run')
+    @CheckJwt()
+    @Error()
+    async run(req: Request, res: Response) {
+        let uuidJob = req.params.uuid;
+
+        let job = await JobSettingRepository.findOneOrFail({
+            where: {
+                uuid: Equal(uuidJob)
+            }
+        });
+
+        let registeredJobs = Runner.get(job.name);
+
+        Runner.execute(registeredJobs, req.body);
+
+        return res.status(HttpCode.OK).send({
+            message: Messages.JOB_RUNNED
         });
     }
 }

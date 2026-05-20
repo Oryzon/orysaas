@@ -9,17 +9,22 @@ import {
 import { DateTime } from "luxon";
 import { UserEntity } from "./user.entity";
 
-export type TokenType = 'verify_account' | 'reset_password' | 'invite';
+export enum TokenType {
+    verify_account = 'verify_account',
+    reset_password = 'reset_password',
+    invite = 'invite',
+    social_login = 'social_login'
+}
 
 @Entity()
 export class TokenEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column({ unique: true })
     token: string;
 
-    @Column()
+    @Column({ type: "enum", enum: TokenType })
     type: TokenType;
 
     @Column()
@@ -28,7 +33,7 @@ export class TokenEntity {
     @Column({ nullable: true })
     usedAt: Date;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
     user: UserEntity;
 
     @Column()

@@ -5,18 +5,26 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, JoinTable, ManyToMany,
+    Entity,
+    JoinTable,
+    ManyToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { RoleEntity } from "./role.entity";
+
+export enum UserOrigin {
+    LOCAL = "local",
+    GOOGLE = "google",
+    FACEBOOK = "facebook",
+    MICROSOFT = "microsoft",
+}
 
 @Entity()
 export class UserEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column()
@@ -31,16 +39,16 @@ export class UserEntity {
     @Column({ nullable: true })
     lastname: string;
 
-    @Column()
-    isActive: boolean;
+    @Column({ type: "enum", enum: UserOrigin, default: UserOrigin.LOCAL })
+    origin: UserOrigin;
 
     @Column()
-    canLogIn: boolean;
+    isActive: boolean;
 
     @Column({ nullable: true })
     lastLogin: Date;
 
-    @Column()
+    @Column({ default: false })
     isSaasAdmin: boolean;
 
     @Column()
@@ -54,7 +62,7 @@ export class UserEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column( { nullable: true })
+    @Column({ nullable: true })
     updatedBy: string;
 
     @Column({ nullable: true })
@@ -80,7 +88,7 @@ export class UserEntity {
     setDeletedAt() {
         this.email = `deleted_${this.uuid}_${this.email}`;
         this.deletedAt = DateTime.now().toJSDate();
-        this.deletedBy = getUserUuid()
+        this.deletedBy = getUserUuid();
     }
 
     hashPassword() {

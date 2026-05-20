@@ -9,7 +9,7 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "outDir": "./build",
-    "rootDir": "./",
+    "rootDir": "..",
     "resolveJsonModule": true,
     "sourceMap": true
   }

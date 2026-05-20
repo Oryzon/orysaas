@@ -28,11 +28,16 @@ export function CheckJwt() {
                 res.locals.jwtPayload = jwtPayload;
 
                 const user = await UserRepository.findOneOrFail({
-                    where: { uuid: Equal(jwtPayload.uuid) },
-                    select: { uuid: true, isActive: true, canLogIn: true },
+                    where: {
+                        uuid: Equal(jwtPayload.uuid)
+                    },
+                    select: {
+                        uuid: true,
+                        isActive: true,
+                    },
                 });
 
-                if (!user.isActive || !user.canLogIn) {
+                if (!user.isActive) {
                     return res.status(HttpCode.FORBIDDEN).send({ message: Messages.USER_CAN_T_LOG_IN });
                 }
 
