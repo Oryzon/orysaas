@@ -164,8 +164,6 @@ onMounted(async () => {
     await router.replace({ query });
 });
 
-const pageTitle = useState("pageTitle");
-
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
 
