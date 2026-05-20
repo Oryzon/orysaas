@@ -24,16 +24,12 @@ export default class Messages {
         "Votre compte a été activé, vous pouvez maintenant vous connecter.";
     static TOKEN_INVALID = "Ce lien d'activation est invalide ou a expiré.";
     static TOKEN_ALREADY_USED = "Ce compte est déjà activé.";
-    static FORGOT_PASSWORD_SENT =
-        "Si cet e-mail est associé à un compte, vous recevrez un lien de réinitialisation dans quelques instants.";
-    static RESET_PASSWORD_INVALID_TOKEN =
-        "Ce lien de réinitialisation est invalide ou a expiré.";
-    static RESET_PASSWORD_PASSWORDS_DONT_MATCH =
-        "Les mots de passe ne correspondent pas.";
-    static RESET_PASSWORD_TOO_SHORT =
-        "Le mot de passe doit contenir au moins 8 caractères.";
-    static RESET_PASSWORD_DONE =
-        "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
+    static FORGOT_PASSWORD_SENT = "Si cet e-mail est associé à un compte, vous recevrez un lien de réinitialisation dans quelques instants.";
+    static RESET_PASSWORD_INVALID_TOKEN = "Ce lien de réinitialisation est invalide ou a expiré.";
+    static RESET_PASSWORD_PASSWORDS_DONT_MATCH = "Les mots de passe ne correspondent pas.";
+    static RESET_PASSWORD_TOO_SHORT = "Le mot de passe doit contenir au moins 8 caractères.";
+    static RESET_PASSWORD_DONE = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
+    static USER_NOT_AUTHED = "Vous n'êtes pas identifié."
 
     // -------------------------
     // Utilisateurs
@@ -62,4 +58,11 @@ export default class Messages {
     // -------------------------
     static JOB_UPDATED = "Le job a été mis à jour.";
     static JOB_RUNNED = "Le job vient d'être lancé.";
+
+
+    // -------------------------
+    // Notifications
+    // -------------------------
+    static NOTIFICATION_READED = "Notification lue.";
+    static NOTIFICATIONS_READED = "Notifications lues.";
 }

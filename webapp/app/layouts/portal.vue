@@ -2,7 +2,7 @@
     <v-app>
         <v-navigation-drawer
             :rail="isCollapsed"
-            class="bg-brand-dark"
+            class="bg-brand-dark main-nav"
             :class="{ 'drawer-collapsed': isCollapsed }"
             :width="300"
             @mouseenter="isHovering = true"
@@ -64,17 +64,8 @@
 
             <v-spacer></v-spacer>
 
-            <v-btn
-                variant="tonal"
-                color="primary"
-                :width="56"
-                :height="56"
-                :min-width="0"
-                rounded="lg"
-                class="mr-2"
-            >
-                <v-icon size="32">mdi-bell-outline</v-icon>
-            </v-btn>
+            <notifications-bell
+            ></notifications-bell>
 
             <v-menu>
                 <template v-slot:activator="{ props }">
@@ -121,6 +112,19 @@
             </v-menu>
         </v-app-bar>
 
+        <v-navigation-drawer
+            v-model="notifOpen"
+            location="right"
+            temporary
+            width="600"
+            class="notif-drawer"
+        >
+            <transition name="notif-content">
+                <notifications-panel v-if="notifOpen"></notifications-panel>
+            </transition>
+        </v-navigation-drawer>
+
+
         <v-main>
             <v-container fluid>
                 <slot />
@@ -130,14 +134,17 @@
 </template>
 
 <script setup lang="ts">
-import { definePage } from "vue-router/dist/experimental/index.js";
+const notifOpen = useState('notif:drawer:open', () => false);
 
 const { menuIsOpen, toggleMenu } = useUserPreferences();
 const { user, logout } = useAuth();
+const { connect, disconnect } = useNotifications();
 
-definePage({
-    name: "PortalLayout",
-});
+// SSE parts, important to keep for notification system.
+onMounted(() => connect());
+onUnmounted(() => disconnect());
+
+const pageTitle = useState('pageTitle');
 
 const route = useRoute();
 const router = useRouter();
@@ -222,9 +229,13 @@ const userRole = computed(() => {
     pointer-events: none;
 }
 
-:deep(.v-navigation-drawer) {
+:deep(.v-navigation-drawer.main-nav) {
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     z-index: 999 !important;
+}
+
+:deep(.notif-drawer) {
+    transition: transform 0.35s cubic-bezier(0.34, 1.1, 0.64, 1) !important;
 }
 
 :deep(.v-app-bar) {
