@@ -1,15 +1,32 @@
 <template>
     <NuxtLayout name="auth">
         <template #left>
-            <h2 class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase">Heureux de vous revoir.</h2>
+            <h2
+                class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase"
+            >
+                Heureux de vous revoir.
+            </h2>
 
-            <h1 class="mt-n4 text-white font-weight-bold text-display-large">Reprenez là où vous l'avez laissé.</h1>
+            <h1 class="mt-n4 text-white font-weight-bold text-display-large">
+                Reprenez là où vous l'avez laissé.
+            </h1>
 
-            <h3 class="mt-n2 text-blue-grey-lighten-3">Votre dashboard, vos utilisateurs, vos métriques.<br /> Tout est resté en place.</h3>
+            <h3 class="mt-n2 text-blue-grey-lighten-3">
+                Votre dashboard, vos utilisateurs, vos métriques.<br />
+                Tout est resté en place.
+            </h3>
 
-            <v-card rounded="lg" variant="outlined" class="card-glass" color="white">
-                <v-card-text class="text-headline-small font-weight-black px-6 pt-6 pb-4">
-                    « Le seul outil dont j'ai vraiment eu besoin pour lancer en prod. »
+            <v-card
+                rounded="lg"
+                variant="outlined"
+                class="card-glass"
+                color="white"
+            >
+                <v-card-text
+                    class="text-headline-small font-weight-black px-6 pt-6 pb-4"
+                >
+                    « Le seul outil dont j'ai vraiment eu besoin pour lancer en
+                    prod. »
                 </v-card-text>
 
                 <v-card-actions class="px-4 pb-4">
@@ -21,9 +38,13 @@
                             ></v-avatar>
                         </template>
 
-                        <v-list-item-title class="font-weight-black">Vincent BOULANGER</v-list-item-title>
+                        <v-list-item-title class="font-weight-black"
+                            >Vincent BOULANGER</v-list-item-title
+                        >
 
-                        <v-list-item-subtitle>Président - OryScorp</v-list-item-subtitle>
+                        <v-list-item-subtitle
+                            >Président - OryScorp</v-list-item-subtitle
+                        >
                     </v-list-item>
                 </v-card-actions>
             </v-card>
@@ -42,7 +63,14 @@
 
             <h1>Connexion</h1>
 
-            <h4>Vous n'avez pas encore de compte ? <v-btn color="primary" variant="text" to="register">S'inscrire.</v-btn></h4>
+            <h4>
+                Vous n'avez pas encore de compte ?
+                <v-btn color="primary" variant="text" to="register"
+                    >S'inscrire.</v-btn
+                >
+            </h4>
+
+            <providers-banner />
 
             <v-divider>OU</v-divider>
 
@@ -53,7 +81,7 @@
                             hide-details="auto"
                             label="Email"
                             variant="outlined"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                             v-model="user.email"
                             :loading="isLoading"
                             :disabled="isLoading"
@@ -65,7 +93,7 @@
                             hide-details="auto"
                             label="Mot de passe"
                             variant="outlined"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                             type="password"
                             v-model="user.password"
                             :loading="isLoading"
@@ -84,7 +112,9 @@
                     </v-col>
 
                     <v-col md="6" class="mt-n3 text-right">
-                        <v-btn class="mr-n3" variant="tonal" color="primary">Mot de passe oublié ?</v-btn>
+                        <v-btn class="mr-n3" variant="tonal" color="primary"
+                            >Mot de passe oublié ?</v-btn
+                        >
                     </v-col>
 
                     <v-col md="12" class="mt-n8">
@@ -110,19 +140,20 @@
 
 <script setup lang="ts">
 import type { User } from "~/models/User";
+import ProvidersBanner from "~/components/auth/providers-banner.vue";
 
 const api = useApi();
 
-useConfigPage('Connexion');
+useConfigPage("Connexion");
 
 definePageMeta({
-    layout: false
+    layout: false,
 });
 
 const route = useRoute();
 const router = useRouter();
 
-const isLoading = computed(() => api.isLoading('auth:login'));
+const isLoading = computed(() => api.isLoading("auth:login"));
 
 const { login, loggedIn } = useAuth();
 const form = ref();
@@ -131,22 +162,27 @@ const rules = useValidationRules();
 const user = ref<Partial<User>>({});
 const stayConnected = ref<Boolean>(false);
 
-const verification = reactive({ success: false, message: '' });
+const verification = reactive({ success: false, message: "" });
 
 onMounted(async () => {
     const token = route.query.token as string;
-
-    if (!token) {
-        return;
-    }
+    const error = route.query.error as string;
 
     await router.replace({ query: {} });
 
-    let res = <any><unknown>await api.get(`auth/verify?token=${token}`,
-        {
-            loadingKey: 'auth:verify',
-            toast: true
-        });
+    if (error) {
+        verification.success = false;
+        verification.message = error;
+
+        return;
+    } else if (!token) {
+        return;
+    }
+
+    let res = <any>(<unknown>await api.get(`auth/verify?token=${token}`, {
+        loadingKey: "auth:verify",
+        toast: true,
+    }));
 
     verification.success = true;
     verification.message = res.message;
@@ -159,13 +195,13 @@ const handleLogin = async () => {
         stayConnected: stayConnected.value
     });
 
-    await router.replace('/portal/dashboard/'); // fast, replaces history
-}
+    await router.replace("/portal/dashboard/"); // fast, replaces history
+};
 </script>
 
 <style scoped>
 .card-glass {
-    background: rgba(95, 95, 103, 0.30) !important;
+    background: rgba(95, 95, 103, 0.3) !important;
     backdrop-filter: blur(12px);
 }
 </style>

@@ -1,48 +1,45 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    compatibilityDate: '2025-07-15',
+    compatibilityDate: "2025-07-15",
     devtools: {
-        enabled: true
+        enabled: true,
     },
-    modules: [
-        '@nuxtjs/seo',
-        '@pinia/nuxt',
-        '@vueuse/nuxt'
-    ],
+    modules: ["@nuxtjs/seo", "@pinia/nuxt", "@vueuse/nuxt"],
     css: [
-        'vuetify/styles',
-        '@mdi/font/css/materialdesignicons.css',
-        '~/assets/css/main.css'
+        "vuetify/styles",
+        "@mdi/font/css/materialdesignicons.css",
+        "~/assets/css/main.css",
     ],
     devServer: {
         port: Number(process.env.PORT) || 3000,
     },
     build: {
-        transpile: [
-            'vuetify',
-            'toast',
-        ]
+        transpile: ["vuetify", "toast"],
     },
     vite: {
         ssr: {
-            noExternal: ['vuetify'],
+            noExternal: ["vuetify"],
         },
         optimizeDeps: {
             include: [
-                '@vue/devtools-core',
-                '@vue/devtools-kit',
-                'vuetify',
-                '@mdi/js',
-                'luxon',
+                "@vue/devtools-core",
+                "@vue/devtools-kit",
+                "vuetify",
+                "@mdi/js",
+                "luxon",
             ],
         },
     },
     runtimeConfig: {
         public: {
-            title: 'OrySaas',
+            title: "OrySaas",
             // @ts-ignore
-            apiBase: process.env.API_URL || 'http://localhost:3001/v1/'
-        }
+            apiBase: process.env.API_URL || "http://localhost:3001/v1/",
+            googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+            facebookAppId: process.env.FACEBOOK_APP_ID || "",
+            microsoftClientId: process.env.MICROSOFT_CLIENT_ID || "",
+            microsoftTenantId: process.env.MICROSOFT_TENANT_ID || "common",
+        },
     },
-    ogImage: { zeroRuntime: true }
-})
+    ogImage: { zeroRuntime: true },
+});

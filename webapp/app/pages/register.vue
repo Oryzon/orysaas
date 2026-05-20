@@ -1,17 +1,33 @@
 <template>
     <NuxtLayout name="auth">
         <template #left>
-            <h2 class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase">Bienvenue à bord.</h2>
+            <h2
+                class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase"
+            >
+                Bienvenue à bord.
+            </h2>
 
-            <h1 class="mt-n4 text-white font-weight-bold text-display-large">Lancez votre Saas en quelque jours.</h1>
+            <h1 class="mt-n4 text-white font-weight-bold text-display-large">
+                Lancez votre Saas en quelque jours.
+            </h1>
 
-            <h3 class="mt-n2 text-blue-grey-lighten-3">Pas de CB. 14 jours d'essai. Aucun engagement.<br />Vous pouvez tester aujourd'hui.</h3>
+            <h3 class="mt-n2 text-blue-grey-lighten-3">
+                Pas de CB. 14 jours d'essai. Aucun engagement.<br />Vous pouvez
+                tester aujourd'hui.
+            </h3>
         </template>
 
         <template #right>
             <h1>Créer un compte</h1>
 
-            <h4>Déjà inscrit ? <v-btn color="primary" variant="text" to="login">Se connecter</v-btn></h4>
+            <h4>
+                Déjà inscrit ?
+                <v-btn color="primary" variant="text" to="login"
+                    >Se connecter</v-btn
+                >
+            </h4>
+
+            <providers-banner />
 
             <v-divider>OU</v-divider>
 
@@ -22,7 +38,7 @@
                             hide-details="auto"
                             label="Nom"
                             variant="outlined"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                             v-model="user.lastname"
                             :loading="isLoading"
                             :disabled="isLoading"
@@ -34,7 +50,7 @@
                             hide-details="auto"
                             label="Prénom"
                             variant="outlined"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                             v-model="user.firstname"
                             :loading="isLoading"
                             :disabled="isLoading"
@@ -46,7 +62,7 @@
                             hide-details="auto"
                             label="E-mail"
                             variant="outlined"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                             v-model="user.email"
                             :loading="isLoading"
                             :disabled="isLoading"
@@ -59,7 +75,7 @@
                             hide-details="auto"
                             label="Mot de passe"
                             variant="outlined"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                             type="password"
                             :loading="isLoading"
                             :disabled="isLoading"
@@ -101,17 +117,18 @@
 </template>
 
 <script setup lang="ts">
+import ProvidersBanner from "~/components/auth/providers-banner.vue";
 import type { User } from "~/models/User";
 
 const api = useApi();
 
-useConfigPage('Inscription');
+useConfigPage("Inscription");
 
 definePageMeta({
-    layout: false
+    layout: false,
 });
 
-const isLoading = computed(() => api.isLoading('auth:register'));
+const isLoading = computed(() => api.isLoading("auth:register"));
 
 const router = useRouter();
 const form = ref();
@@ -127,15 +144,17 @@ const handleRegister = async () => {
         return;
     }
 
-    let res = await api.post<{ message: string }>(`auth/register`,
+    let res = await api.post<{ message: string }>(
+        `auth/register`,
         { ...user.value },
         {
-            loadingKey: 'auth:register',
-            toast: true
-        });
+            loadingKey: "auth:register",
+            toast: true,
+        },
+    );
 
-    if (res['message'] === "L'utilisateur a bien été crée.") {
-        await router.replace('/admin/login'); // fast, replaces history
+    if (res["message"] === "L'utilisateur a bien été crée.") {
+        await router.replace("/admin/login"); // fast, replaces history
     }
-}
+};
 </script>

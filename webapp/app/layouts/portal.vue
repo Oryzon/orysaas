@@ -11,13 +11,23 @@
             <div class="drawer-header">
                 <img src="/logo.png" alt="OrySaas" width="28" height="34" />
 
-                <span class="drawer-title">Ory<span class="text-primary">Saas</span></span>
+                <span class="drawer-title"
+                    >Ory<span class="text-primary">Saas</span></span
+                >
 
                 <v-spacer></v-spacer>
                 <v-spacer></v-spacer>
                 <v-spacer></v-spacer>
 
-                <v-btn variant="tonal" :color="!!menuIsOpen ? 'surface' : 'primary'" @click="toggleMenu" :width="48" :height="48" :min-width="0" rounded="lg">
+                <v-btn
+                    variant="tonal"
+                    :color="!!menuIsOpen ? 'surface' : 'primary'"
+                    @click="toggleMenu"
+                    :width="48"
+                    :height="48"
+                    :min-width="0"
+                    rounded="lg"
+                >
                     <v-icon>mdi-menu</v-icon>
                 </v-btn>
             </div>
@@ -32,7 +42,11 @@
                     to="/portal/dashboard"
                 />
 
-                <v-list-subheader class="mt-2 text-uppercase text-label-large" color="grey-lighten-2">Pilotage SaaS</v-list-subheader>
+                <v-list-subheader
+                    class="mt-2 text-uppercase text-label-large"
+                    color="grey-lighten-2"
+                    >Pilotage SaaS</v-list-subheader
+                >
 
                 <v-list-item
                     rounded="xl"
@@ -44,11 +58,21 @@
         </v-navigation-drawer>
 
         <v-app-bar height="82" color="navbar">
-            <v-app-bar-title class="font-weight-black">{{ pageTitle }}</v-app-bar-title>
+            <v-app-bar-title class="font-weight-black">{{
+                pageTitle
+            }}</v-app-bar-title>
 
             <v-spacer></v-spacer>
 
-            <v-btn variant="tonal" color="primary" :width="56" :height="56" :min-width="0" rounded="lg" class="mr-2">
+            <v-btn
+                variant="tonal"
+                color="primary"
+                :width="56"
+                :height="56"
+                :min-width="0"
+                rounded="lg"
+                class="mr-2"
+            >
                 <v-icon size="32">mdi-bell-outline</v-icon>
             </v-btn>
 
@@ -71,30 +95,30 @@
                         </v-avatar>
 
                         <div class="text-left">
-                            <div class="text-body-2 font-weight-bold">{{ userName }}</div>
+                            <div class="text-body-2 font-weight-bold">
+                                {{ userName }}
+                            </div>
                             <div class="text-caption">{{ userRole }}</div>
                         </div>
                     </v-btn>
                 </template>
 
                 <v-list width="300px">
-                <v-list-item @click="navigateTo('/admin/profil')">
-                    <v-list-item-title>
-                        <v-icon color="primary">mdi-cog</v-icon>
-                        Profil
-                    </v-list-item-title>
-                </v-list-item>
+                    <v-list-item @click="navigateTo('/admin/profil')">
+                        <v-list-item-title>
+                            <v-icon color="primary">mdi-cog</v-icon>
+                            Profil
+                        </v-list-item-title>
+                    </v-list-item>
 
-                <v-list-item @click="logout()">
-                    <v-list-item-title>
-                        <v-icon color="red">mdi-logout</v-icon>
-                        Déconnexion
-                    </v-list-item-title>
-                </v-list-item>
+                    <v-list-item @click="logout()">
+                        <v-list-item-title>
+                            <v-icon color="red">mdi-logout</v-icon>
+                            Déconnexion
+                        </v-list-item-title>
+                    </v-list-item>
                 </v-list>
             </v-menu>
-
-
         </v-app-bar>
 
         <v-main>
@@ -106,45 +130,72 @@
 </template>
 
 <script setup lang="ts">
+import { definePage } from "vue-router/dist/experimental/index.js";
+
 const { menuIsOpen, toggleMenu } = useUserPreferences();
 const { user, logout } = useAuth();
 
-const pageTitle = useState('pageTitle');
+definePage({
+    name: "PortalLayout",
+});
+
+const route = useRoute();
+const router = useRouter();
+
+onMounted(async () => {
+    if (
+        typeof route.query.token !== "string" &&
+        typeof route.query.refreshToken !== "string"
+    ) {
+        return;
+    }
+
+    const query = { ...route.query };
+    delete query.token;
+    delete query.refreshToken;
+
+    await router.replace({ query });
+});
+
+const pageTitle = useState("pageTitle");
 
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
 
 const userInitials = computed(() => {
     if (!user.value) {
-        return '?';
+        return "?";
     }
 
-    const f = user.value.firstname?.[0] ?? '';
-    const l = user.value.lastname?.[0] ?? '';
+    const f = user.value.firstname?.[0] ?? "";
+    const l = user.value.lastname?.[0] ?? "";
 
     return (f + l).toUpperCase() || user.value.email[0].toUpperCase();
 });
 
 const userName = computed(() => {
     if (!user.value) {
-        return '';
+        return "";
     }
 
-    const parts = [user.value.firstname, user.value.lastname ? `${user.value.lastname[0]}.` : null].filter(Boolean);
+    const parts = [
+        user.value.firstname,
+        user.value.lastname ? `${user.value.lastname[0]}.` : null,
+    ].filter(Boolean);
 
-    return parts.length ? parts.join(' ') : user.value.email;
+    return parts.length ? parts.join(" ") : user.value.email;
 });
 
 const userRole = computed(() => {
     if (!user.value) {
-        return '';
+        return "";
     }
 
     if (user.value.isSaasAdmin) {
-        return 'Propriétaire';
+        return "Propriétaire";
     }
 
-    return '';
+    return "";
 });
 </script>
 
@@ -177,8 +228,9 @@ const userRole = computed(() => {
 }
 
 :deep(.v-app-bar) {
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition:
+        left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 :deep(.v-main) {
@@ -207,14 +259,18 @@ const userRole = computed(() => {
 }
 
 :deep(.v-list-item--active::before) {
-    content: '';
+    content: "";
     position: absolute;
     left: -8px;
     top: 50%;
     transform: translateY(-50%);
     width: 3px;
     height: 55%;
-    background: linear-gradient(to bottom, var(--brand-primary), var(--brand-accent));
+    background: linear-gradient(
+        to bottom,
+        var(--brand-primary),
+        var(--brand-accent)
+    );
     border-radius: 0 3px 3px 0;
     z-index: 10;
 }

@@ -12,12 +12,13 @@ import { UserEntity } from "./user.entity";
 export enum TokenType {
     verify_account = 'verify_account',
     reset_password = 'reset_password',
-    invite = 'invite'
+    invite = 'invite',
+    social_login = 'social_login'
 }
 
 @Entity()
 export class TokenEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column({ unique: true })
@@ -32,7 +33,7 @@ export class TokenEntity {
     @Column({ nullable: true })
     usedAt: Date;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
     user: UserEntity;
 
     @Column()
