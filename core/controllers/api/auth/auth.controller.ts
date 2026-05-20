@@ -1,9 +1,6 @@
 import { CheckJwt, Controller, Error, Get, Post } from "../../../decorators";
 import { Request, Response } from "express";
-import {
-    UserEntity,
-    UserOrigin,
-} from "../../../databases/entities/user.entity";
+import { UserEntity, UserOrigin, } from "../../../databases/entities/user.entity";
 import { UserRepository } from "../../../databases/repositories/user.repository";
 import { TokenRepository } from "../../../databases/repositories/token.repository";
 import { MailService } from "../../../services/mail.service";
@@ -14,7 +11,6 @@ import { DateTime } from "luxon";
 import { RefreshTokenRepository } from "../../../databases/repositories/refresh-token.repository";
 import { TokenType } from "../../../databases/entities/token.entity";
 import crypto from "crypto";
-import { TokenEntity } from "../../../databases/entities/token.entity";
 
 type OAuthUserData = {
     email?: string;
@@ -138,7 +134,7 @@ export default class AuthController {
 
         const tokenEntity = await TokenRepository.findValid(
             token,
-            "social_login",
+            TokenType.social_login
         );
 
         if (!tokenEntity || tokenEntity.isExpired()) {
@@ -154,7 +150,8 @@ export default class AuthController {
         }
 
         const user = tokenEntity.user;
-        if (!user || !user.isActive || !user.canLogIn) {
+
+        if (!user || !user.isActive) {
             return res.status(HttpCode.FORBIDDEN).send({
                 message: Messages.USER_CAN_T_LOG_IN,
             });
@@ -635,7 +632,7 @@ export default class AuthController {
             user.origin = origin;
             user.password = crypto.randomBytes(32).toString("hex");
             user.isActive = true;
-            user.canLogIn = true;
+
             user.hashPassword();
 
             await UserRepository.save(user);
@@ -660,24 +657,10 @@ export default class AuthController {
     private async buildPortalRedirectUrl(user: UserEntity): Promise<string> {
         const redirectUrl = new URL(`${process.env.HTTP_URL}/portal/dashboard`);
 
-        const accessToken = await this.generateAccessDataToken(user);
+        const accessToken = await TokenRepository.createToken(user, TokenType.social_login);
 
-        redirectUrl.searchParams.set("social_token", accessToken);
+        redirectUrl.searchParams.set("social_token", accessToken.token);
 
         return redirectUrl.toString();
-    }
-
-    private async generateAccessDataToken(user: UserEntity): Promise<string> {
-        const expiresAt = DateTime.now().plus({ minutes: 10 }).toJSDate();
-
-        const tokenEntity = new TokenEntity();
-        tokenEntity.token = crypto.randomUUID();
-        tokenEntity.type = "social_login";
-        tokenEntity.expiresAt = expiresAt;
-        tokenEntity.user = user;
-
-        const savedToken = await TokenRepository.save(tokenEntity);
-
-        return savedToken.token;
     }
 }
