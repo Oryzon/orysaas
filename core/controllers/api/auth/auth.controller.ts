@@ -3,10 +3,13 @@ import { Request, Response } from "express";
 import { UserEntity, UserOrigin } from "../../../databases/entities/user.entity";
 import { UserRepository } from "../../../databases/repositories/user.repository";
 import { TokenRepository } from "../../../databases/repositories/token.repository";
+import { OrganizationInviteRepository } from "../../../databases/repositories/organization-invite.repository";
+import { OrganizationMemberRepository } from "../../../databases/repositories/organization-member.repository";
+import { OrganizationMemberEntity } from "../../../databases/entities/organization-member.entity";
 import { MailService } from "../../../services/mail.service";
 import Messages from "../../../config/messages";
 import HttpCode from "../../../config/http-code";
-import { Equal } from "typeorm";
+import { Equal, IsNull } from "typeorm";
 import { DateTime } from "luxon";
 import { RefreshTokenRepository } from "../../../databases/repositories/refresh-token.repository";
 import { TokenType } from "../../../databases/entities/token.entity";
@@ -75,11 +78,15 @@ export default class AuthController {
             template: "verify-account",
             variables: {
                 firstname,
-                verificationUrl: `${process.env.APP_URL}/verify?token=${tokenEntity.token}`,
+                verificationUrl: `${process.env.HTTP_URL}/login?token=${tokenEntity.token}`,
             },
         });
 
-        return res.status(HttpCode.OK).send({ message: Messages.USER_CREATED });
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.USER_CREATED
+            });
     }
 
     @Post("/login")
@@ -112,10 +119,13 @@ export default class AuthController {
         user.lastLogin = DateTime.now().toJSDate();
         await UserRepository.save(user);
 
+        const organization = await OrganizationMemberRepository.findLight(user.uuid);
+
         res.status(HttpCode.OK).send({
-            message: "Bon retour parmis nous !",
+            message: Messages.LOGIN_DONE,
             token: UserRepository.generateJwtToken(user),
             refreshToken: await RefreshTokenRepository.createToken(user.uuid),
+            organization: organization,
         });
     }
 
@@ -126,7 +136,7 @@ export default class AuthController {
 
         if (typeof token !== "string") {
             return res.status(HttpCode.BAD_REQUEST).send({
-                message: "Token manquant",
+                message: Messages.OAUTH_TOKEN_MISSING,
             });
         }
 
@@ -148,14 +158,16 @@ export default class AuthController {
             });
         }
 
-        const jwt = UserRepository.generateJwtToken(user);
+        const jwtToken = UserRepository.generateJwtToken(user);
         const refreshToken = await RefreshTokenRepository.createToken(user.uuid);
+        const organization = await OrganizationMemberRepository.findLight(user.uuid);
 
         await TokenRepository.markAsUsed(tokenEntity);
 
         return res.status(HttpCode.OK).send({
-            token: jwt,
+            token: jwtToken,
             refreshToken,
+            organization: organization,
         });
     }
 
@@ -180,7 +192,42 @@ export default class AuthController {
         await UserRepository.save(user);
         await TokenRepository.markAsUsed(tokenEntity);
 
-        return res.status(HttpCode.OK).send({ message: Messages.ACCOUNT_VERIFIED });
+        await OrganizationInviteRepository.acceptPendingInvites(user);
+
+        return res
+            .status(HttpCode.OK)
+            .send({ message: Messages.ACCOUNT_VERIFIED });
+    }
+
+    @Get("/invite/check")
+    @Error()
+    async checkInvite(req: Request, res: Response) {
+        const { token } = req.query as { token: string };
+
+        const invite = await OrganizationInviteRepository.findByToken(token);
+
+        if (!invite || DateTime.now().toJSDate() > invite.expiresAt) {
+            return res
+                .status(HttpCode.NOT_FOUND)
+                .send({
+                    message: Messages.ORGANIZATION_INVITE_NOT_FOUND
+                });
+        }
+
+        if (invite.acceptedAt) {
+            return res
+                .status(HttpCode.UNPROCESSABLE_ENTITY)
+                .send({
+                    message: Messages.ORGANIZATION_INVITE_ALREADY_ACCEPTED
+                });
+        }
+
+        return res.status(HttpCode.OK).send({
+            email: invite.email,
+            role: invite.role,
+            organizationName: invite.organization.name,
+            organizationSlug: invite.organization.slug,
+        });
     }
 
     @Post("/logout")
@@ -501,7 +548,7 @@ export default class AuthController {
 
         if (typeof code !== "string") {
             return res.status(HttpCode.BAD_REQUEST).send({
-                message: "Code d'autorisation manquant",
+                message: Messages.OAUTH_CODE_MISSING,
             });
         }
 
@@ -509,7 +556,7 @@ export default class AuthController {
 
         if (!accessToken) {
             return res.status(HttpCode.INTERNAL_ERROR).send({
-                message: "Erreur lors de la récupération du token",
+                message: Messages.OAUTH_TOKEN_FETCH_ERROR,
             });
         }
 
@@ -517,7 +564,7 @@ export default class AuthController {
 
         if (!userData?.email) {
             return res.status(HttpCode.INTERNAL_ERROR).send({
-                message: "Impossible de récupérer les informations utilisateur",
+                message: Messages.OAUTH_USER_FETCH_ERROR,
             });
         }
 

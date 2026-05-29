@@ -1,15 +1,23 @@
 // composables/useAuth.ts
 import type { User } from "~/models/User";
 import { useNuxtApp } from "#app";
+import type { OrganizationMemberRole } from "#shared/organization-roles";
 
-type LoginDto = { email: string; password: string };
+type LoginDto = {
+    stayConnected: any;
+    email: string;
+    password: string
+};
+
 type ResetDto = {
     uuidUser: string;
     newPassword: string;
     confNewPassword: string;
     password: string;
 };
-type TokenPair = { token: string; refreshToken: string; message?: string };
+
+type Organization = { slug: string | null; name: string | null; logoUrl: string | null; nbMembers: number; role: OrganizationMemberRole | null };
+type TokenPair = { token: string; refreshToken: string; organization?: Organization | null; message?: string };
 type ForgotPasswordDto = { email: string };
 type ResetPasswordDto = {
     token: string;
@@ -32,6 +40,12 @@ export const useAuth = () => {
         secure: !import.meta.dev,
     });
 
+    const currentOrganization = useCookie<Organization | null>("organization", {
+        sameSite: "lax",
+        secure: !import.meta.dev,
+        maxAge: 60 * 60 * 24 * 30,
+    });
+
     const user = useState<User | null>("auth:user", () => null);
     const loggedIn = computed(() => !!token.value);
 
@@ -43,6 +57,7 @@ export const useAuth = () => {
         });
 
         token.value = res.token;
+        currentOrganization.value = res.organization ?? null;
 
         const maxAge = payload.stayConnected ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
 
@@ -76,10 +91,21 @@ export const useAuth = () => {
 
         token.value = res.token;
         rToken.value = res.refreshToken;
+        currentOrganization.value = res.organization ?? null;
 
         if (res.token) {
             await refreshUser(res.token);
         }
+    }
+
+    async function refreshOrganization(slug?: string) {
+        const org = await api.get<Organization>("/user/organization", {
+            toast: false,
+            loadingKey: "auth:organization",
+            params: slug ? { slug } : undefined,
+        });
+
+        currentOrganization.value = org ?? null;
     }
 
     async function refreshUser(forceToken: string = "") {
@@ -115,6 +141,7 @@ export const useAuth = () => {
         token.value = null;
         rToken.value = null;
         user.value = null;
+        currentOrganization.value = null;
 
         nuxtApp.runWithContext(() => navigateTo("/login"));
     }
@@ -143,6 +170,7 @@ export const useAuth = () => {
             token.value = null;
             rToken.value = null;
             user.value = null;
+            currentOrganization.value = null;
 
             throw err;
         }
@@ -167,10 +195,12 @@ export const useAuth = () => {
     return {
         user,
         loggedIn,
+        currentOrganization,
         login,
         logout,
         refresh,
         refreshUser,
+        refreshOrganization,
         forgotPassword,
         resetPassword,
         socialLogin,

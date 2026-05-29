@@ -34,6 +34,11 @@
 
             <v-divider />
 
+            <portal-tenant-organization-switch
+                v-if="!user?.isSaasAdmin"
+                :is-collapsed="isCollapsed"
+            ></portal-tenant-organization-switch>
+
             <v-list color="primary" base-color="white" nav>
                 <v-list-item
                     rounded="xl"
@@ -43,24 +48,50 @@
                 />
 
                 <v-list-subheader
+                    v-if="user?.isSaasAdmin"
                     class="mt-2 text-uppercase text-label-large"
                     color="grey-lighten-2"
                     >Pilotage SaaS</v-list-subheader
                 >
 
                 <v-list-item
+                    v-if="user?.isSaasAdmin"
                     rounded="xl"
                     prepend-icon="mdi-file-tree"
                     title="Jobs"
                     to="/portal/jobs"
                 />
+
+                <v-list-subheader
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    class="mt-2 text-uppercase text-label-large"
+                    color="grey-lighten-2"
+                >
+                    Configuration
+                </v-list-subheader>
+
+                <v-list-item
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    rounded="xl"
+                    prepend-icon="mdi-account-group"
+                    title="Membres"
+                    :to="`/portal/${currentOrganization?.slug}/members`"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    rounded="xl"
+                    prepend-icon="mdi-cog"
+                    title="Paramètres"
+                    :to="`/portal/${currentOrganization?.slug}/settings`"
+                ></v-list-item>
             </v-list>
         </v-navigation-drawer>
 
         <v-app-bar height="82" color="navbar">
-            <v-app-bar-title class="font-weight-black">{{
-                pageTitle
-            }}</v-app-bar-title>
+            <v-app-bar-title class="font-weight-black">
+                {{ pageTitle }}
+            </v-app-bar-title>
 
             <v-spacer></v-spacer>
 
@@ -124,7 +155,6 @@
             </transition>
         </v-navigation-drawer>
 
-
         <v-main>
             <v-container fluid>
                 <slot />
@@ -134,10 +164,12 @@
 </template>
 
 <script setup lang="ts">
+import { OrganizationMemberRoleLabel } from "~/models/OrganizationMember";
+
 const notifOpen = useState('notif:drawer:open', () => false);
 
 const { menuIsOpen, toggleMenu } = useUserPreferences();
-const { user, logout } = useAuth();
+const { user, logout, currentOrganization } = useAuth();
 const { connect, disconnect } = useNotifications();
 
 // SSE parts, important to keep for notification system.
@@ -198,6 +230,10 @@ const userRole = computed(() => {
 
     if (user.value.isSaasAdmin) {
         return "Propriétaire";
+    }
+
+    if (currentOrganization.value?.role) {
+        return OrganizationMemberRoleLabel[currentOrganization.value.role];
     }
 
     return "";
