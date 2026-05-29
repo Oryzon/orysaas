@@ -1,6 +1,6 @@
 import { CheckJwt, Controller, Error, Get, Post } from "../../../decorators";
 import { Request, Response } from "express";
-import { UserEntity, UserOrigin, } from "../../../databases/entities/user.entity";
+import { UserEntity, UserOrigin } from "../../../databases/entities/user.entity";
 import { UserRepository } from "../../../databases/repositories/user.repository";
 import { TokenRepository } from "../../../databases/repositories/token.repository";
 import { OrganizationInviteRepository } from "../../../databases/repositories/organization-invite.repository";
@@ -55,9 +55,7 @@ export default class AuthController {
         });
 
         if (existing) {
-            return res
-                .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({ message: Messages.USER_EMAIL_EXIST });
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({ message: Messages.USER_EMAIL_EXIST });
         }
 
         const user = new UserEntity();
@@ -142,21 +140,14 @@ export default class AuthController {
             });
         }
 
-        const tokenEntity = await TokenRepository.findValid(
-            token,
-            TokenType.social_login
-        );
+        const tokenEntity = await TokenRepository.findValid(token, TokenType.social_login);
 
         if (!tokenEntity || tokenEntity.isExpired()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_INVALID });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_INVALID });
         }
 
         if (tokenEntity.isUsed()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_ALREADY_USED });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_ALREADY_USED });
         }
 
         const user = tokenEntity.user;
@@ -188,15 +179,11 @@ export default class AuthController {
         const tokenEntity = await TokenRepository.findValid(token, TokenType.verify_account);
 
         if (!tokenEntity || tokenEntity.isExpired()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_INVALID });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_INVALID });
         }
 
         if (tokenEntity.isUsed()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_ALREADY_USED });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_ALREADY_USED });
         }
 
         const user = tokenEntity.user;
@@ -289,11 +276,9 @@ export default class AuthController {
         });
 
         if (!user || !user.isActive) {
-            return res
-                .status(HttpCode.FORBIDDEN)
-                .send({
-                    message: Messages.USER_CAN_T_LOG_IN
-                });
+            return res.status(HttpCode.FORBIDDEN).send({
+                message: Messages.USER_CAN_T_LOG_IN,
+            });
         }
 
         return res.status(HttpCode.OK).send({
@@ -326,9 +311,7 @@ export default class AuthController {
             });
         }
 
-        return res
-            .status(HttpCode.OK)
-            .send({ message: Messages.FORGOT_PASSWORD_SENT });
+        return res.status(HttpCode.OK).send({ message: Messages.FORGOT_PASSWORD_SENT });
     }
 
     @Post("/reset-password")
@@ -383,30 +366,22 @@ export default class AuthController {
             code: req.query.code,
             authError: req.query.error,
             getAccessToken: async (code: string) => {
-                const redirectUri =
-                    process.env.GOOGLE_REDIRECT_URI ||
-                    `${process.env.API_URL}/auth/callback/google`;
+                const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${process.env.API_URL}/auth/callback/google`;
 
                 const params = new URLSearchParams();
                 params.append("code", code);
                 params.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
-                params.append(
-                    "client_secret",
-                    process.env.GOOGLE_CLIENT_SECRET || "",
-                );
+                params.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
                 params.append("redirect_uri", redirectUri);
                 params.append("grant_type", "authorization_code");
 
-                const tokenResponse = await fetch(
-                    "https://oauth2.googleapis.com/token",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: params.toString(),
+                const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
                     },
-                );
+                    body: params.toString(),
+                });
 
                 const tokenData = (await tokenResponse.json()) as {
                     access_token?: string;
@@ -419,14 +394,11 @@ export default class AuthController {
                 return tokenData.access_token;
             },
             getUserData: async (accessToken: string) => {
-                const userResponse = await fetch(
-                    "https://www.googleapis.com/oauth2/v2/userinfo",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
+                const userResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                );
+                });
 
                 const userData = (await userResponse.json()) as {
                     email?: string;
@@ -457,21 +429,10 @@ export default class AuthController {
             code: req.query.code,
             authError: req.query.error,
             getAccessToken: async (code: string) => {
-                const tokenUrl = new URL(
-                    "https://graph.facebook.com/v20.0/oauth/access_token",
-                );
-                tokenUrl.searchParams.append(
-                    "client_id",
-                    process.env.FACEBOOK_APP_ID || "",
-                );
-                tokenUrl.searchParams.append(
-                    "client_secret",
-                    process.env.FACEBOOK_APP_SECRET || "",
-                );
-                tokenUrl.searchParams.append(
-                    "redirect_uri",
-                    `${process.env.API_URL}/auth/callback/facebook`,
-                );
+                const tokenUrl = new URL("https://graph.facebook.com/v20.0/oauth/access_token");
+                tokenUrl.searchParams.append("client_id", process.env.FACEBOOK_APP_ID || "");
+                tokenUrl.searchParams.append("client_secret", process.env.FACEBOOK_APP_SECRET || "");
+                tokenUrl.searchParams.append("redirect_uri", `${process.env.API_URL}/auth/callback/facebook`);
                 tokenUrl.searchParams.append("code", code);
 
                 const tokenResponse = await fetch(tokenUrl.toString());
@@ -487,10 +448,7 @@ export default class AuthController {
             },
             getUserData: async (accessToken: string) => {
                 const userUrl = new URL("https://graph.facebook.com/me");
-                userUrl.searchParams.append(
-                    "fields",
-                    "id,name,email,first_name,last_name",
-                );
+                userUrl.searchParams.append("fields", "id,name,email,first_name,last_name");
                 userUrl.searchParams.append("access_token", accessToken);
 
                 const userResponse = await fetch(userUrl.toString());
@@ -553,14 +511,11 @@ export default class AuthController {
                 return tokenData.access_token;
             },
             getUserData: async (accessToken: string) => {
-                const userResponse = await fetch(
-                    "https://graph.microsoft.com/v1.0/me",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
+                const userResponse = await fetch("https://graph.microsoft.com/v1.0/me", {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                );
+                });
 
                 const userData = (await userResponse.json()) as {
                     userPrincipalName?: string;
@@ -584,13 +539,8 @@ export default class AuthController {
         });
     }
 
-    private async handleOAuthCallback(
-        req: Request,
-        res: Response,
-        options: OAuthCallbackOptions,
-    ) {
-        const { origin, code, authError, getAccessToken, getUserData } =
-            options;
+    private async handleOAuthCallback(req: Request, res: Response, options: OAuthCallbackOptions) {
+        const { origin, code, authError, getAccessToken, getUserData } = options;
 
         if (authError) {
             return res.redirect(`${process.env.HTTP_URL}/login`);
@@ -630,18 +580,12 @@ export default class AuthController {
         );
 
         if (userLoginResponse.ok === false) {
-            return (
-                res
-                    .status(userLoginResponse.status)
-                    .redirect(
-                        `${process.env.HTTP_URL}/login?error=${encodeURIComponent(userLoginResponse.message)}`,
-                    )
-            );
+            return res
+                .status(userLoginResponse.status)
+                .redirect(`${process.env.HTTP_URL}/login?error=${encodeURIComponent(userLoginResponse.message)}`);
         }
 
-        return res.redirect(
-            await this.buildPortalRedirectUrl(userLoginResponse.user),
-        );
+        return res.redirect(await this.buildPortalRedirectUrl(userLoginResponse.user));
     }
 
     private async handleOriginUserLogin(
@@ -661,9 +605,7 @@ export default class AuthController {
         });
 
         if (!user) {
-            const [firstnameFromName = "", lastnameFromName = ""] = (
-                userData.name || ""
-            ).split(" ");
+            const [firstnameFromName = "", lastnameFromName = ""] = (userData.name || "").split(" ");
 
             user = new UserEntity();
             user.email = userData.email;
