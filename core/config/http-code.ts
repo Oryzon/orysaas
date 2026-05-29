@@ -1,5 +1,6 @@
 export default class HttpCode {
     static OK: number = 200;
+    static CREATED: number = 201;
     static BAD_REQUEST: number = 400;
     static UNAUTHORIZED: number = 401;
     static FORBIDDEN: number = 403;

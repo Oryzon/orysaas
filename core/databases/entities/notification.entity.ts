@@ -1,7 +1,7 @@
 import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { DateTime } from "luxon";
-import { NotificationTypes } from "../../../shared/notification-types";
+import { NotificationTypes, NotificationAction } from "../../../shared/notification-types";
 
 @Entity()
 export class NotificationEntity {
@@ -20,6 +20,9 @@ export class NotificationEntity {
 
     @Column({ type: "json" })
     payload: Record<string, unknown>;
+
+    @Column({ type: "json", nullable: true })
+    actions: Array<NotificationAction> | null;
 
     @Column({ nullable: true })
     readAt: Date | null;

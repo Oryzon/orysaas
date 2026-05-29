@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invitation à rejoindre {{organizationName}}</title>
+    <style>
+        body { font-family: 'Roboto', Arial, sans-serif; background: #0B0A12; margin: 0; padding: 40px 0; }
+        .container { max-width: 560px; margin: 0 auto; background: #1A1827; border-radius: 12px; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%); padding: 40px 40px 32px; }
+        .header h1 { color: white; margin: 0; font-size: 24px; font-weight: 700; }
+        .body { padding: 40px; }
+        .body p { color: #94A3B8; font-size: 15px; line-height: 1.7; margin: 0 0 20px; }
+        .body p strong { color: #E2E8F0; }
+        .badge { display: inline-block; background: rgba(168,85,247,0.15); color: #A855F7; border: 1px solid rgba(168,85,247,0.3); padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 15px; margin: 8px 0 24px; }
+        .footer { padding: 24px 40px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .footer p { color: #475569; font-size: 13px; margin: 0; line-height: 1.6; }
+        .footer a { color: #A855F7; text-decoration: none; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>OrySaaS</h1>
+        </div>
+
+        <div class="body">
+            <p>Bonjour,</p>
+
+            <p><strong>{{inviterName}}</strong> vous invite à rejoindre l'organisation <strong>{{organizationName}}</strong> en tant que :</p>
+
+            <div class="badge">{{roleLabel}}</div>
+
+            {{#if isExistingUser}}
+            <p>Une notification vous attend dans votre espace. Connectez-vous pour l'accepter.</p>
+            {{else}}
+            <p>Cliquez sur le bouton ci-dessous pour créer votre compte et rejoindre l'équipe. Le lien est valable <strong>72 heures</strong>.</p>
+            {{/if}}
+
+            <a href="{{inviteUrl}}" class="btn">{{btnLabel}}</a>
+
+            <p>Si vous n'êtes pas concerné par cette invitation, ignorez simplement cet e-mail.</p>
+        </div>
+
+        <div class="footer">
+            <p>Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
+            <p><a href="{{inviteUrl}}">{{inviteUrl}}</a></p>
+        </div>
+    </div>
+</body>
+</html>

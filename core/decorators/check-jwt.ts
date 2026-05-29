@@ -18,7 +18,11 @@ export function CheckJwt() {
             let token: string = <string>req.headers["authorization"];
 
             if (token === undefined) {
-                return res.status(HttpCode.FORBIDDEN).send({ message: "You're not identified." });
+                return res
+                    .status(HttpCode.FORBIDDEN)
+                    .send({
+                        message: Messages.USER_NOT_AUTHED
+                    });
             }
 
             token = token.replace("Bearer ", "");
@@ -41,7 +45,9 @@ export function CheckJwt() {
                     return res.status(HttpCode.FORBIDDEN).send({ message: Messages.USER_CAN_T_LOG_IN });
                 }
 
-                setRequestContext({ uuid: jwtPayload.uuid });
+                setRequestContext({
+                    uuid: jwtPayload.uuid,
+                });
             } catch (error) {
                 if (error instanceof TokenExpiredError) {
                     return res.status(HttpCode.UNAUTHORIZED).send();

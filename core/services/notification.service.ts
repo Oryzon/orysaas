@@ -1,6 +1,6 @@
 import { NotificationRepository } from "../databases/repositories/notification.repository";
 import { sseService } from "./sse.service";
-import type { NotificationTypes, NotificationPayload } from "../../shared/notification-types";
+import type { NotificationTypes, NotificationPayload, NotificationAction } from "../../shared/notification-types";
 import { UserRepository } from "../databases/repositories/user.repository";
 import { Equal } from "typeorm";
 
@@ -8,7 +8,8 @@ class NotificationService {
     async send<T extends NotificationTypes>(
         userUuid: string,
         type: T,
-        payload: NotificationPayload<T>
+        payload: NotificationPayload<T>,
+        actions?: Array<NotificationAction>
     ): Promise<void> {
         // First, check user for avoid spam in database
         let user = await UserRepository.findOne({
@@ -26,6 +27,7 @@ class NotificationService {
             userUuid,
             type,
             payload: payload as Record<string, unknown>,
+            actions: actions ?? null,
         });
 
         await NotificationRepository.save(notif);
@@ -35,6 +37,7 @@ class NotificationService {
             userUuid: notif.userUuid,
             type: notif.type,
             payload: notif.payload,
+            actions: notif.actions,
             readAt: null,
             createdAt: notif.createdAt.toISOString(),
         });
