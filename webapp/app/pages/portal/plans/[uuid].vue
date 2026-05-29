@@ -6,7 +6,7 @@
                     <div class="d-flex align-center ga-2">
                         <v-icon color="primary" icon="mdi-file-document-edit-outline" />
                         <span class="text-h6 font-weight-bold">
-                            {{ uuid === "create" ? "Nouveau plan" : "Modifier le plan" }}
+                            {{ uuid === "create" ? "Nouvel abonnement" : "Modifier l'abonnement" }}
                         </span>
                     </div>
                     <v-spacer />
@@ -90,7 +90,7 @@
                             />
                         </v-col>
                         <v-col cols="12" md="6" class="d-flex justify-start justify-md-end">
-                            <portal-plans-quotas-modal />
+                            <portal-plans-quotas-modal :entity="plan" @edited="handleQuotaEdit" />
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -98,7 +98,7 @@
                 <v-divider />
 
                 <v-card-actions class="px-6 px-sm-8 py-4">
-                    <v-btn :loading="isLoading" variant="text" class="text-none" @click="handleCancel">Annuler</v-btn>
+                    <v-btn :loading="isLoading" variant="text" class="text-none" @click="handleCancel">Retour</v-btn>
                     <v-spacer />
                     <v-btn
                         color="primary"
@@ -118,6 +118,7 @@
 </template>
 <script setup lang="ts">
 import { type Plan, defaultPlan } from "~/models/Plan";
+import type { Quota } from "~/models/Quota";
 
 const api = useApi();
 const uuid = useRoute().params.uuid as string;
@@ -148,18 +149,44 @@ const handleSearch = async () => {
     }
 };
 
+const handleQuotaEdit = (updatedPlan: Partial<Plan>) => {
+    plan.value = {
+        ...plan.value,
+        quotas: updatedPlan.quotas ?? [],
+    };
+};
+
+const buildPlanPayload = (): Partial<Plan> => {
+    const quotas: Partial<Quota>[] = (plan.value.quotas ?? []).map((quota) => ({
+        uuid: quota.uuid,
+        type: quota.type,
+        value: Number(quota.value) || 0,
+        planUuid: uuid !== "create" ? uuid : quota.planUuid,
+    }));
+
+    return {
+        ...plan.value,
+        quotas,
+    };
+};
+
 const handleSave = async () => {
     const options = {
         loadingKey: "plan:save",
         toast: true,
     };
 
+    const payload = buildPlanPayload();
+
     if (uuid === "create") {
-        const response = await api.post<Plan>("plan", plan.value, options);
+        const response = await api.post<Plan>("plan", payload, options);
         await navigateTo(`/portal/plans/${response.uuid}`);
     } else {
-        const response = await api.put<Plan>(`plan/${uuid}`, plan.value, options);
-        plan.value = response;
+        const response = await api.put<Plan>(`plan/${uuid}`, payload, options);
+        plan.value = {
+            ...response,
+            quotas: response.quotas ?? payload.quotas,
+        };
     }
 };
 

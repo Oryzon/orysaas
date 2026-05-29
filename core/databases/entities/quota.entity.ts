@@ -1,63 +1,47 @@
 import {
-    BeforeInsert,
-    BeforeSoftRemove,
-    BeforeUpdate,
     Column,
-    CreateDateColumn,
-    DeleteDateColumn,
     Entity,
-    OneToMany,
     PrimaryGeneratedColumn,
+    CreateDateColumn,
     UpdateDateColumn,
+    DeleteDateColumn,
+    BeforeInsert,
+    BeforeUpdate,
+    BeforeSoftRemove,
+    JoinColumn,
+    ManyToOne,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { QuotaEntity } from "./quota.entity";
+import { PlanEntity } from "./plan.entity";
+
+enum QuotaType {
+    API_CALLS = "api_calls",
+    STORAGE = "storage",
+    USERS = "members",
+    OTHER = "other",
+}
 
 @Entity()
-export class PlanEntity {
+export class QuotaEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
-    @Column()
-    title: string;
-
-    @Column({ nullable: true })
-    description: string;
-
     @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 2,
-        // transform to convert string from database to number in TypeScript and vice versa
-        transformer: {
-            to: (value: number) => value,
-            from: (value: string) => parseFloat(value),
-        },
+        type: "enum",
+        enum: QuotaType,
     })
-    purchasePrice: number;
-
-    @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 2,
-        transformer: {
-            to: (value: number) => value,
-            from: (value: string) => parseFloat(value),
-        },
-    })
-    salePrice: number;
+    type: QuotaType;
 
     @Column()
-    isActive: boolean;
+    value: number;
 
     @Column()
-    uniqueKey: string;
+    planUuid: string;
 
-    @OneToMany(() => QuotaEntity, (quota) => quota.plan, {
-        cascade: ["insert", "update"],
-    })
-    quotas: QuotaEntity[];
+    @ManyToOne(() => PlanEntity, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "planUuid" })
+    plan: PlanEntity;
 
     @Column()
     @CreateDateColumn()
@@ -94,7 +78,6 @@ export class PlanEntity {
 
     @BeforeSoftRemove()
     setDeletedAt() {
-        this.isActive = false;
         this.deletedAt = DateTime.now().toJSDate();
         this.deletedBy = getUserUuid();
     }

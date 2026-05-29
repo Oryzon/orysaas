@@ -6,6 +6,14 @@ import Messages from "../../../config/messages";
 import { PlanRepository } from "../../../databases/repositories/plan.repository";
 import { PlanEntity } from "../../../databases/entities/plan.entity";
 
+const hasValidQuotas = (quotas: PlanEntity["quotas"] | undefined) => {
+    if (!quotas) {
+        return true;
+    }
+
+    return quotas.every((quota) => quota && quota.type && quota.value !== undefined);
+};
+
 @Controller("plan")
 export default class PlanController {
     @Get("/:uuid")
@@ -18,6 +26,7 @@ export default class PlanController {
             where: {
                 uuid: Equal(uuid),
             },
+            relations: ["quotas"],
         });
 
         if (!plan) {
@@ -35,7 +44,7 @@ export default class PlanController {
     async create(req: Request, res: Response) {
         const plan = req.body as Partial<PlanEntity>;
 
-        if (!plan || !plan.title || !plan.purchasePrice || !plan.salePrice) {
+        if (!plan || !plan.title || !plan.purchasePrice || !plan.salePrice || !hasValidQuotas(plan.quotas)) {
             return res.status(HttpCode.BAD_REQUEST).send({
                 message: Messages.MISSING_PARAMETERS,
             });
@@ -55,10 +64,17 @@ export default class PlanController {
         const { uuid } = req.params;
         const plan = req.body as Partial<PlanEntity>;
 
+        if (!hasValidQuotas(plan.quotas)) {
+            return res.status(HttpCode.BAD_REQUEST).send({
+                message: Messages.MISSING_PARAMETERS,
+            });
+        }
+
         const existingPlan = await PlanRepository.findOne({
             where: {
                 uuid: Equal(uuid),
             },
+            relations: ["quotas"],
         });
 
         if (!existingPlan) {
