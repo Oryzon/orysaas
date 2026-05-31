@@ -11,9 +11,7 @@
             <div class="drawer-header">
                 <img src="/logo.png" alt="OrySaas" width="28" height="34" />
 
-                <span class="drawer-title"
-                    >Ory<span class="text-primary">Saas</span></span
-                >
+                <span class="drawer-title">Ory<span class="text-primary">Saas</span></span>
 
                 <v-spacer></v-spacer>
                 <v-spacer></v-spacer>
@@ -51,7 +49,7 @@
                     v-if="user?.isSaasAdmin"
                     class="mt-2 text-uppercase text-label-large"
                     color="grey-lighten-2"
-                    >Pilotage SaaS</v-list-subheader
+                    >Pilotage SaaS</v-list-subheader 
                 >
 
                 <v-list-item
@@ -60,6 +58,13 @@
                     prepend-icon="mdi-file-tree"
                     title="Jobs"
                     to="/portal/jobs"
+                />
+              
+                <v-list-item 
+                    rounded="xl" 
+                    prepend-icon="mdi-cube-outline" 
+                    title="Abonnements" 
+                    to="/portal/plans" 
                 />
 
                 <v-list-subheader
@@ -95,24 +100,12 @@
 
             <v-spacer></v-spacer>
 
-            <notifications-bell
-            ></notifications-bell>
+            <notifications-bell></notifications-bell>
 
             <v-menu>
                 <template v-slot:activator="{ props }">
-                    <v-btn
-                        :height="56"
-                        :min-width="0"
-                        variant="tonal"
-                        rounded="lg"
-                        class="mr-4 px-3"
-                        v-bind="props"
-                    >
-                        <v-avatar
-                            size="34"
-                            class="gradient-primary mr-2"
-                            rounded="0"
-                        >
+                    <v-btn :height="56" :min-width="0" variant="tonal" rounded="lg" class="mr-4 px-3" v-bind="props">
+                        <v-avatar size="34" class="gradient-primary mr-2" rounded="0">
                             {{ userInitials }}
                         </v-avatar>
 
@@ -143,13 +136,7 @@
             </v-menu>
         </v-app-bar>
 
-        <v-navigation-drawer
-            v-model="notifOpen"
-            location="right"
-            temporary
-            width="600"
-            class="notif-drawer"
-        >
+        <v-navigation-drawer v-model="notifOpen" location="right" temporary width="600" class="notif-drawer">
             <transition name="notif-content">
                 <notifications-panel v-if="notifOpen"></notifications-panel>
             </transition>
@@ -176,16 +163,13 @@ const { connect, disconnect } = useNotifications();
 onMounted(() => connect());
 onUnmounted(() => disconnect());
 
-const pageTitle = useState('pageTitle');
+const pageTitle = useState("pageTitle");
 
 const route = useRoute();
 const router = useRouter();
 
 onMounted(async () => {
-    if (
-        typeof route.query.token !== "string" &&
-        typeof route.query.refreshToken !== "string"
-    ) {
+    if (typeof route.query.token !== "string" && typeof route.query.refreshToken !== "string") {
         return;
     }
 
@@ -215,10 +199,7 @@ const userName = computed(() => {
         return "";
     }
 
-    const parts = [
-        user.value.firstname,
-        user.value.lastname ? `${user.value.lastname[0]}.` : null,
-    ].filter(Boolean);
+    const parts = [user.value.firstname, user.value.lastname ? `${user.value.lastname[0]}.` : null].filter(Boolean);
 
     return parts.length ? parts.join(" ") : user.value.email;
 });
@@ -311,11 +292,7 @@ const userRole = computed(() => {
     transform: translateY(-50%);
     width: 3px;
     height: 55%;
-    background: linear-gradient(
-        to bottom,
-        var(--brand-primary),
-        var(--brand-accent)
-    );
+    background: linear-gradient(to bottom, var(--brand-primary), var(--brand-accent));
     border-radius: 0 3px 3px 0;
     z-index: 10;
 }
