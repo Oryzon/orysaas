@@ -13,6 +13,7 @@ import {
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
 import { QuotaEntity } from "./quota.entity";
+import { NumericTransformer } from "../transformers/number.transformer";
 
 @Entity()
 export class PlanEntity {
@@ -29,11 +30,7 @@ export class PlanEntity {
         type: "decimal",
         precision: 10,
         scale: 2,
-        // transform to convert string from database to number in TypeScript and vice versa
-        transformer: {
-            to: (value: number) => value,
-            from: (value: string) => parseFloat(value),
-        },
+        transformer: new NumericTransformer(),
     })
     purchasePrice: number;
 
@@ -41,10 +38,7 @@ export class PlanEntity {
         type: "decimal",
         precision: 10,
         scale: 2,
-        transformer: {
-            to: (value: number) => value,
-            from: (value: string) => parseFloat(value),
-        },
+        transformer: new NumericTransformer(),
     })
     salePrice: number;
 
@@ -52,10 +46,11 @@ export class PlanEntity {
     isActive: boolean;
 
     @Column()
-    uniqueKey: string;
+    slug: string;
 
     @OneToMany(() => QuotaEntity, (quota) => quota.plan, {
         cascade: ["insert", "update"],
+        orphanedRowAction: "delete",
     })
     quotas: QuotaEntity[];
 

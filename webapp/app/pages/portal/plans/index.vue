@@ -2,7 +2,7 @@
     <v-row class="mb-4">
         <v-col md="12" class="d-flex justify-end">
             <v-btn color="secondary" variant="flat" @click="handleSearch" prepend-icon="mdi-refresh">Rafraîchir</v-btn>
-            <v-btn color="primary" variant="flat" @click="handleCreation" prepend-icon="mdi-plus" class="ms-2">Créer</v-btn>
+            <v-btn color="primary" variant="flat" to="/portal/plans/create" prepend-icon="mdi-plus" class="ms-2">Créer</v-btn>
         </v-col>
     </v-row>
     <v-row>
@@ -51,7 +51,10 @@
                         </template>
                         <template v-slot:item.actions="{ item }">
                             <div class="d-flex align-center justify-end ga-2">
-                                <portal-plans-edit :entity="item" @updated="handleSearch"></portal-plans-edit>
+                                <portal-plans-edit :entity="item"></portal-plans-edit>
+                                <v-btn variant="text" icon color="info" :to="`/portal/plans/${item.uuid}`">
+                                    <v-icon>mdi-pencil</v-icon>
+                                </v-btn>
                                 <portal-plans-delete :entity="item" @deleted="handleDelete"></portal-plans-delete>
                             </div>
                         </template>
@@ -104,15 +107,6 @@ const handleSearch = async () => {
 };
 
 const handleDelete = async (plan: Plan) => {
-    await api.remove(`plans/${plan.uuid}`, {
-        toast: true,
-        loadingKey: "plans:delete",
-    });
-
-    await handleSearch();
-};
-
-const handleCreation = async () => {
-    await navigateTo("/portal/plans/create");
+    plans.value = plans.value.filter((p) => p.uuid !== plan.uuid);
 };
 </script>

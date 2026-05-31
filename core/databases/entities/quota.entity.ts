@@ -18,7 +18,7 @@ import { PlanEntity } from "./plan.entity";
 enum QuotaType {
     API_CALLS = "api_calls",
     STORAGE = "storage",
-    USERS = "members",
+    MEMBERS = "members",
     OTHER = "other",
 }
 

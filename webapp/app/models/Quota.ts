@@ -3,14 +3,14 @@ import type { Plan } from "./Plan";
 export enum QuotaType {
     API_CALLS = "api_calls",
     STORAGE = "storage",
-    USERS = "members",
+    MEMBERS = "members",
     OTHER = "other",
 }
 
 export const QuotaTypeLabels: Record<QuotaType, string> = {
     [QuotaType.API_CALLS]: "Appels API",
     [QuotaType.STORAGE]: "Stockage",
-    [QuotaType.USERS]: "Utilisateurs",
+    [QuotaType.MEMBERS]: "Membres",
     [QuotaType.OTHER]: "Autre",
 };
 
@@ -27,8 +27,3 @@ export interface Quota {
     deletedAt?: Date;
     deletedBy?: string;
 }
-
-export const defaultQuota = (): Quota => ({
-    type: QuotaType.OTHER,
-    value: 0,
-});

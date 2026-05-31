@@ -2,7 +2,9 @@
     <v-dialog v-model="dialog" max-width="500px">
         <template #activator="{ props: activatorProps }">
             <v-badge :content="quotaCount" color="primary" floating>
-                <v-btn v-bind="activatorProps" variant="tonal" color="secondary" prepend-icon="mdi-tune-variant">Gestion des quotas</v-btn>
+                <v-btn v-bind="activatorProps" variant="tonal" color="secondary" prepend-icon="mdi-tune-variant" :disabled="props.disabled"
+                    >Gestion des quotas</v-btn
+                >
             </v-badge>
         </template>
 
@@ -34,9 +36,11 @@
                                         variant="text"
                                         color="error"
                                         :aria-label="`Supprimer le quota ${index + 1}`"
+                                        :loading="isLoading"
+                                        :disabled="isLoading"
                                         @click="handleRemoveQuota(index)"
                                     >
-                                        <v-icon size="18">mdi-trash-can-outline</v-icon>
+                                        <v-icon size="18">mdi-delete</v-icon>
                                     </v-btn>
                                 </div>
 
@@ -51,12 +55,16 @@
                                             variant="outlined"
                                             density="compact"
                                             hide-details
+                                            :loading="isLoading"
+                                            :disabled="isLoading"
                                         />
                                     </v-col>
                                     <v-col cols="12" sm="5">
                                         <v-text-field
                                             v-model.number="quota.value"
                                             label="Limite"
+                                            :loading="isLoading"
+                                            :disabled="isLoading"
                                             variant="outlined"
                                             density="compact"
                                             type="number"
@@ -69,7 +77,15 @@
                         </v-card>
                     </div>
 
-                    <v-btn color="secondary" variant="tonal" prepend-icon="mdi-plus" class="mt-3" @click="handleAddQuota">
+                    <v-btn
+                        color="secondary"
+                        variant="tonal"
+                        prepend-icon="mdi-plus"
+                        class="mt-3"
+                        :loading="isLoading"
+                        :disabled="isLoading"
+                        @click="handleAddQuota"
+                    >
                         Ajouter un quota
                     </v-btn>
                 </v-card-text>
@@ -78,7 +94,7 @@
 
                 <v-card-actions class="px-5 py-4">
                     <v-spacer />
-                    <v-btn color="primary" variant="flat" @click="handleEdit">Enregistrer</v-btn>
+                    <v-btn color="primary" variant="flat" :loading="isLoading" :disabled="isLoading" @click="handleEdit">Enregistrer</v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -90,17 +106,19 @@ import type { Plan } from "~/models/Plan";
 import type { Quota } from "~/models/Quota";
 import { QuotaType, QuotaTypeLabels } from "~/models/Quota";
 
-const props = withDefaults(
-    defineProps<{
-        entity?: Partial<Plan>;
-    }>(),
-    {
-        entity: () => ({}),
+const props = defineProps({
+    entity: {
+        type: Object as () => Partial<Plan>,
+        default: () => ({}),
     },
-);
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const emit = defineEmits<{
-    edited: [plan: Partial<Plan>];
+    updated: [plan: Partial<Plan>];
 }>();
 
 const dialog = ref(false);
@@ -112,14 +130,16 @@ const quotaTypeOptions = Object.values(QuotaType).map((value) => ({
 }));
 
 watch(dialog, (isOpen) => {
-    if (!isOpen) {
-        return;
+    if (isOpen) {
+        plan.value = {
+            ...props.entity,
+            quotas: (props.entity?.quotas ?? []).map((quota) => ({ ...quota })),
+        };
     }
+});
 
-    plan.value = {
-        ...props.entity,
-        quotas: (props.entity?.quotas ?? []).map((quota) => ({ ...quota })),
-    };
+const isLoading = computed(() => {
+    return false;
 });
 
 const handleAddQuota = () => {
@@ -142,7 +162,7 @@ const handleRemoveQuota = (index: number) => {
 };
 
 const handleEdit = () => {
-    emit("edited", plan.value);
+    emit("updated", plan.value);
     handleClose();
 };
 

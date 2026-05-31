@@ -6,14 +6,6 @@ import Messages from "../../../config/messages";
 import { PlanRepository } from "../../../databases/repositories/plan.repository";
 import { PlanEntity } from "../../../databases/entities/plan.entity";
 
-const hasValidQuotas = (quotas: PlanEntity["quotas"] | undefined) => {
-    if (!quotas) {
-        return true;
-    }
-
-    return quotas.every((quota) => quota && quota.type && quota.value !== undefined);
-};
-
 @Controller("plan")
 export default class PlanController {
     @Get("/:uuid")
@@ -22,7 +14,7 @@ export default class PlanController {
     async getDetails(req: Request, res: Response) {
         const { uuid } = req.params;
 
-        const plan = await PlanRepository.findOne({
+        const plan = await PlanRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuid),
             },
@@ -44,15 +36,9 @@ export default class PlanController {
     async create(req: Request, res: Response) {
         const plan = req.body as Partial<PlanEntity>;
 
-        if (!plan || !plan.title || !plan.purchasePrice || !plan.salePrice || !hasValidQuotas(plan.quotas)) {
-            return res.status(HttpCode.BAD_REQUEST).send({
-                message: Messages.MISSING_PARAMETERS,
-            });
-        }
-
         const newPlan = PlanRepository.create(plan);
-        newPlan.uniqueKey = await PlanRepository.createKey();
-        await PlanRepository.save(newPlan);
+        newPlan.slug = await PlanRepository.getSlug(newPlan.title);
+        await PlanRepository.insert(newPlan);
 
         return res.status(HttpCode.CREATED).send(newPlan);
     }
@@ -64,13 +50,7 @@ export default class PlanController {
         const { uuid } = req.params;
         const plan = req.body as Partial<PlanEntity>;
 
-        if (!hasValidQuotas(plan.quotas)) {
-            return res.status(HttpCode.BAD_REQUEST).send({
-                message: Messages.MISSING_PARAMETERS,
-            });
-        }
-
-        const existingPlan = await PlanRepository.findOne({
+        const existingPlan = await PlanRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuid),
             },
@@ -95,7 +75,7 @@ export default class PlanController {
     async delete(req: Request, res: Response) {
         const { uuid } = req.params;
 
-        const existingPlan = await PlanRepository.findOne({
+        const existingPlan = await PlanRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuid),
             },

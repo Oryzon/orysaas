@@ -23,6 +23,7 @@
                             <v-text-field
                                 v-model="plan.title"
                                 :loading="isLoading"
+                                :disabled="isLoading"
                                 variant="outlined"
                                 label="Titre"
                                 prepend-inner-icon="mdi-format-title"
@@ -36,6 +37,7 @@
                             <v-textarea
                                 v-model="plan.description"
                                 :loading="isLoading"
+                                :disabled="isLoading"
                                 variant="outlined"
                                 label="Description"
                                 rows="4"
@@ -53,6 +55,7 @@
                                 :step="0.01"
                                 :precision="2"
                                 :loading="isLoading"
+                                :disabled="isLoading"
                                 variant="outlined"
                                 label="Prix d'achat"
                                 type="number"
@@ -67,6 +70,7 @@
                                 :step="0.01"
                                 :precision="2"
                                 :loading="isLoading"
+                                :disabled="isLoading"
                                 variant="outlined"
                                 label="Prix de vente"
                                 type="number"
@@ -82,6 +86,7 @@
                             <v-switch
                                 v-model="plan.isActive"
                                 :loading="isLoading"
+                                :disabled="isLoading"
                                 color="primary"
                                 base-color="grey-darken-1"
                                 label="Actif"
@@ -90,7 +95,7 @@
                             />
                         </v-col>
                         <v-col cols="12" md="6" class="d-flex justify-start justify-md-end">
-                            <portal-plans-quotas-modal :entity="plan" @edited="handleQuotaEdit" />
+                            <portal-plans-quotas-modal :entity="plan" @updated="handleQuotaEdit" :disabled="isLoading" />
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -117,7 +122,7 @@
     </v-container>
 </template>
 <script setup lang="ts">
-import { type Plan, defaultPlan } from "~/models/Plan";
+import { type Plan } from "~/models/Plan";
 import type { Quota } from "~/models/Quota";
 
 const api = useApi();
@@ -139,7 +144,7 @@ const isLoading = computed(() => {
     return api.isLoading("plan:details") || api.isLoading("plan:save");
 });
 
-const plan = ref<Partial<Plan>>(defaultPlan());
+const plan = ref<Partial<Plan>>({});
 
 const handleSearch = async () => {
     if (uuid !== "create") {

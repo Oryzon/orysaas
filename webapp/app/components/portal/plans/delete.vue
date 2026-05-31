@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="600">
         <template v-slot:activator="{ props: activatorProps }">
             <v-btn v-bind="activatorProps" variant="text" icon color="error">
-                <v-icon>mdi-trash-can</v-icon>
+                <v-icon>mdi-delete</v-icon>
             </v-btn>
         </template>
 
@@ -18,15 +18,16 @@
                     </v-toolbar-items>
                 </v-toolbar>
 
-                <v-card-text>
-                    <p>Êtes-vous sûr de vouloir supprimer ce plan ?</p>
-                    <p class="text-caption">Cette action est irréversible.</p>
+                <v-card-text class="py-5">
+                    <p class="text-body-1 mb-3">Vous êtes sur le point de supprimer l'abonnement "{{ entity.title }}".</p>
+                    <p class="text-body-2 text-medium-emphasis mb-1">Date de création : {{ createdAtLabel }}</p>
+                    <p class="text-caption text-error">Cette action est irréversible.</p>
                 </v-card-text>
 
                 <v-card-actions class="bg-surface-light mt-n2">
                     <v-spacer />
 
-                    <v-btn color="error" variant="flat" :disabled="isLoading" @click="handleDelete"> Supprimer </v-btn>
+                    <v-btn color="error" variant="flat" :disabled="isLoading" :loading="isLoading" @click="handleDelete"> Supprimer </v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -53,6 +54,14 @@ watch(dialog, async (newVal) => {
 });
 
 const isLoading = computed(() => api.isLoading("plans:delete"));
+
+const createdAtLabel = computed(() => {
+    if (!props.entity.createdAt) {
+        return "Date inconnue";
+    }
+
+    return new Date(props.entity.createdAt).toLocaleDateString();
+});
 
 const handleClose = () => {
     dialog.value = false;
