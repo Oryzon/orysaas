@@ -18,6 +18,18 @@
         </template>
 
         <template #right>
+            <v-alert
+                v-if="inviteOrganizationName"
+                type="info"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+                icon="mdi-account-plus"
+            >
+                Vous avez été invité à rejoindre <strong>{{ inviteOrganizationName }}</strong>.<br />
+                Créez votre compte pour rejoindre l'équipe.
+            </v-alert>
+
             <h1>Créer un compte</h1>
 
             <h4>
@@ -65,7 +77,8 @@
                             :rules="[rules.required()]"
                             v-model="user.email"
                             :loading="isLoading"
-                            :disabled="isLoading"
+                            :disabled="isLoading || inviteEmailLocked"
+                            :readonly="inviteEmailLocked"
                         ></v-text-field>
                     </v-col>
 
@@ -128,13 +141,35 @@ definePageMeta({
     layout: false,
 });
 
-const isLoading = computed(() => api.isLoading("auth:register"));
-
+const route = useRoute();
 const router = useRouter();
 const form = ref();
 const isFormValid = ref(false);
 const rules = useValidationRules();
 const user = ref<Partial<User>>({});
+const inviteOrganizationName = ref<string | null>(null);
+const inviteEmailLocked = ref(false);
+
+const isLoading = computed(() => api.isLoading("auth:register"));
+
+onMounted(async () => {
+    const inviteToken = route.query.inviteToken as string | undefined;
+
+    if (!inviteToken) {
+        return;
+    }
+
+    const info = await api.get<{ organizationName: string; email: string }>(
+        `/auth/invite/check?token=${inviteToken}`,
+        { auth: false, toast: false },
+    );
+
+    if (info) {
+        inviteOrganizationName.value = info.organizationName;
+        user.value.email = info.email;
+        inviteEmailLocked.value = true;
+    }
+});
 
 const handleRegister = async () => {
     const { valid } = await form.value.validate();
@@ -144,7 +179,7 @@ const handleRegister = async () => {
         return;
     }
 
-    let res = await api.post<{ message: string }>(
+    const res = await api.post<{ message: string }>(
         `auth/register`,
         { ...user.value },
         {
@@ -153,8 +188,8 @@ const handleRegister = async () => {
         },
     );
 
-    if (res["message"] === "L'utilisateur a bien été crée.") {
-        await router.replace("/admin/login"); // fast, replaces history
+    if (res) {
+        await router.replace("/login");
     }
 };
 </script>
