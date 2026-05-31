@@ -32,40 +32,18 @@
 
             <v-divider />
 
-            <portal-tenant-organization-switch
-                v-if="!user?.isSaasAdmin"
-                :is-collapsed="isCollapsed"
-            ></portal-tenant-organization-switch>
+            <portal-tenant-organization-switch v-if="!user?.isSaasAdmin" :is-collapsed="isCollapsed"></portal-tenant-organization-switch>
 
             <v-list color="primary" base-color="white" nav>
-                <v-list-item
-                    rounded="xl"
-                    prepend-icon="mdi-view-dashboard"
-                    title="Tableau de bord"
-                    to="/portal/dashboard"
-                />
+                <v-list-item rounded="xl" prepend-icon="mdi-view-dashboard" title="Tableau de bord" to="/portal/dashboard" />
 
-                <v-list-subheader
-                    v-if="user?.isSaasAdmin"
-                    class="mt-2 text-uppercase text-label-large"
-                    color="grey-lighten-2"
-                    >Pilotage SaaS</v-list-subheader 
+                <v-list-subheader v-if="user?.isSaasAdmin" class="mt-2 text-uppercase text-label-large" color="grey-lighten-2"
+                    >Pilotage SaaS</v-list-subheader
                 >
 
-                <v-list-item
-                    v-if="user?.isSaasAdmin"
-                    rounded="xl"
-                    prepend-icon="mdi-file-tree"
-                    title="Jobs"
-                    to="/portal/jobs"
-                />
-              
-                <v-list-item 
-                    rounded="xl" 
-                    prepend-icon="mdi-cube-outline" 
-                    title="Abonnements" 
-                    to="/portal/plans" 
-                />
+                <v-list-item v-if="user?.isSaasAdmin" rounded="xl" prepend-icon="mdi-cube-outline" title="Abonnements" to="/portal/plans" />
+
+                <v-list-item v-if="user?.isSaasAdmin" rounded="xl" prepend-icon="mdi-file-tree" title="Jobs" to="/portal/jobs" />
 
                 <v-list-subheader
                     v-if="!user?.isSaasAdmin && currentOrganization?.slug"
@@ -153,7 +131,7 @@
 <script setup lang="ts">
 import { OrganizationMemberRoleLabel } from "~/models/OrganizationMember";
 
-const notifOpen = useState('notif:drawer:open', () => false);
+const notifOpen = useState("notif:drawer:open", () => false);
 
 const { menuIsOpen, toggleMenu } = useUserPreferences();
 const { user, logout, currentOrganization } = useAuth();
