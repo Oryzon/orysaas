@@ -8,6 +8,7 @@ import { dataSource } from "./config/datasource";
 import { controllers } from "./controllers/controller";
 import { IRouter } from "./decorators";
 import { Runner } from "./jobs/runner";
+import { showcaseSeeders } from "./seeders/showcase";
 
 class Server {
 

@@ -1,8 +1,6 @@
 export const useConfigPage = (title: string) => {
-    let projectName = useRuntimeConfig().public.title;
-
     useHead({
-        title: `${title} - ${projectName}`,
+        title: `${title}`,
     });
 
     useState('pageTitle', () => title).value = title;

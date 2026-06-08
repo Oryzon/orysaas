@@ -10,10 +10,15 @@ export default defineNuxtConfig({
         enabled: true,
     },
     modules: ["@nuxtjs/seo", "@pinia/nuxt", "@vueuse/nuxt"],
+    site: {
+        name: 'OrySaas',
+        url: process.env.SITE_URL || 'http://localhost:3000',
+    },
     css: [
         "vuetify/styles",
         "@mdi/font/css/materialdesignicons.css",
         "~/assets/css/main.css",
+        "@vueup/vue-quill/dist/vue-quill.snow.css",
     ],
     devServer: {
         port: Number(process.env.PORT) || 3000,
