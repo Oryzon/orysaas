@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Delete, Error, Get, Post, Put } from "../../../../decorators";
+import { CheckIsSaasAdmin, CheckJwt, Controller, Delete, Error, Get, Post, Put } from "../../../../decorators";
 import { Request, Response } from "express";
 import { MenuRepository } from "../../../../databases/repositories/menu.repository";
 import { Equal } from "typeorm";
@@ -11,6 +11,7 @@ import Messages from "../../../../config/messages";
 export default class MenuItemController {
     @Post('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
         let uuidMenu = req.params.uuidMenu;
@@ -45,6 +46,7 @@ export default class MenuItemController {
 
     @Put('/:uuidItem')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         let uuidMenu = req.params.uuidMenu;
@@ -81,6 +83,7 @@ export default class MenuItemController {
 
     @Put('/:uuidItem/:order')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async move(req: Request, res: Response) {
         let uuidMenu = req.params.uuidMenu;
@@ -110,6 +113,7 @@ export default class MenuItemController {
 
     @Delete('/:uuidItem')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async remove(req: Request, res: Response) {
         let uuidMenu = req.params.uuidMenu;

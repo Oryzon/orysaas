@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get, Post, Put } from "../../../decorators";
+import { CheckIsSaasAdmin, CheckJwt, Controller, Error, Get, Post, Put } from "../../../decorators";
 import { Request, Response } from "express";
 import HttpCode from "../../../config/http-code";
 import { MenuRepository } from "../../../databases/repositories/menu.repository";
@@ -8,6 +8,7 @@ export default class MenusController {
 
     @Get('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async list(req: Request, res: Response) {
         let menus = await MenuRepository.find({

@@ -49,6 +49,11 @@
                         color="primary"
                         @click.stop="handleEdit"
                     ></v-btn>
+
+                    <portal-menus-items-remove
+                        :entity="item"
+                        @removed="handleDelete"
+                    ></portal-menus-items-remove>
                 </template>
             </v-list-item>
         </template>
@@ -99,6 +104,11 @@
                 color="primary"
                 @click.stop="handleEdit"
             ></v-btn>
+
+            <portal-menus-items-remove
+                :entity="item"
+                @removed="handleDelete"
+            ></portal-menus-items-remove>
         </template>
     </v-list-item>
 </template>

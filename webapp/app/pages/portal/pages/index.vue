@@ -33,6 +33,11 @@
                                     >
                                         <v-icon>mdi-pencil</v-icon>
                                     </v-btn>
+
+                                    <portal-pages-remove
+                                        :entity="item"
+                                        @removed="removeToPages"
+                                    ></portal-pages-remove>
                                 </template>
                             </v-data-table>
                         </v-col>
@@ -86,5 +91,9 @@ const handleSearch = async () => {
 
 const addToPages = (data: Page) => {
     pages.value.push(data);
+}
+
+const removeToPages = (data: Page) => {
+    pages.value = pages.value.filter((entity) => entity.uuid !== data.uuid);
 }
 </script>

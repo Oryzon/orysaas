@@ -1,41 +1,36 @@
 import {
-    BeforeInsert, BeforeSoftRemove,
-    BeforeUpdate,
+    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
     Column,
     CreateDateColumn,
-    DeleteDateColumn,
-    Entity,
-    OneToMany,  // AJOUTÉ
+    DeleteDateColumn, Entity,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { BlockEntity } from "./block.entity";  // AJOUTÉ
 
 @Entity()
-export class PageEntity {
+export class ContactEntity {
     @PrimaryGeneratedColumn('uuid')
     uuid: string;
 
-    @Column({ unique: true })
-    slug: string;
+    @Column()
+    firstname: string;
 
     @Column()
-    title: string;
+    lastname: string;
 
     @Column()
-    metaTitle: string;
+    email: string;
+
+    @Column({ default: null, nullable: true })
+    company: string;
 
     @Column()
-    metaDescription: string;
+    subject: string;
 
-    @Column()
-    isPublished: boolean;
-
-    @OneToMany(() => BlockEntity, (block) => block.page, {
-    })
-    blocks: BlockEntity[];
+    @Column({ length: 2500 })
+    message: string;
 
     @Column()
     @CreateDateColumn()

@@ -1,4 +1,3 @@
-// entities/block.entity.ts
 import {
     BeforeInsert,
     BeforeSoftRemove,

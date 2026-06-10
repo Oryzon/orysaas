@@ -48,6 +48,14 @@
                 <v-list-item
                     v-if="user?.isSaasAdmin"
                     rounded="xl"
+                    prepend-icon="mdi-message-processing-outline"
+                    title="Formulaire de contact"
+                    to="/portal/contacts"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
                     prepend-icon="mdi-file-code-outline"
                     title="Pages"
                     to="/portal/pages"

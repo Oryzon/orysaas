@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Delete, Error, Get, Post, Put } from "../../../decorators";
+import { CheckIsSaasAdmin, CheckJwt, Controller, Delete, Error, Get, Post, Put } from "../../../decorators";
 import { Request, Response } from "express";
 import { MenuRepository } from "../../../databases/repositories/menu.repository";
 import HttpCode from "../../../config/http-code";
@@ -11,6 +11,7 @@ import Messages from "../../../config/messages";
 export default class MenuController {
     @Get('/:uuid')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async detail(req: Request, res: Response) {
         let uuid = req.params.uuid;
@@ -34,6 +35,7 @@ export default class MenuController {
 
     @Post('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
         let {
@@ -58,6 +60,7 @@ export default class MenuController {
 
     @Put('/:uuid')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         let uuid = req.params.uuid;
@@ -86,6 +89,7 @@ export default class MenuController {
 
     @Delete('/:uuid')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async remove(req: Request, res: Response) {
         let uuid = req.params.uuid;

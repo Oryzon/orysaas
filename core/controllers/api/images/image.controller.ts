@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get, Post } from "../../../decorators";
+import { CheckIsSaasAdmin, CheckJwt, Controller, Error, Get, Post } from "../../../decorators";
 import { Request, Response } from "express";
 import multer from 'multer';
 import path from 'path';
@@ -42,6 +42,7 @@ export default class ImageController {
 
     @Post('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
         const upload = this.getUploadMiddleware();

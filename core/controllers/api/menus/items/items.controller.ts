@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get, Post, Put } from "../../../../decorators";
+import { CheckIsSaasAdmin, CheckJwt, Controller, Error, Get, Post, Put } from "../../../../decorators";
 import { Request, Response } from "express";
 import { MenuItemRepository } from "../../../../databases/repositories/menu-item.repository";
 import { Equal } from "typeorm";
@@ -8,6 +8,7 @@ import HttpCode from "../../../../config/http-code";
 export default class MenuItemsController {
     @Get('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async list(req: Request, res: Response) {
         let uuidMenu = req.params.uuidMenu;

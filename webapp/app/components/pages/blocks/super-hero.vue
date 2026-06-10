@@ -117,13 +117,13 @@ const hasLastChanges = computed(
     () => props.data.lastChanges?.title || props.data.lastChanges?.versionNo,
 );
 
-const isExternal = (url: string | undefined) =>
-    !!url && (url.startsWith('http://') || url.startsWith('https://'));
+const isExternal = (url: string | undefined) => !!url && (url.startsWith('http://') || url.startsWith('https://'));
 
 const buildTo = (url: string | undefined) => {
     if (!url || isExternal(url)) {
         return undefined;
     }
+
     return url.startsWith('/') ? url : `/${url}`;
 };
 </script>
@@ -132,7 +132,7 @@ const buildTo = (url: string | undefined) => {
 .super-hero-section {
     position: relative;
     overflow: hidden;
-    padding: 80px 0 0;
+    padding: 80px 0px 48px;
 }
 
 .super-hero-content {
@@ -191,7 +191,7 @@ const buildTo = (url: string | undefined) => {
     box-shadow:
         0 2px 4px rgba(0, 0, 0, 0.08),
         0 8px 24px rgba(0, 0, 0, 0.12),
-        0 32px 64px rgba(0, 0, 0, 0.16);
+        0 2px 64px rgba(0, 0, 0, 0.16);
 }
 
 .mac-titlebar {

@@ -31,12 +31,51 @@ export async function showcaseSeeders() {
 
     console.log('Menu header recreated ✓');
 
+    // Menu parts - header
+    console.log('Recreate the footer menu...');
+
+    let footerMenu = new MenuEntity();
+
+    footerMenu.label = "Pied de page";
+    footerMenu.key = "footer";
+    footerMenu.isActive = true;
+
+    await MenuRepository.insert(footerMenu);
+
+    let ressources = await createMenuItem(footerMenu, 'Ressources', '#', 0);
+    await createMenuItem(footerMenu, 'Documentation', 'docs', 0, ressources);
+    await createMenuItem(footerMenu, 'Changelog', 'changelog', 1, ressources);
+    await createMenuItem(footerMenu, 'Roadmap', 'roadmap', 2, ressources);
+
+    let company = await createMenuItem(footerMenu, 'Société', '#', 1);
+    await createMenuItem(footerMenu, 'A propos', 'a-propos', 0, company);
+    await createMenuItem(footerMenu, 'Contact', 'contact', 1, company);
+    await createMenuItem(footerMenu, 'Partenaires', 'nos-partenaires', 2, company);
+
+    let legal = await createMenuItem(footerMenu, 'Légal', '#', 2);
+    await createMenuItem(footerMenu, 'CGU', 'conditions-generales-d-utilisations', 0, legal);
+    await createMenuItem(footerMenu, 'Confidentialité', 'confidentialite', 1, legal);
+    await createMenuItem(footerMenu, 'Mentions légales', 'mentions-legales', 2, legal);
+    await createMenuItem(footerMenu, 'RGPD', 'rgpd', 3, legal);
+
+    console.log('Menu footer recreated ✓');
+
     // Pages parts
 
     await clearPages();
     await createHome();
     await createFunctionnality();
     await createFaq();
+
+    // Know default page
+    await createDefaultPage('Changelog', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "changelog");
+    await createDefaultPage('Roadmap', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "roadmap");
+    await createDefaultPage('A propos', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "a-propos");
+    await createDefaultPage('Partenaires', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "nos-partenaires");
+    await createDefaultPage('CGU', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "conditions-generales-d-utilisations");
+    await createDefaultPage('Confidentialité', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "confidentialite");
+    await createDefaultPage('Mentions légales', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "mentions-legales");
+    await createDefaultPage('RGPD', "Bienvenue sur une page par défaut, n'oubliez pas de mettre a jour le contenu.", "rgpd");
 
     console.log('Showcase seeded ... !');
 }
@@ -58,7 +97,7 @@ async function clearPages() {
     console.log('Pages deleted... ✓');
 }
 
-async function createMenuItem(menu: MenuEntity, label: string, url: string, position: number, target: '_self' | '_blank' = '_self') {
+async function createMenuItem(menu: MenuEntity, label: string, url: string, position: number, parent: MenuItemEntity | null = null, target: '_self' | '_blank' = '_self') {
     let entity = new MenuItemEntity();
 
     entity.menu = menu;
@@ -68,7 +107,13 @@ async function createMenuItem(menu: MenuEntity, label: string, url: string, posi
     entity.position = position;
     entity.isVisible = true;
 
+    if (parent) {
+        entity.parent = parent;
+    }
+
     await MenuItemRepository.insert(entity);
+
+    return entity;
 }
 
 async function createHome() {
@@ -168,13 +213,13 @@ async function createFaq() {
     ]);
 }
 
-async function createHeroBloc(page: PageEntity, order: number, title: string, subtile: string, cta: { text: string, url: string, variant: string }) {
+async function createHeroBloc(page: PageEntity, order: number, title: string, subtitle: string, cta: { text: string, url: string, variant: string }) {
     let bloc = new BlockEntity();
 
     bloc.type = "hero";
     bloc.data = {
         title: title,
-        subtile: subtile,
+        subtitle: subtitle,
         cta: cta
     };
     bloc.page = page;
@@ -252,4 +297,18 @@ async function createSuperHero(
     bloc.order = order;
 
     await BlockRepository.insert(bloc);
+}
+
+async function createDefaultPage(title: string, metaDescription: string, slug: string) {
+    let page = new PageEntity();
+
+    page.title = title;
+    page.metaTitle = title;
+    page.metaDescription = metaDescription;
+    page.slug = slug;
+    page.isPublished = true;
+
+    await PageRepository.insert(page);
+
+    await createHeroBloc(page, 0, title, metaDescription, { text: "", url: "", variant: "flat"});
 }

@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get } from "../../../decorators";
+import { CheckIsSaasAdmin, CheckJwt, Controller, Error, Get } from "../../../decorators";
 import { Request, Response } from "express";
 import { JobSettingRepository } from "../../../databases/repositories/job-setting.repository";
 import { Runner } from "../../../jobs/runner";
@@ -8,6 +8,7 @@ import HttpCode from "../../../config/http-code";
 export default class JobsController {
     @Get('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async list(req: Request, res: Response) {
         let jobs = await JobSettingRepository.find({

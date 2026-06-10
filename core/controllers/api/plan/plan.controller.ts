@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get, Post, Put, Delete } from "../../../decorators";
+import { CheckJwt, Controller, Error, Get, Post, Put, Delete, CheckIsSaasAdmin } from "../../../decorators";
 import { Request, Response } from "express";
 import HttpCode from "../../../config/http-code";
 import { Equal } from "typeorm";
@@ -10,6 +10,7 @@ import { PlanEntity } from "../../../databases/entities/plan.entity";
 export default class PlanController {
     @Get("/:uuid")
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async getDetails(req: Request, res: Response) {
         const { uuid } = req.params;
@@ -32,6 +33,7 @@ export default class PlanController {
 
     @Post("/")
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
         const plan = req.body as Partial<PlanEntity>;
@@ -45,6 +47,7 @@ export default class PlanController {
 
     @Put("/:uuid")
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         const { uuid } = req.params;
@@ -71,6 +74,7 @@ export default class PlanController {
 
     @Delete("/:uuid")
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async delete(req: Request, res: Response) {
         const { uuid } = req.params;

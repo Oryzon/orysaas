@@ -41,9 +41,11 @@
             </v-btn>
         </v-app-bar>
 
-        <v-main style="background-color: white;">
+        <v-main style="background-color: white;" class="pb-10">
             <slot></slot>
         </v-main>
+
+        <visitors-menus-footer :items="footerMenu"></visitors-menus-footer>
     </v-app>
 </template>
 
@@ -61,4 +63,5 @@ const { bootstrap, load } = usePublicBootstrap();
 await load();
 
 const headerMenu = computed(() => buildMenuTree(bootstrap.value?.menus?.header ?? []));
+const footerMenu = computed(() => buildMenuTree(bootstrap.value?.menus?.footer ?? []));
 </script>

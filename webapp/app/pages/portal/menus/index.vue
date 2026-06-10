@@ -33,6 +33,11 @@
                                     >
                                         <v-icon>mdi-pencil</v-icon>
                                     </v-btn>
+
+                                    <portal-menus-remove
+                                        :entity="item"
+                                        @removed="removeToMenus"
+                                    ></portal-menus-remove>
                                 </template>
                             </v-data-table>
                         </v-col>

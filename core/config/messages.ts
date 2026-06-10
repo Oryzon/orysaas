@@ -107,8 +107,9 @@ export default class Messages {
     // -------------------------
     // Pages
     // -------------------------
-    static PAGE_CREATED = "La page a été crée.";
-    static PAGE_UPDATED = "La page a été modifié.";
+    static PAGE_CREATED = "La page a été créee.";
+    static PAGE_UPDATED = "La page a été modifiée.";
+    static PAGE_REMOVED = "La page a été supprimée.";
 
     // -------------------------
     // Menus
@@ -123,4 +124,10 @@ export default class Messages {
     static MENU_ITEM_REMOVED = "Le lien de menu a été supprimé.";
 
     static NO_FILE_SENDED = "No file sended.";
+
+    // -------------------------
+    // Contacts
+    // -------------------------
+    static CONTACT_SENDED = "Votre message a bien été envoyé.";
+    static CONTACT_ARCHIVED = "Le message a bien été archivé.";
 }

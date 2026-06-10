@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get, Post, Put, Delete } from "../../../decorators";
+import { CheckJwt, Controller, Error, Get, Post, Put, Delete, CheckIsSaasAdmin } from "../../../decorators";
 import { Request, Response } from "express";
 import { PageEntity } from "../../../databases/entities/page.entity";
 import { PageRepository } from "../../../databases/repositories/page.repository";
@@ -34,6 +34,7 @@ export default class PageController {
 
     @Get('/:uuid')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async detail(req: Request, res: Response) {
         let uuid = req.params.uuid;
@@ -59,6 +60,7 @@ export default class PageController {
 
     @Post('/')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
         let {
@@ -86,6 +88,7 @@ export default class PageController {
 
     @Put('/:uuid')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         let uuid = req.params.uuid;
@@ -174,4 +177,55 @@ export default class PageController {
             entity: updatedPage
         });
     }
+
+    @Delete('/:uuid')
+    @CheckJwt()
+    @CheckIsSaasAdmin()
+    @Error()
+    async remove(req: Request, res: Response) {
+        let uuid = req.params.uuid;
+
+        let item = await PageRepository.findOneOrFail({
+            where: {
+                uuid: Equal(uuid)
+            }
+        });
+
+        item.setDeletedAt();
+        await PageRepository.save(item);
+
+        return res.status(HttpCode.OK).send({
+            message: Messages.PAGE_REMOVED,
+            entity: item
+        });
+    }
+
+    /*
+        @Delete('/:uuidItem')
+    @CheckJwt()
+    @Error()
+    async remove(req: Request, res: Response) {
+        let uuidMenu = req.params.uuidMenu;
+        let uuidItem = req.params.uuidItem;
+
+        let item = await MenuItemRepository.findOneOrFail({
+            where: {
+                uuid: Equal(uuidItem),
+                menuUuid: Equal(uuidMenu)
+            },
+            relations: {
+                children: true
+            }
+        });
+
+        item.setDeletedAt();
+
+        await MenuItemRepository.save(item);
+
+        return res.status(HttpCode.OK).send({
+            message: Messages.MENU_ITEM_REMOVED,
+            entity: refreshedMenu,
+        })
+    }
+     */
 }
