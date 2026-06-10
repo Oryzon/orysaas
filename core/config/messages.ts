@@ -103,4 +103,31 @@ export default class Messages {
     static PERMISSION_UNAUTHORIZED = "Unauthorized";
     static PERMISSION_FORBIDDEN = "Forbidden";
     static PERMISSION_INTERNAL_ERROR = "Internal server error";
+
+    // -------------------------
+    // Pages
+    // -------------------------
+    static PAGE_CREATED = "La page a été créee.";
+    static PAGE_UPDATED = "La page a été modifiée.";
+    static PAGE_REMOVED = "La page a été supprimée.";
+
+    // -------------------------
+    // Menus
+    // -------------------------
+    static MENU_CREATED = "Menu crée.";
+    static MENU_UPDATED = "Le menu a été modifié.";
+    static MENU_DELETED = "Le menu a été supprimé.";
+
+    static MENU_ITEM_CREATED = "Le lien de menu a été crée.";
+    static MENU_ITEM_MOVED = "Le lien de menu a été déplacé.";
+    static MENU_ITEM_UPDATED = "Le lien de menu a été modifié.";
+    static MENU_ITEM_REMOVED = "Le lien de menu a été supprimé.";
+
+    static NO_FILE_SENDED = "No file sended.";
+
+    // -------------------------
+    // Contacts
+    // -------------------------
+    static CONTACT_SENDED = "Votre message a bien été envoyé.";
+    static CONTACT_ARCHIVED = "Le message a bien été archivé.";
 }
