@@ -6,7 +6,7 @@ import type { OrganizationMemberRole } from "#shared/organization-roles";
 type LoginDto = {
     stayConnected: any;
     email: string;
-    password: string
+    password: string;
 };
 
 type ResetDto = {
@@ -16,7 +16,13 @@ type ResetDto = {
     password: string;
 };
 
-type Organization = { slug: string | null; name: string | null; logoUrl: string | null; nbMembers: number; role: OrganizationMemberRole | null };
+type Organization = {
+    slug: string | null;
+    name: string | null;
+    logoUrl: string | null;
+    nbMembers: number;
+    role: OrganizationMemberRole | null;
+};
 type TokenPair = { token: string; refreshToken: string; organization?: Organization | null; message?: string };
 type ForgotPasswordDto = { email: string };
 type ResetPasswordDto = {
@@ -46,6 +52,12 @@ export const useAuth = () => {
         maxAge: 60 * 60 * 24 * 30,
     });
 
+    const hasOrganization = useCookie<boolean | null>("hasOrganization", {
+        sameSite: "lax",
+        secure: !import.meta.dev,
+        maxAge: 60 * 60 * 24 * 30,
+    });
+
     const user = useState<User | null>("auth:user", () => null);
     const loggedIn = computed(() => !!token.value);
 
@@ -62,11 +74,11 @@ export const useAuth = () => {
         const maxAge = payload.stayConnected ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
 
         const rTokenWithExpiry = await nuxtApp.runWithContext(() =>
-            useCookie<string | null>('refreshToken', {
-                sameSite: 'lax',
+            useCookie<string | null>("refreshToken", {
+                sameSite: "lax",
                 secure: !import.meta.dev,
                 maxAge,
-            })
+            }),
         );
 
         rTokenWithExpiry.value = res.refreshToken;
@@ -93,9 +105,22 @@ export const useAuth = () => {
         rToken.value = res.refreshToken;
         currentOrganization.value = res.organization ?? null;
 
+        await refreshOrganizations();
+
         if (res.token) {
             await refreshUser(res.token);
         }
+    }
+
+    async function refreshOrganizations() {
+        const organizations = await api.get<Array<Organization>>(`/user/organizations`, {
+            loadingKey: "organizations:load",
+            toast: false,
+        });
+
+        console.log("User organizations:", organizations);
+
+        hasOrganization.value = organizations.length > 0;
     }
 
     async function refreshOrganization(slug?: string) {
@@ -114,6 +139,7 @@ export const useAuth = () => {
         let datToken = forceToken || token.value;
 
         try {
+            await refreshOrganizations();
             user.value = await api.get<User>("/user/me", {
                 toast: false,
                 loadingKey: "auth:login",
@@ -196,6 +222,7 @@ export const useAuth = () => {
         user,
         loggedIn,
         currentOrganization,
+        hasOrganization,
         login,
         logout,
         refresh,

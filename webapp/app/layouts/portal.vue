@@ -1,6 +1,7 @@
 <template>
     <v-app>
         <v-navigation-drawer
+            v-if="showLeftMenu"
             :rail="isCollapsed"
             class="bg-brand-dark main-nav"
             :class="{ 'drawer-collapsed': isCollapsed }"
@@ -37,11 +38,7 @@
             <v-list color="primary" base-color="white" nav>
                 <v-list-item rounded="xl" prepend-icon="mdi-view-dashboard" title="Tableau de bord" to="/portal/dashboard" />
 
-                <v-list-subheader
-                    v-if="user?.isSaasAdmin"
-                    class="mt-2 text-uppercase text-label-large"
-                    color="grey-lighten-2"
-                >
+                <v-list-subheader v-if="user?.isSaasAdmin" class="mt-2 text-uppercase text-label-large" color="grey-lighten-2">
                     Pilotage SaaS
                 </v-list-subheader>
 
@@ -61,13 +58,7 @@
                     to="/portal/pages"
                 ></v-list-item>
 
-                <v-list-item
-                    v-if="user?.isSaasAdmin"
-                    rounded="xl"
-                    prepend-icon="mdi-menu"
-                    title="Menus"
-                    to="/portal/menus"
-                ></v-list-item>
+                <v-list-item v-if="user?.isSaasAdmin" rounded="xl" prepend-icon="mdi-menu" title="Menus" to="/portal/menus"></v-list-item>
 
                 <v-list-item
                     v-if="user?.isSaasAdmin"
@@ -174,7 +165,7 @@ import { OrganizationMemberRoleLabel } from "~/models/OrganizationMember";
 const notifOpen = useState("notif:drawer:open", () => false);
 
 const { menuIsOpen, toggleMenu } = useUserPreferences();
-const { user, logout, currentOrganization } = useAuth();
+const { user, logout, currentOrganization, hasOrganization } = useAuth();
 const { connect, disconnect } = useNotifications();
 
 // SSE parts, important to keep for notification system.
@@ -200,6 +191,7 @@ onMounted(async () => {
 
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
+const showLeftMenu = computed(() => user.value?.isSaasAdmin || !!hasOrganization.value);
 
 const userInitials = computed(() => {
     if (!user.value) {
@@ -209,7 +201,7 @@ const userInitials = computed(() => {
     const f = user.value.firstname?.[0] ?? "";
     const l = user.value.lastname?.[0] ?? "";
 
-    return (f + l).toUpperCase() || user.value.email[0].toUpperCase();
+    return (f + l).toUpperCase() || user.value.email[0]?.toUpperCase();
 });
 
 const userName = computed(() => {

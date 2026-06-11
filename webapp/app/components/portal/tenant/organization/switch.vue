@@ -1,17 +1,18 @@
 <template>
-    <div
-        class="org-switcher"
-        :class="{ 'org-switcher-collapsed': props.isCollapsed }"
-        @click="dialogSwitchOrga = !dialogSwitchOrga"
-    >
-        <v-avatar size="36" rounded="lg" class="flex-shrink-0" :class="{ 'gradient-primary': !currentOrganization?.logoUrl, 'bg-white': !!currentOrganization?.logoUrl }">
+    <div class="org-switcher" :class="{ 'org-switcher-collapsed': props.isCollapsed }" @click="dialogSwitchOrga = !dialogSwitchOrga">
+        <v-avatar
+            size="36"
+            rounded="lg"
+            class="flex-shrink-0"
+            :class="{ 'gradient-primary': !currentOrganization?.logoUrl, 'bg-white': !!currentOrganization?.logoUrl }"
+        >
             <v-img v-if="currentOrganization?.logoUrl" :src="currentOrganization.logoUrl!" :alt="currentOrganization.name ?? ''" cover />
-            <span v-else>{{ initialsFromName(currentOrganization?.name ?? '') }}</span>
+            <span v-else>{{ initialsFromName(currentOrganization?.name ?? "") }}</span>
         </v-avatar>
 
         <transition name="org-content">
             <div v-if="!props.isCollapsed" class="org-info">
-                <div class="org-name">{{ currentOrganization?.name ?? 'Aucune organisation' }}</div>
+                <div class="org-name">{{ currentOrganization?.name ?? "Aucune organisation" }}</div>
                 <div class="org-sub" v-if="currentOrganization?.name">{{ currentOrganization?.nbMembers ?? 0 }} utilisateurs</div>
             </div>
         </transition>
@@ -72,16 +73,14 @@
                                     <v-col md="10">
                                         <h2 class="mt-2">{{ organization.name }}</h2>
                                         <p class="mt-n4">
-                                            {{ organization.nbMembers }} utilisateur{{ (organization.nbMembers ?? 0) > 1 ? 's' : '' }}
+                                            {{ organization.nbMembers }} utilisateur{{ (organization.nbMembers ?? 0) > 1 ? "s" : "" }}
                                         </p>
                                     </v-col>
                                 </v-row>
                             </v-card-text>
                         </v-card>
 
-                        <portal-tenant-organization-create
-                            @created="addToOrganizations"
-                        ></portal-tenant-organization-create>
+                        <portal-tenant-organization-create @created="addToOrganizations"></portal-tenant-organization-create>
                     </v-col>
                 </v-row>
             </v-card-text>
@@ -94,20 +93,20 @@ import type { Organization } from "~/models/Organization";
 
 const props = defineProps<{ isCollapsed: boolean }>();
 
-const { currentOrganization } = useAuth();
+const { currentOrganization, hasOrganization } = useAuth();
 const router = useRouter();
 
 const initialsFromName = (name: string) => {
     if (!name) {
-        return 'N.R';
+        return "N.R";
     }
 
     return name
-        .split(' ')
+        .split(" ")
         .map((w: string) => w.charAt(0).toUpperCase())
-        .join('')
+        .join("")
         .slice(0, 2);
-}
+};
 
 // Switch Orga Mod
 const api = useApi();
@@ -122,8 +121,8 @@ const handleClose = () => {
 watch(dialogSwitchOrga, async (newVal) => {
     if (newVal) {
         organizations.value = await api.get<Array<Organization>>(`/user/organizations`, {
-            loadingKey: 'organizations:load',
-            toast: false
+            loadingKey: "organizations:load",
+            toast: false,
         });
     }
 });
@@ -135,7 +134,7 @@ const addToOrganizations = (data: Organization) => {
 };
 
 const handleChangeOrganization = async (uuid: string) => {
-    const org = organizations.value.find(o => o.uuid === uuid);
+    const org = organizations.value.find((o) => o.uuid === uuid);
 
     if (!org || org.slug === currentOrganization.value?.slug) {
         dialogSwitchOrga.value = false;
@@ -149,6 +148,8 @@ const handleChangeOrganization = async (uuid: string) => {
         nbMembers: org.nbMembers ?? 0,
         role: org.role as any,
     };
+
+    hasOrganization.value = true;
 
     dialogSwitchOrga.value = false;
     await router.replace("/portal/dashboard");
@@ -165,7 +166,11 @@ const handleChangeOrganization = async (uuid: string) => {
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.2s ease, padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+    transition:
+        background 0.2s ease,
+        padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.3s ease;
     color: white;
 }
 
