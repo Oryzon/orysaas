@@ -1,20 +1,11 @@
 <template>
     <v-row class="mb-3">
-        <v-col v-for="provider in providers" :key="provider.name" md="4">
-            <v-btn
-                block
-                variant="outlined"
-                color="grey-darken-1"
-                @click="provider.action"
-            >
+        <v-col v-for="provider in visibleProviders" :key="provider.name" :md="providerColumnMd">
+            <v-btn block variant="outlined" color="grey-darken-1" @click="provider.action">
                 <template v-slot:prepend>
                     <icons-google-svg-icon v-if="provider.key === 'google'" />
-                    <icons-facebook-svg-icon
-                        v-else-if="provider.key === 'facebook'"
-                    />
-                    <icons-microsoft-svg-icon
-                        v-else-if="provider.key === 'microsoft'"
-                    />
+                    <icons-facebook-svg-icon v-else-if="provider.key === 'facebook'" />
+                    <icons-microsoft-svg-icon v-else-if="provider.key === 'microsoft'" />
                 </template>
 
                 {{ provider.name }}
@@ -56,10 +47,7 @@ const loginWithGoogle = () => {
         key: "google",
         rootUrl: "https://accounts.google.com/o/oauth2/v2/auth",
         clientId: config.public.googleClientId,
-        scope: [
-            "https://www.googleapis.com/auth/userinfo.profile",
-            "https://www.googleapis.com/auth/userinfo.email",
-        ].join(" "),
+        scope: ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"].join(" "),
         extraParams: {
             access_type: "offline",
             prompt: "consent",
@@ -81,13 +69,7 @@ const loginWithMicrosoft = () => {
         key: "microsoft",
         rootUrl: `https://login.microsoftonline.com/${config.public.microsoftTenantId}/oauth2/v2.0/authorize`,
         clientId: config.public.microsoftClientId,
-        scope: [
-            "openid",
-            "profile",
-            "email",
-            "offline_access",
-            "User.Read",
-        ].join(" "),
+        scope: ["openid", "profile", "email", "offline_access", "User.Read"].join(" "),
     });
 };
 
@@ -96,23 +78,49 @@ const providers: {
     key: string;
     iconColor?: string;
     action: () => void;
+    env?: string[];
 }[] = [
     {
         name: "Google",
         key: "google",
         action: loginWithGoogle,
+        env: ["googleClientId"],
     },
     {
         name: "Facebook",
         key: "facebook",
         action: loginWithFacebook,
+        env: ["facebookAppId"],
     },
     {
         name: "Microsoft",
         key: "microsoft",
         action: loginWithMicrosoft,
+        env: ["microsoftClientId", "microsoftTenantId"],
     },
 ];
+
+const hasAllRequiredEnv = (envKeys?: string[]) => {
+    if (!envKeys?.length) {
+        return true;
+    }
+
+    return envKeys.every((envKey) => {
+        const value = config.public?.[envKey as keyof typeof config.public];
+        return value !== undefined && value !== null && String(value).trim() !== "";
+    });
+};
+
+const visibleProviders = computed(() => providers.filter((provider) => hasAllRequiredEnv(provider.env)));
+
+const providerColumnMd = computed(() => {
+    const count = visibleProviders.value.length;
+    if (!count) {
+        return 12;
+    }
+
+    return Math.max(1, Math.floor(12 / count));
+});
 </script>
 
 <style scoped>
