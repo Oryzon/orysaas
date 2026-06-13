@@ -1,6 +1,5 @@
 import { Controller, Error, CheckJwt, Post, Get } from "../../../../decorators";
 import { Request, Response } from "express";
-import { Equal } from "typeorm";
 import Messages from "../../../../config/messages";
 import HttpCode from "../../../../config/http-code";
 import { OrganizationEntity } from "../../../../databases/entities/organization.entity";
@@ -71,20 +70,5 @@ export default class OrganizationController {
             message: Messages.ORGANIZATION_CREATED,
             entity: tmpEntity,
         });
-    }
-
-    @Get("/")
-    @CheckJwt()
-    @Error()
-    async getAll(req: Request, res: Response) {
-        const organizations = await OrganizationRepository.find({
-            relations: {
-                members: {
-                    member: true,
-                },
-            },
-        });
-
-        return res.status(HttpCode.OK).send(organizations);
     }
 }

@@ -56,7 +56,9 @@
 
                         <template v-slot:item.actions="{ item }">
                             <div class="d-flex justify-end ga-2">
-                                <v-btn :to="`/portal/${item.slug}/settings`" icon="mdi-cog-outline" variant="flat" size="small"></v-btn>
+                                <v-btn icon :to="`/portal/organizations/${item.slug}`" variant="flat" size="small">
+                                    <v-icon color="primary">mdi-pencil</v-icon>
+                                </v-btn>
                             </div>
                         </template>
                     </v-data-table>
