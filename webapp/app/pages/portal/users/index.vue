@@ -72,7 +72,9 @@
 
                         <template v-slot:item.actions="{ item }">
                             <div class="d-flex justify-end py-2">
-                                <v-btn :to="`/portal/users/${item.uuid}`" icon="mdi-cog-outline" variant="flat" size="small"></v-btn>
+                                <v-btn :to="`/portal/users/${item.uuid}`" variant="flat">
+                                    <v-icon icon="mdi-pencil" color="primary"></v-icon>
+                                </v-btn>
                             </div>
                         </template>
                     </v-data-table>
@@ -110,6 +112,19 @@ const headers = computed(() => {
     return headers;
 });
 
+const users = ref<Array<User>>([]);
+
+// Init of the page
+onMounted(async () => {
+    await handleSearch();
+});
+
+const handleSearch = async () => {
+    users.value = await api.get<Array<User>>("users", {
+        loadingKey: "users:list",
+    });
+};
+
 const getInitials = (user: User) => {
     const firstname = user.firstname?.[0] ?? "";
     const lastname = user.lastname?.[0] ?? "";
@@ -137,18 +152,5 @@ const getOriginChipColor = (origin: unknown) => {
 
 const getOriginLabel = (origin: unknown) => {
     return String(origin ?? "—");
-};
-
-const users = ref<Array<User>>([]);
-
-// Init of the page
-onMounted(async () => {
-    await handleSearch();
-});
-
-const handleSearch = async () => {
-    users.value = await api.get<Array<User>>("users", {
-        loadingKey: "users:list",
-    });
 };
 </script>

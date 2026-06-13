@@ -7,10 +7,9 @@ import { Equal } from "typeorm";
 import Messages from "../../../config/messages";
 import { getUserUuid } from "../../../helpers/request-context.helper";
 
-@Controller('user')
+@Controller("user")
 export default class UserController {
-
-    @Get('/me')
+    @Get("/me")
     @CheckJwt()
     @Error()
     async me(req: Request, res: Response) {
@@ -18,26 +17,49 @@ export default class UserController {
 
         const user = await UserRepository.findOne({
             where: {
-                uuid: Equal(uuid)
+                uuid: Equal(uuid),
             },
         });
 
         if (!user) {
-            return res
-                .status(HttpCode.NOT_FOUND)
-                .send({
-                    message: Messages.USER_NOT_FOUND
-                });
+            return res.status(HttpCode.NOT_FOUND).send({
+                message: Messages.USER_NOT_FOUND,
+            });
         }
 
         delete user.password;
 
-        return res
-            .status(HttpCode.OK)
-            .send(user);
+        return res.status(HttpCode.OK).send(user);
     }
 
-    @Get('/organization')
+    @Get("/:uuid")
+    @CheckJwt()
+    @Error()
+    async getUserByUuid(req: Request, res: Response) {
+        const uuid = req.params.uuid;
+
+        const user = await UserRepository.findOne({
+            where: {
+                uuid: Equal(uuid),
+            },
+        });
+
+        if (!user) {
+            return res.status(HttpCode.NOT_FOUND).send({
+                message: Messages.USER_NOT_FOUND,
+            });
+        }
+
+        delete user.password;
+        const organizations = await OrganizationMemberRepository.findAll(uuid);
+
+        return res.status(HttpCode.OK).send({
+            ...user,
+            organizations,
+        });
+    }
+
+    @Get("/organization")
     @CheckJwt()
     @Error()
     async organization(req: Request, res: Response) {
@@ -48,19 +70,15 @@ export default class UserController {
             ? await OrganizationMemberRepository.findLightBySlug(userUuid, slug)
             : await OrganizationMemberRepository.findLight(userUuid);
 
-        return res
-            .status(HttpCode.OK)
-            .send(organization);
+        return res.status(HttpCode.OK).send(organization);
     }
 
-    @Get('/organizations')
+    @Get("/organizations")
     @CheckJwt()
     @Error()
     async listOrganization(req: Request, res: Response) {
         const organizations = await OrganizationMemberRepository.findAll(getUserUuid());
 
-        return res
-            .status(HttpCode.OK)
-            .send(organizations);
+        return res.status(HttpCode.OK).send(organizations);
     }
 }
