@@ -1,6 +1,5 @@
-import { Controller, Error, CheckJwt, Post } from "../../../../decorators";
+import { Controller, Error, CheckJwt, Post, Get } from "../../../../decorators";
 import { Request, Response } from "express";
-import { Equal } from "typeorm";
 import Messages from "../../../../config/messages";
 import HttpCode from "../../../../config/http-code";
 import { OrganizationEntity } from "../../../../databases/entities/organization.entity";
@@ -14,13 +13,13 @@ import fs from "fs";
 import path from "path";
 import { organizationLogoService } from "../../../../services/organization-logo.service";
 
-@Controller('organizations')
+@Controller("organizations")
 export default class OrganizationController {
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @Error()
     async create(req: Request, res: Response) {
-        const tmpDir = path.join(process.cwd(), 'uploads', 'tmp');
+        const tmpDir = path.join(process.cwd(), "uploads", "tmp");
         fs.mkdirSync(tmpDir, { recursive: true });
 
         const form = formidable({ uploadDir: tmpDir, keepExtensions: true, maxFileSize: 5 * 1024 * 1024 });
@@ -64,14 +63,12 @@ export default class OrganizationController {
         const tmpEntity = {
             ...entity,
             nbMembers: 1,
-            role: OrganizationMemberRole.OWNER
+            role: OrganizationMemberRole.OWNER,
         };
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_CREATED,
-                entity: tmpEntity
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_CREATED,
+            entity: tmpEntity,
+        });
     }
 }

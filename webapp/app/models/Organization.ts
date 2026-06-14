@@ -1,3 +1,6 @@
+import type { OrganizationMember } from "./OrganizationMember";
+import type { OrganizationInvite } from "./OrganizationInvite";
+
 export interface Organization {
     uuid: string;
     name: string;
@@ -14,8 +17,8 @@ export interface Organization {
     postalCode: string;
     country: string;
 
-    members: [];
-    invites: [];
+    members: OrganizationMember[];
+    invites: OrganizationInvite[];
 
     createdAt: Date;
     createdBy: string;
