@@ -56,6 +56,14 @@
                     title="Utilisateurs"
                     to="/portal/users"
                 ></v-list-item>
+                
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-domain"
+                    title="Organisations"
+                    to="/portal/organizations"
+                ></v-list-item>
 
                 <v-list-item
                     v-if="user?.isSaasAdmin"

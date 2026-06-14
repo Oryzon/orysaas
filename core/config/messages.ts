@@ -79,7 +79,8 @@ export default class Messages {
     // -------------------------
     static ORGANIZATION_CREATED = "L'organisation a bien été créée.";
     static ORGANIZATION_UPDATED = "L'organisation a été mise à jour.";
-    static ORGANIZATION_ALREADY_EXIST = "Cette organisation existe déjà.. Si vous pensez qu'il s'agit d'une erreur, merci de contacter le support information.";
+    static ORGANIZATION_ALREADY_EXIST =
+        "Cette organisation existe déjà.. Si vous pensez qu'il s'agit d'une erreur, merci de contacter le support information.";
     static ORGANIZATION_LOGO_UPDATED = "Le logo a été mis à jour.";
     static ORGANIZATION_LOGO_FILE_MISSING = "Aucun fichier fourni.";
     static ORGANIZATION_SLUG_MISSING = "Slug d'organisation manquant.";
