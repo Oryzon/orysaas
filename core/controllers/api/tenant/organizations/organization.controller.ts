@@ -13,8 +13,8 @@ import fs from "fs";
 import path from "path";
 import { organizationLogoService } from "../../../../services/organization-logo.service";
 
-@Controller("organizations")
-export default class OrganizationController {
+@Controller("/tenant/organizations")
+export default class TenantOrganizationController {
     @Post("/")
     @CheckJwt()
     @Error()

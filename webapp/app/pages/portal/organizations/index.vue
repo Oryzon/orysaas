@@ -12,27 +12,31 @@
                         items-per-page="25"
                     >
                         <template v-slot:item.name="{ item }">
-                            <div class="d-flex align-center ga-3 py-2">
-                                <v-avatar size="36" rounded="lg" class="gradient-primary flex-shrink-0">
-                                    {{ organizationInitials(item.name) }}
-                                </v-avatar>
+                            <v-list lines="two" class="ml-n4">
+                                <v-list-item>
+                                    <template v-slot:prepend>
+                                        <v-avatar size="48" rounded="lg" class="gradient-primary flex-shrink-0">
+                                            <v-img v-if="item?.logoUrl" :src="item.logoUrl!" :alt="item.name ?? ''" cover />
+                                            <span v-else>{{ getInitials(item.name) }}</span>
+                                        </v-avatar>
+                                    </template>
 
-                                <div>
-                                    <div class="text-body-2 font-weight-medium">{{ item.name }}</div>
-                                    <div class="text-caption text-medium-emphasis">Organisation</div>
-                                </div>
-                            </div>
+                                    <v-list-item-title>{{ item.name }}</v-list-item-title>
+
+                                    <v-list-item-subtitle class="text-label-large">
+                                        Propriétaire : {{ ownerName(item) }}
+                                    </v-list-item-subtitle>
+                                </v-list-item>
+                            </v-list>
                         </template>
 
                         <template v-slot:item.slug="{ item }">
-                            <v-chip color="primary" variant="tonal" size="small" rounded="lg" prepend-icon="mdi-pound">
+                            <v-chip
+                                color="primary"
+                                variant="tonal"
+                                prepend-icon="mdi-pound"
+                            >
                                 {{ item.slug }}
-                            </v-chip>
-                        </template>
-
-                        <template v-slot:item.ownerName="{ item }">
-                            <v-chip color="secondary" variant="outlined" size="small" rounded="lg" prepend-icon="mdi-account-star">
-                                {{ ownerName(item) }}
                             </v-chip>
                         </template>
 
@@ -40,26 +44,21 @@
                             <v-chip
                                 :color="item.members.length >= 10 ? 'success' : 'info'"
                                 variant="tonal"
-                                size="small"
-                                rounded="lg"
                                 prepend-icon="mdi-account-group"
                             >
                                 {{ item.members.length }} {{ item.members.length > 1 ? "membres" : "membre" }}
                             </v-chip>
                         </template>
 
-                        <template v-slot:item.country="{ item }">
-                            <v-chip color="grey" variant="outlined" size="small" rounded="lg" prepend-icon="mdi-earth">
-                                {{ item.country || "Non renseigné" }}
-                            </v-chip>
-                        </template>
-
                         <template v-slot:item.actions="{ item }">
-                            <div class="d-flex justify-end ga-2">
-                                <v-btn icon :to="`/portal/organizations/${item.slug}`" variant="flat" size="small">
-                                    <v-icon color="primary">mdi-pencil</v-icon>
+                                <v-btn
+                                    variant="text"
+                                    icon
+                                    color="info"
+                                    :to="`/portal/organizations/${item.slug}`"
+                                >
+                                    <v-icon>mdi-eye</v-icon>
                                 </v-btn>
-                            </div>
                         </template>
                     </v-data-table>
                 </v-card-text>
@@ -85,7 +84,6 @@ const isLoading = computed(() => {
 const headers = [
     { title: "Nom", key: "name" },
     { title: "Slug", key: "slug" },
-    { title: "Propriétaire", key: "ownerName" },
     { title: "Nombre de membres", key: "membersCount" },
     { title: "Pays", key: "country" },
     { title: "Actions", key: "actions", sortable: false, align: "end" },
@@ -106,19 +104,6 @@ const handleSearch = async () => {
 
 const ownerName = (org: Organization) => {
     const owner = org.members.find((member) => member.role === "owner");
-    return owner ? `${owner.member.firstname} ${owner.member.lastname}` : "N/A";
-};
-
-const organizationInitials = (name: string): string => {
-    if (!name) {
-        return "N/A";
-    }
-
-    return name
-        .split(" ")
-        .filter(Boolean)
-        .map((word) => word[0]?.toUpperCase())
-        .join("")
-        .slice(0, 2);
+    return owner ? `${owner.member.firstname} ${owner.member.lastname}` : "N.R";
 };
 </script>

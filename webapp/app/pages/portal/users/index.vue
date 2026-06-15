@@ -12,70 +12,63 @@
                         items-per-page="25"
                     >
                         <template v-slot:item.firstname="{ item }">
-                            <div class="d-flex align-center ga-3 py-2">
-                                <v-avatar size="36" rounded="lg" class="gradient-primary flex-shrink-0">
-                                    {{ getInitials(item) }}
-                                </v-avatar>
+                            <v-list lines="two" class="ml-n4">
+                                <v-list-item>
+                                    <template v-slot:prepend>
+                                        <v-avatar size="48" rounded="lg" class="gradient-primary flex-shrink-0">
+                                            {{ getInitials(item.firstname + ' ' + item.lastname) }}
+                                        </v-avatar>
+                                    </template>
 
-                                <div>
-                                    <div class="text-body-2 font-weight-medium">{{ item.firstname || "—" }}</div>
-                                    <div class="text-caption text-medium-emphasis">{{ item.lastname?.toUpperCase() || "—" }}</div>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template v-slot:item.email="{ item }">
-                            <div class="py-2">
-                                <v-chip label color="primary" variant="tonal" size="small" rounded="lg" prepend-icon="mdi-email-outline">
-                                    {{ item.email }}
-                                </v-chip>
-                            </div>
+                                    <v-list-item-title>{{ item.lastname?.toUpperCase() }} {{ item.firstname }}</v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        {{ item.email }}
+                                    </v-list-item-subtitle>
+                                </v-list-item>
+                            </v-list>
                         </template>
 
                         <template v-slot:item.origin="{ value }">
-                            <div class="py-2">
-                                <v-chip label :color="getOriginChipColor(value)" variant="tonal" size="small" rounded="lg">
-                                    {{ getOriginLabel(value) }}
-                                </v-chip>
-                            </div>
+                            <v-chip
+                                label
+                                :color="getUserOriginColor(value)"
+                                variant="tonal"
+                            >
+                                {{ getUserOriginLabel(value) }}
+                            </v-chip>
                         </template>
 
                         <template v-slot:item.isSaasAdmin="{ value }">
-                            <div class="py-2">
-                                <v-chip
-                                    label
-                                    :color="value ? 'success' : 'grey-darken-1'"
-                                    variant="tonal"
-                                    size="small"
-                                    rounded="lg"
-                                    :prepend-icon="value ? 'mdi-shield-check' : 'mdi-shield-off-outline'"
-                                >
-                                    {{ value ? "Oui" : "Non" }}
-                                </v-chip>
-                            </div>
+                            <v-chip
+                                label
+                                :color="value ? 'success' : 'error'"
+                                variant="tonal"
+                                :prepend-icon="value ? 'mdi-check' : 'mdi-close'"
+                            >
+                                {{ value ? "Oui" : "Non" }}
+                            </v-chip>
                         </template>
 
                         <template v-slot:item.lastLogin="{ value }">
-                            <div class="py-2">
-                                <v-chip
-                                    label
-                                    color="info"
-                                    variant="tonal"
-                                    size="small"
-                                    rounded="lg"
-                                    prepend-icon="mdi-calendar-clock-outline"
-                                >
-                                    {{ value ? $date.french(value) : "Jamais" }}
-                                </v-chip>
-                            </div>
+                            <v-chip
+                                label
+                                color="info"
+                                variant="tonal"
+                                prepend-icon="mdi-calendar-clock-outline"
+                            >
+                                {{ value ? $date.french(value) : "Jamais" }}
+                            </v-chip>
                         </template>
 
                         <template v-slot:item.actions="{ item }">
-                            <div class="d-flex justify-end py-2">
-                                <v-btn :to="`/portal/users/${item.uuid}`" variant="flat">
-                                    <v-icon icon="mdi-pencil" color="primary"></v-icon>
-                                </v-btn>
-                            </div>
+                            <v-btn
+                                :to="`/portal/users/${item.uuid}`"
+                                variant="text"
+                                icon
+                                color="info"
+                            >
+                                <v-icon>mdi-eye</v-icon>
+                            </v-btn>
                         </template>
                     </v-data-table>
                 </v-card-text>
@@ -84,7 +77,7 @@
     </v-row>
 </template>
 <script setup lang="ts">
-import { type User } from "~/models/User";
+import { type User, getUserOriginColor, getUserOriginLabel } from "~/models/User";
 
 const api = useApi();
 
@@ -100,16 +93,13 @@ const isLoading = computed(() => {
 });
 
 const headers = computed(() => {
-    let headers = [
-        { title: "Prénom", key: "firstname" },
-        { title: "Email", key: "email" },
+    return [
+        { title: "Utilisateur", key: "firstname" },
         { title: "Origine", key: "origin" },
-        { title: "Saas Admin", key: "isSaasAdmin" },
+        { title: "Administrateur ?", key: "isSaasAdmin" },
         { title: "Dernière connexion", key: "lastLogin" },
         { title: "Actions", key: "actions", align: "end" },
     ];
-
-    return headers;
 });
 
 const users = ref<Array<User>>([]);
@@ -123,34 +113,5 @@ const handleSearch = async () => {
     users.value = await api.get<Array<User>>("users", {
         loadingKey: "users:list",
     });
-};
-
-const getInitials = (user: User) => {
-    const firstname = user.firstname?.[0] ?? "";
-    const lastname = user.lastname?.[0] ?? "";
-
-    return (firstname + lastname).toUpperCase() || user.email[0]?.toUpperCase();
-};
-
-const getOriginChipColor = (origin: unknown) => {
-    const value = String(origin ?? "").toLowerCase();
-
-    if (value.includes("google")) {
-        return "red-darken-2";
-    }
-
-    if (value.includes("microsoft")) {
-        return "blue-darken-2";
-    }
-
-    if (value.includes("local") || value.includes("email")) {
-        return "teal-darken-2";
-    }
-
-    return "secondary";
-};
-
-const getOriginLabel = (origin: unknown) => {
-    return String(origin ?? "—");
 };
 </script>

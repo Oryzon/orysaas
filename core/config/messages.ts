@@ -99,6 +99,11 @@ export default class Messages {
     static ORGANIZATION_MEMBER_OWNER_CANT_BE_EDITED = "Le rôle du propriétaire ne peut pas être modifié.";
 
     // -------------------------
+    // Settings
+    // -------------------------
+    static SETTINGS_UPDATED = "Les paramètres ont été mis à jour.";
+
+    // -------------------------
     // Permissions
     // -------------------------
     static PERMISSION_UNAUTHORIZED = "Unauthorized";

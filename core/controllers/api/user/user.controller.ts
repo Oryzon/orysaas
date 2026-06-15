@@ -32,6 +32,29 @@ export default class UserController {
         return res.status(HttpCode.OK).send(user);
     }
 
+    @Get("/organization")
+    @CheckJwt()
+    @Error()
+    async organization(req: Request, res: Response) {
+        const slug = req.query.slug as string;
+        const userUuid = getUserUuid();
+
+        const organization = slug
+            ? await OrganizationMemberRepository.findLightBySlug(userUuid, slug)
+            : await OrganizationMemberRepository.findLight(userUuid);
+
+        return res.status(HttpCode.OK).send(organization);
+    }
+
+    @Get("/organizations")
+    @CheckJwt()
+    @Error()
+    async listOrganization(req: Request, res: Response) {
+        const organizations = await OrganizationMemberRepository.findAll(getUserUuid());
+
+        return res.status(HttpCode.OK).send(organizations);
+    }
+
     @Get("/:uuid")
     @CheckJwt()
     @Error()
@@ -57,28 +80,5 @@ export default class UserController {
             ...user,
             organizations,
         });
-    }
-
-    @Get("/organization")
-    @CheckJwt()
-    @Error()
-    async organization(req: Request, res: Response) {
-        const slug = req.query.slug as string;
-        const userUuid = getUserUuid();
-
-        const organization = slug
-            ? await OrganizationMemberRepository.findLightBySlug(userUuid, slug)
-            : await OrganizationMemberRepository.findLight(userUuid);
-
-        return res.status(HttpCode.OK).send(organization);
-    }
-
-    @Get("/organizations")
-    @CheckJwt()
-    @Error()
-    async listOrganization(req: Request, res: Response) {
-        const organizations = await OrganizationMemberRepository.findAll(getUserUuid());
-
-        return res.status(HttpCode.OK).send(organizations);
     }
 }

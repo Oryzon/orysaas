@@ -46,7 +46,7 @@
                         icon="mdi-pencil"
                         size="small"
                         variant="text"
-                        color="primary"
+                        color="info"
                         @click.stop="handleEdit"
                     ></v-btn>
 
@@ -101,7 +101,7 @@
                 icon="mdi-pencil"
                 size="small"
                 variant="text"
-                color="primary"
+                color="info"
                 @click.stop="handleEdit"
             ></v-btn>
 

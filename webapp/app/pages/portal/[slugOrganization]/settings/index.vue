@@ -283,22 +283,10 @@ const isLoading = computed(() => api.isLoading('setting:detail') || api.isLoadin
 
 const canManage = useOrganizationCan(OrganizationMemberRole.ADMIN);
 
-const orgInitials = computed(() => {
-    const name = organization.value?.name;
-
-    if (!name) {
-        return '?';
-    }
-
-    return name
-        .split(' ')
-        .map((w: string) => w.charAt(0).toUpperCase())
-        .join('')
-        .slice(0, 2);
-});
+const orgInitials = computed(() => getInitials(organization.value?.name));
 
 const getGeneral = async () => {
-    organization.value = await api.get<Organization>(`/${slugOrganization}/setting/details`, {
+    organization.value = await api.get<Organization>(`/tenant/${slugOrganization}/setting/details`, {
         loadingKey: 'setting:detail',
         toast: false
     });
@@ -330,7 +318,7 @@ const handleLogoChange = async (event: Event) => {
     const formData = new FormData();
     formData.append('logo', file);
 
-    const res = await api.post<{ logoUrl: string }>(`/${slugOrganization}/setting/logo`, formData, {
+    const res = await api.post<{ logoUrl: string }>(`/tenant/${slugOrganization}/setting/logo`, formData, {
         loadingKey: 'setting:logo',
         toast: true,
     });
@@ -349,7 +337,7 @@ const handleEditGeneral = async () => {
         return;
     }
 
-    await api.put(`/${slugOrganization}/setting`, {
+    await api.put(`/tenant/${slugOrganization}/setting`, {
         ...organization.value
     }, {
         loadingKey: 'setting:update',

@@ -9,18 +9,14 @@ import {
     Put
 } from "../../../../decorators";
 import { Request, Response } from "express";
-
 import Messages from "../../../../config/messages";
 import HttpCode from "../../../../config/http-code";
 import { OrganizationMemberRepository } from "../../../../databases/repositories/organization-member.repository";
 import { Equal } from "typeorm";
-import {
-    OrganizationMemberEntity,
-    OrganizationMemberRole
-} from "../../../../databases/entities/organization-member.entity";
+import { OrganizationMemberRole } from "../../../../databases/entities/organization-member.entity";
 
-@Controller(':slugOrganization/member')
-export default class MemberController {
+@Controller('/tenant/:slugOrganization/member')
+export default class TenantMemberController {
     @Put('/:memberUuid')
     @CheckJwt()
     @CheckOrganizationMember()

@@ -54,7 +54,7 @@
                                 <template v-slot:item.member="{ item }">
                                     <div class="d-flex align-center ga-3 py-2">
                                         <v-avatar size="36" rounded="lg" class="gradient-primary flex-shrink-0">
-                                            {{ memberInitials(item.member) }}
+                                            {{ getInitials(item.member.firstname + ' ' + item.member.lastname) }}
                                         </v-avatar>
 
                                         <div>
@@ -145,17 +145,10 @@ const headers = computed(() => {
 });
 
 onMounted(async () => {
-    members.value = await api.get<Array<OrganizationMember>>(`/${slugOrganization}/members`, {
+    members.value = await api.get<Array<OrganizationMember>>(`/tenant/${slugOrganization}/members`, {
         loadingKey: "members:list",
     });
 });
-
-const memberInitials = (user: User): string => {
-    const f = user.firstname?.[0] ?? "";
-    const l = user.lastname?.[0] ?? "";
-
-    return (f + l).toUpperCase() || (user.email?.[0] ?? "?").toUpperCase();
-};
 
 const removeToMembers = (data: OrganizationMember) => {
     members.value = members.value.filter((member) => member.uuid !== data.uuid);

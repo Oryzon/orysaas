@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn icon variant="text" color="blue" v-bind="activatorProps">
+            <v-btn icon variant="text" color="info" v-bind="activatorProps">
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </template>
@@ -95,7 +95,7 @@ const handleUpdate = async () => {
     }
 
     const res = await api.put<{ message: string, entity: OrganizationMember }>(
-        `/${slugOrganization}/member/${props.entity.uuid}`,
+        `/tenant/${slugOrganization}/member/${props.entity.uuid}`,
         { role: selectedRole.value },
         {
             loadingKey: "member:update",

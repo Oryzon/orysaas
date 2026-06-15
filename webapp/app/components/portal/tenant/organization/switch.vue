@@ -6,7 +6,7 @@
     >
         <v-avatar size="36" rounded="lg" class="flex-shrink-0" :class="{ 'gradient-primary': !currentOrganization?.logoUrl, 'bg-white': !!currentOrganization?.logoUrl }">
             <v-img v-if="currentOrganization?.logoUrl" :src="currentOrganization.logoUrl!" :alt="currentOrganization.name ?? ''" cover />
-            <span v-else>{{ initialsFromName(currentOrganization?.name ?? '') }}</span>
+            <span v-else>{{ getInitials(currentOrganization?.name) }}</span>
         </v-avatar>
 
         <transition name="org-content">
@@ -65,7 +65,7 @@
                                                 cover
                                             />
 
-                                            <span v-else>{{ initialsFromName(organization.name) }}</span>
+                                            <span v-else>{{ getInitials(organization.name) }}</span>
                                         </v-avatar>
                                     </v-col>
 
@@ -97,17 +97,6 @@ const props = defineProps<{ isCollapsed: boolean }>();
 const { currentOrganization } = useAuth();
 const router = useRouter();
 
-const initialsFromName = (name: string) => {
-    if (!name) {
-        return 'N.R';
-    }
-
-    return name
-        .split(' ')
-        .map((w: string) => w.charAt(0).toUpperCase())
-        .join('')
-        .slice(0, 2);
-}
 
 // Switch Orga Mod
 const api = useApi();

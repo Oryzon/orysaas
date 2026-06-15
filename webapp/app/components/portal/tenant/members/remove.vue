@@ -73,7 +73,7 @@ const handleClose = () => {
 
 const handleRemove = async () => {
     const res = await api.remove<{ message: string, entity: OrganizationMember}>(
-        `/${slugOrganization}/member/${props.entity.uuid}`,
+        `/tenant/${slugOrganization}/member/${props.entity.uuid}`,
         {
             loadingKey: "member:remove",
             toast: true,

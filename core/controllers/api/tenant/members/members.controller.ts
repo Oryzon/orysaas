@@ -12,8 +12,8 @@ const roleLabelMap: Record<OrganizationMemberRole, string> = {
     [OrganizationMemberRole.MEMBER]: "Membre",
 };
 
-@Controller(':slugOrganization/members')
-export default class MembersController {
+@Controller('/tenant/:slugOrganization/members')
+export default class TenantMembersController {
     @Get('/')
     @CheckJwt()
     @CheckOrganizationMember()

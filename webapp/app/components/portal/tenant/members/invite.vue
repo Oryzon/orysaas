@@ -112,7 +112,7 @@ const handleInvite = async () => {
     }
 
     const res = await api.post<{ message: string }>(
-        `/${slugOrganization}/member/invite`,
+        `/tenant/${slugOrganization}/member/invite`,
         { ...invite.value },
         {
             loadingKey: "member:invite",
