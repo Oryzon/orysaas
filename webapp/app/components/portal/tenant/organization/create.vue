@@ -173,7 +173,7 @@ const handleCreate = async () => {
     }
 
     const res = await api.post<{ message: string; entity: Organization }>(
-        '/organizations',
+        '/tenant/organizations',
         formData,
         {
             loadingKey: "organization:create",

@@ -9,20 +9,17 @@ import {
     CheckOrganizationRole
 } from "../../../../decorators";
 import { Request, Response } from "express";
-import { getUserUuid } from "../../../../helpers/request-context.helper";
 import { OrganizationRepository } from "../../../../databases/repositories/organization.repository";
-import { OrganizationMemberRepository } from "../../../../databases/repositories/organization-member.repository";
-import { Equal } from "typeorm";
 import HttpCode from "../../../../config/http-code";
 import { OrganizationEntity } from "../../../../databases/entities/organization.entity";
-import { OrganizationMemberEntity, OrganizationMemberRole } from "../../../../databases/entities/organization-member.entity";
+import { OrganizationMemberRole } from "../../../../databases/entities/organization-member.entity";
 import Messages from "../../../../config/messages";
 import formidable from "formidable";
 import fs from "fs";
 import path from "path";
 import { organizationLogoService } from "../../../../services/organization-logo.service";
 
-@Controller(':slugOrganization/setting')
+@Controller('/tenant/:slugOrganization/setting')
 export default class TenantSettingController {
 
     @Get('/details')

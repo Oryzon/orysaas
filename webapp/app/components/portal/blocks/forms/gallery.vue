@@ -94,7 +94,7 @@
                                                     icon="mdi-pencil"
                                                     size="small"
                                                     variant="tonal"
-                                                    color="primary"
+                                                    color="info"
                                                     @click.stop="editImage(index)"
                                                     title="Modifier"
                                                 ></v-btn>

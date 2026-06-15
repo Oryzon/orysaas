@@ -35,7 +35,7 @@
             <portal-tenant-organization-switch v-if="!user?.isSaasAdmin" :is-collapsed="isCollapsed"></portal-tenant-organization-switch>
 
             <v-list color="primary" base-color="white" nav>
-                <v-list-item rounded="xl" prepend-icon="mdi-view-dashboard" title="Tableau de bord" to="/portal/dashboard" />
+                <v-list-item rounded="xl" prepend-icon="mdi-view-dashboard" title="Tableau de bord" to="/portal/dashboard" :active="isNavActive('/portal/dashboard')" />
 
                 <v-list-subheader v-if="user?.isSaasAdmin" class="mt-2 text-uppercase text-label-large" color="grey-lighten-2">
                     Pilotage SaaS
@@ -47,22 +47,7 @@
                     prepend-icon="mdi-message-processing-outline"
                     title="Formulaire de contact"
                     to="/portal/contacts"
-                ></v-list-item>
-
-                <v-list-item
-                    v-if="user?.isSaasAdmin"
-                    rounded="xl"
-                    prepend-icon="mdi-account-group"
-                    title="Utilisateurs"
-                    to="/portal/users"
-                ></v-list-item>
-                
-                <v-list-item
-                    v-if="user?.isSaasAdmin"
-                    rounded="xl"
-                    prepend-icon="mdi-domain"
-                    title="Organisations"
-                    to="/portal/organizations"
+                    :active="isNavActive('/portal/contacts')"
                 ></v-list-item>
 
                 <v-list-item
@@ -71,9 +56,17 @@
                     prepend-icon="mdi-file-code-outline"
                     title="Pages"
                     to="/portal/pages"
+                    :active="isNavActive('/portal/pages')"
                 ></v-list-item>
 
-                <v-list-item v-if="user?.isSaasAdmin" rounded="xl" prepend-icon="mdi-menu" title="Menus" to="/portal/menus"></v-list-item>
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-menu"
+                    title="Menus"
+                    to="/portal/menus"
+                    :active="isNavActive('/portal/menus')"
+                ></v-list-item>
 
                 <v-list-item
                     v-if="user?.isSaasAdmin"
@@ -81,6 +74,25 @@
                     prepend-icon="mdi-cube-outline"
                     title="Abonnements"
                     to="/portal/plans"
+                    :active="isNavActive('/portal/plans')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-domain"
+                    title="Organisations"
+                    to="/portal/organizations"
+                    :active="isNavActive('/portal/organizations')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-account-group"
+                    title="Utilisateurs"
+                    to="/portal/users"
+                    :active="isNavActive('/portal/users')"
                 ></v-list-item>
 
                 <v-list-item
@@ -89,6 +101,16 @@
                     prepend-icon="mdi-file-tree"
                     title="Jobs"
                     to="/portal/jobs"
+                    :active="isNavActive('/portal/jobs')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-cog"
+                    title="Paramètres"
+                    to="/portal/settings"
+                    :active="isNavActive('/portal/settings')"
                 ></v-list-item>
 
                 <v-list-subheader
@@ -105,6 +127,7 @@
                     prepend-icon="mdi-account-group"
                     title="Membres"
                     :to="`/portal/${currentOrganization?.slug}/members`"
+                    :active="isNavActive(`/portal/${currentOrganization?.slug}/members`)"
                 ></v-list-item>
 
                 <v-list-item
@@ -113,6 +136,7 @@
                     prepend-icon="mdi-cog"
                     title="Paramètres"
                     :to="`/portal/${currentOrganization?.slug}/settings`"
+                    :active="isNavActive(`/portal/${currentOrganization?.slug}/settings`)"
                 ></v-list-item>
             </v-list>
         </v-navigation-drawer>
@@ -206,6 +230,8 @@ onMounted(async () => {
 
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
+
+const isNavActive = (path: string) => route.path === path || route.path.startsWith(path + '/');
 
 const userInitials = computed(() => {
     if (!user.value) {

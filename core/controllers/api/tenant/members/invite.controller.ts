@@ -25,8 +25,8 @@ import { getUserUuid } from "../../../../helpers/request-context.helper";
 import { notificationService } from "../../../../services/notification.service";
 import { MailService } from "../../../../services/mail.service";
 
-@Controller(':slugOrganization/member/invite')
-export default class InviteController {
+@Controller('/tenant/:slugOrganization/member/invite')
+export default class TenantInviteController {
     @Post('/')
     @CheckJwt()
     @CheckOrganizationMember()

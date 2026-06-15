@@ -28,7 +28,7 @@
                                     <v-btn
                                         variant="text"
                                         icon
-                                        color="primary"
+                                        color="info"
                                         :to="`/portal/menus/${item.uuid}`"
                                     >
                                         <v-icon>mdi-pencil</v-icon>
