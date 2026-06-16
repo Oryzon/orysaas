@@ -167,7 +167,7 @@
                 </template>
 
                 <v-list width="300px">
-                    <v-list-item @click="navigateTo('/admin/profil')">
+                    <v-list-item @click="navigateTo('/portal/profil')">
                         <v-list-item-title>
                             <v-icon color="primary">mdi-cog</v-icon>
                             Profil

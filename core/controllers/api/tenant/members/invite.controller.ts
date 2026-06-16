@@ -5,6 +5,7 @@ import {
     Controller,
     Delete,
     Error,
+    Get,
     Post,
     Put
 } from "../../../../decorators";
@@ -131,6 +132,52 @@ export default class TenantInviteController {
             .status(HttpCode.OK)
             .send({
                 message: Messages.ORGANIZATION_INVITE_SENT
+            });
+    }
+
+    @Get('/pending')
+    @CheckJwt()
+    @CheckOrganizationMember()
+    @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
+    @Error()
+    async pending(req: Request, res: Response) {
+        const organization = res.locals.organization as OrganizationEntity;
+
+        const invites = await OrganizationInviteRepository.findPendingByOrganization(organization.uuid);
+
+        return res
+            .status(HttpCode.OK)
+            .send(invites);
+    }
+
+    @Delete('/:uuid')
+    @CheckJwt()
+    @CheckOrganizationMember()
+    @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
+    @Error()
+    async cancel(req: Request, res: Response) {
+        const organization = res.locals.organization as OrganizationEntity;
+
+        const {
+            uuid
+        } = req.params;
+
+        let invite = await OrganizationInviteRepository.findOneOrFail({
+            where: {
+                uuid: Equal(uuid),
+                organizationUuid: Equal(organization.uuid),
+            },
+        });
+
+        invite.setDeletedAt();
+
+        await OrganizationInviteRepository.save(invite);
+
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.ORGANIZATION_INVITE_CANCELLED,
+                entity: invite
             });
     }
 

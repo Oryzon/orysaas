@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get } from "../../../decorators";
+import { CheckJwt, Controller, Error, Get, Put } from "../../../decorators";
 import { Request, Response } from "express";
 import { UserRepository } from "../../../databases/repositories/user.repository";
 import { OrganizationMemberRepository } from "../../../databases/repositories/organization-member.repository";
@@ -6,9 +6,72 @@ import HttpCode from "../../../config/http-code";
 import { Equal } from "typeorm";
 import Messages from "../../../config/messages";
 import { getUserUuid } from "../../../helpers/request-context.helper";
+import { UserOrigin } from "../../../databases/entities/user.entity";
 
 @Controller("user")
 export default class UserController {
+    @Put("/me")
+    @CheckJwt()
+    @Error()
+    async updateMe(req: Request, res: Response) {
+        const uuid = getUserUuid();
+        const {
+            firstname,
+            lastname
+        } = req.body;
+
+        const user = await UserRepository.findOneOrFail({
+            where: {
+                uuid: Equal(uuid)
+            }
+        });
+
+        user.firstname = firstname;
+        user.lastname = lastname;
+
+        await UserRepository.save(user);
+
+        delete user.password;
+
+        return res.status(HttpCode.OK).send({
+            message: Messages.USER_PROFILE_UPDATED,
+            entity: user
+        });
+    }
+
+    @Put("/me/password")
+    @CheckJwt()
+    @Error()
+    async updatePassword(req: Request, res: Response) {
+        const uuid = getUserUuid();
+
+        const {
+            currentPassword,
+            newPassword
+        } = req.body;
+
+        const user = await UserRepository.findOneOrFail({ where: { uuid: Equal(uuid) } });
+
+        if (user.origin !== UserOrigin.LOCAL) {
+            return res.status(HttpCode.FORBIDDEN).send({ message: Messages.USER_CANNOT_CHANGE_PASSWORD });
+        }
+
+        if (!user.checkIfUnencryptedPasswordIsValid(currentPassword)) {
+            return res.status(HttpCode.UNAUTHORIZED).send({ message: Messages.INCORRECT_PASSWORD });
+        }
+
+        user.password = newPassword;
+        user.hashPassword();
+
+        await UserRepository.save(user);
+
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.USER_PASSWORD_UPDATED
+            });
+    }
+
     @Get("/me")
     @CheckJwt()
     @Error()

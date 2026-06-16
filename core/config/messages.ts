@@ -37,6 +37,9 @@ export default class Messages {
     static USER_RESETED = "L'utilisateur a bien été réinitialisé.";
     static USER_SA_CAN_T_BE_REMOVED = "Cet utilisateur ne peut pas être supprimé, il s'agit d'un super-administrateur.";
     static USER_CAN_T_BE_REMOVED_HIMSELF = "Vous ne pouvez pas vous supprimer vous-même.";
+    static USER_PROFILE_UPDATED = "Votre profil a été mis à jour.";
+    static USER_PASSWORD_UPDATED = "Votre mot de passe a été mis à jour.";
+    static USER_CANNOT_CHANGE_PASSWORD = "Vous ne pouvez pas modifier votre mot de passe car vous utilisez une connexion sociale.";
     static USER_SA_CAN_T_BE_RESETED = "Cet utilisateur ne peut pas être réinitialisé, il s'agit d'un super-administrateur.";
     static USER_ALREADY_IN_ROLE = "L'utilisateur possède déjà ce rôle.";
     static USER_ADDED_IN_ROLE = "Rôle assigné avec succès.";
@@ -92,6 +95,7 @@ export default class Messages {
     static ORGANIZATION_INVITE_NOT_FOUND = "Cette invitation est introuvable ou a expiré.";
     static ORGANIZATION_INVITE_ALREADY_ACCEPTED = "Cette invitation a déjà été acceptée.";
     static ORGANIZATION_INVITE_ACCEPTED = "Vous avez bien rejoint l'organisation.";
+    static ORGANIZATION_INVITE_CANCELLED = "L'invitation a été annulée.";
     static ORGANIZATION_INVITE_FORBIDDEN = "Vous n'avez pas les droits pour inviter des membres.";
     static ORGANIZATION_ROLE_INSUFFICIENT = "Vous n'avez pas les droits suffisants pour effectuer cette action.";
     static ORGANIZATION_MEMBER_UPDATED = "Le rôle du membre a été mis à jour.";

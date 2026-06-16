@@ -2,13 +2,9 @@
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
             <v-btn
-                class="mt-n1"
                 color="primary"
-                variant="tonal"
-                rounded="lg"
+                variant="flat"
                 prepend-icon="mdi-account-plus"
-                block
-                size="large"
                 v-bind="activatorProps"
             >
                 Inviter

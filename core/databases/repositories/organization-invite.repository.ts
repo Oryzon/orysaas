@@ -1,6 +1,6 @@
 import { dataSource } from "../../config/datasource";
 import { OrganizationInviteEntity } from "../entities/organization-invite.entity";
-import { Equal, IsNull } from "typeorm";
+import { Equal, IsNull, MoreThan } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
 import { DateTime } from "luxon";
 import { OrganizationMemberRepository } from "./organization-member.repository";
@@ -20,6 +20,16 @@ export const OrganizationInviteRepository = dataSource.getRepository(Organizatio
                 organizationUuid: Equal(organizationUuid),
                 acceptedAt: IsNull(),
             },
+        });
+    },
+    async findPendingByOrganization(organizationUuid: string): Promise<OrganizationInviteEntity[]> {
+        return this.find({
+            where: {
+                organizationUuid: Equal(organizationUuid),
+                acceptedAt: IsNull(),
+                expiresAt: MoreThan(DateTime.now().toJSDate()),
+            },
+            order: { createdAt: 'DESC' },
         });
     },
     async acceptPendingInvites(user: UserEntity) {

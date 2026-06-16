@@ -19,6 +19,8 @@ export const useNotifications = () => {
     const { refresh: refreshToken } = useAuth();
 
     const notifications = useState<Notification[]>('notifications:list', () => []);
+    const nextCursor = useState<string | null>('notifications:cursor', () => null);
+    const isLoadingMore = useState<boolean>('notifications:loading-more', () => false);
 
     const unreadCount = computed(() =>
         notifications.value.filter(n => !n.readAt).length
@@ -102,8 +104,29 @@ export const useNotifications = () => {
     }
 
     async function fetchRecent() {
-        const data = await api.get<Notification[]>('/notifications', { toast: false });
-        notifications.value = data;
+        const data = await api.get<{ items: Notification[], nextCursor: string | null }>('/notifications', { toast: false });
+        notifications.value = data.items;
+        nextCursor.value = data.nextCursor;
+    }
+
+    async function fetchMore() {
+        if (!nextCursor.value || isLoadingMore.value) {
+            return;
+        }
+
+        isLoadingMore.value = true;
+
+        try {
+            const data = await api.get<{ items: Notification[], nextCursor: string | null }>('/notifications', {
+                toast: false,
+                params: { cursor: nextCursor.value }
+            });
+
+            notifications.value = [...notifications.value, ...data.items];
+            nextCursor.value = data.nextCursor;
+        } finally {
+            isLoadingMore.value = false;
+        }
     }
 
     async function markAsRead(uuid: string) {
@@ -132,9 +155,12 @@ export const useNotifications = () => {
 
     return {
         notifications,
+        nextCursor,
+        isLoadingMore,
         unreadCount,
         connect,
         disconnect,
+        fetchMore,
         markAsRead,
         markAllAsRead,
     };

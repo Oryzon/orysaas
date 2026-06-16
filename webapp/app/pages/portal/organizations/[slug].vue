@@ -117,32 +117,21 @@
 
                 <v-col md="12">
                     <v-card flat>
-                        <v-card-title class="text-subtitle-1 font-weight-bold pt-4 px-4">
-                            <v-icon
-                                start
-                                color="primary"
-                            >
-                                mdi-account-group
-                            </v-icon>
+                        <v-card-title class="text-subtitle-1 font-weight-bold pt-4 px-4 d-flex align-center">
+                            <v-icon start color="primary">mdi-account-group</v-icon>
 
                             Membres
 
-                            <v-chip
-                                class="ml-2"
-                                color="primary"
-                                variant="tonal"
-                            >
+                            <v-chip class="ml-2" color="primary" variant="tonal">
                                 {{ organization.members?.length ?? 0 }}
                             </v-chip>
 
-                            <v-btn
-                                class="float-right"
-                                prepend-icon="mdi-email-fast-outline"
-                                variant="tonal"
-                                color="primary"
-                            >
-                                Voir invitations
-                            </v-btn>
+                            <v-spacer></v-spacer>
+
+                            <portal-tenant-members-view-invites
+                                :slug="organization.slug"
+                                :admin-mode="true"
+                            ></portal-tenant-members-view-invites>
                         </v-card-title>
 
                         <v-divider />

@@ -1,47 +1,18 @@
 <template>
     <v-row>
+        <v-col md="12" class="d-flex justify-end ga-2 mb-n2">
+            <portal-tenant-members-view-invites
+                :slug="slugOrganization"
+            ></portal-tenant-members-view-invites>
+
+            <portal-tenant-members-invite></portal-tenant-members-invite>
+        </v-col>
+
         <v-col md="12">
-            <v-card rounded="lg" border flat>
+            <v-card flat>
                 <v-card-text>
                     <v-row>
-                        <v-col md="3">
-                            <v-text-field
-                                variant="outlined"
-                                density="compact"
-                                label="Nom / Prénom"
-                            ></v-text-field>
-                        </v-col>
-
-                        <v-col md="3">
-                            <v-text-field
-                                variant="outlined"
-                                density="compact"
-                                label="Rôle"
-                            ></v-text-field>
-                        </v-col>
-
-                        <v-col md="2">
-                            <v-btn
-                                class="mt-n1"
-                                color="blue"
-                                variant="tonal"
-                                rounded="lg"
-                                prepend-icon="mdi-magnify"
-                                block
-                                size="large"
-                            >
-                                Rechercher
-                            </v-btn>
-                        </v-col>
-
-                        <v-col md="1" offset-md="3" v-if="canInvite">
-                            <portal-tenant-members-invite
-                            ></portal-tenant-members-invite>
-                        </v-col>
-
                         <v-col md="12">
-                            <v-divider class="mt-n8"></v-divider>
-
                             <v-data-table
                                 :headers="headers"
                                 :items="members"
