@@ -1,6 +1,10 @@
 import { dataSource } from "../../config/datasource";
 import { OrganizationEntity } from "../entities/organization.entity";
-import { Like } from "typeorm";
+import { Equal, Like } from "typeorm";
+import { DateTime } from "luxon";
+import { OrganizationMemberRepository } from "./organization-member.repository";
+import { OrganizationInviteRepository } from "./organization-invite.repository";
+import { getUserUuid } from "../../helpers/request-context.helper";
 
 export const OrganizationRepository = dataSource.getRepository(OrganizationEntity).extend({
     async getSlug(name: string) {
@@ -32,5 +36,33 @@ export const OrganizationRepository = dataSource.getRepository(OrganizationEntit
         }
 
         return tmpSlug;
-    }
+    },
+    async softRemoveWithRelations(organization: OrganizationEntity): Promise<void> {
+        const userUuid = getUserUuid();
+        const now = DateTime.now().toJSDate();
+
+        await OrganizationMemberRepository.update(
+            {
+                organizationUuid: Equal(organization.uuid)
+            },
+            {
+                deletedAt: now,
+                deletedBy: userUuid
+            },
+        );
+
+        await OrganizationInviteRepository.update(
+            {
+                organizationUuid: Equal(organization.uuid)
+            },
+            {
+                deletedAt: now,
+                deletedBy: userUuid
+            },
+        );
+
+        organization.setDeletedAt();
+
+        await this.save(organization);
+    },
 });

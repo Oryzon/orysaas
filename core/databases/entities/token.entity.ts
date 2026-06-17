@@ -13,7 +13,8 @@ export enum TokenType {
     verify_account = 'verify_account',
     reset_password = 'reset_password',
     invite = 'invite',
-    social_login = 'social_login'
+    social_login = 'social_login',
+    delete_organization = 'delete_organization',
 }
 
 @Entity()

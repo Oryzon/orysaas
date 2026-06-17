@@ -7,7 +7,7 @@ import { TokenExpiredError } from "jsonwebtoken";
 import HttpCode from "../../../config/http-code";
 import { getUserUuid } from "../../../helpers/request-context.helper";
 import { NotificationRepository } from "../../../databases/repositories/notification.repository";
-import { Equal, LessThan } from "typeorm";
+import { Equal, IsNull, LessThan } from "typeorm";
 import { DateTime } from "luxon";
 import Messages from "../../../config/messages";
 
@@ -54,11 +54,19 @@ export default class NotificationsController {
         const result = hasMore ? items.slice(0, LIMIT) : items;
         const nextCursor = hasMore ? result[result.length - 1]!.uuid : null;
 
+        const totalUnread = await NotificationRepository.count({
+            where: {
+                userUuid: Equal(userUuid),
+                readAt: IsNull(),
+            }
+        });
+
         return res
             .status(HttpCode.OK)
             .send({
                 items: result,
-                nextCursor
+                nextCursor,
+                totalUnread,
             });
     }
 

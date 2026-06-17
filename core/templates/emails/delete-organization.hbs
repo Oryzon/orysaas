@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmation de suppression</title>
+    <style>
+        body { font-family: 'Roboto', Arial, sans-serif; background: #0B0A12; margin: 0; padding: 40px 0; }
+        .container { max-width: 560px; margin: 0 auto; background: #1A1827; border-radius: 12px; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%); padding: 40px 40px 32px; }
+        .header h1 { color: white; margin: 0; font-size: 24px; font-weight: 700; }
+        .body { padding: 40px; }
+        .body p { color: #94A3B8; font-size: 15px; line-height: 1.7; margin: 0 0 20px; }
+        .body p strong { color: #E2E8F0; }
+        .code-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 24px; text-align: center; margin: 8px 0 28px; }
+        .code { font-size: 42px; font-weight: 900; letter-spacing: 10px; color: #F87171; font-family: 'Courier New', monospace; }
+        .code-hint { color: #64748B; font-size: 13px; margin-top: 8px; }
+        .footer { padding: 24px 40px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .footer p { color: #475569; font-size: 13px; margin: 0; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>OrySaaS</h1>
+        </div>
+
+        <div class="body">
+            <p>Bonjour <strong>{{firstname}}</strong>,</p>
+
+            <p>Vous avez demandé la suppression de l'organisation <strong>{{organizationName}}</strong>. Cette action est <strong>irréversible</strong>.</p>
+
+            <p>Saisissez le code ci-dessous pour confirmer la suppression :</p>
+
+            <div class="code-box">
+                <div class="code">{{code}}</div>
+                <div class="code-hint">Valable 15 minutes</div>
+            </div>
+
+            <p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail et contactez immédiatement le support.</p>
+        </div>
+
+        <div class="footer">
+            <p>Pour toute question, contactez notre support. Ne partagez jamais ce code.</p>
+        </div>
+    </div>
+</body>
+</html>

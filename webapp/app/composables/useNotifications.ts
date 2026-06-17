@@ -21,10 +21,7 @@ export const useNotifications = () => {
     const notifications = useState<Notification[]>('notifications:list', () => []);
     const nextCursor = useState<string | null>('notifications:cursor', () => null);
     const isLoadingMore = useState<boolean>('notifications:loading-more', () => false);
-
-    const unreadCount = computed(() =>
-        notifications.value.filter(n => !n.readAt).length
-    );
+    const unreadCount = useState<number>('notifications:unread-count', () => 0);
 
     async function connect() {
         if (!import.meta.client) {
@@ -65,6 +62,7 @@ export const useNotifications = () => {
         _eventSource.addEventListener('notification', (e: MessageEvent) => {
             const notif = JSON.parse(e.data) as Notification;
             notifications.value.unshift(notif);
+            unreadCount.value++;
         });
 
         _eventSource.onerror = async () => {
@@ -104,9 +102,10 @@ export const useNotifications = () => {
     }
 
     async function fetchRecent() {
-        const data = await api.get<{ items: Notification[], nextCursor: string | null }>('/notifications', { toast: false });
+        const data = await api.get<{ items: Notification[], nextCursor: string | null, totalUnread: number }>('/notifications', { toast: false });
         notifications.value = data.items;
         nextCursor.value = data.nextCursor;
+        unreadCount.value = data.totalUnread;
     }
 
     async function fetchMore() {
@@ -136,8 +135,9 @@ export const useNotifications = () => {
 
         const notif = notifications.value.find(n => n.uuid === uuid);
 
-        if (notif) {
+        if (notif && !notif.readAt) {
             notif.readAt = new Date().toISOString();
+            unreadCount.value = Math.max(0, unreadCount.value - 1);
         }
     }
 
@@ -151,13 +151,15 @@ export const useNotifications = () => {
                 n.readAt = new Date().toISOString();
             }
         });
+
+        unreadCount.value = 0;
     }
 
     return {
         notifications,
         nextCursor,
         isLoadingMore,
-        unreadCount,
+        unreadCount: computed(() => unreadCount.value),
         connect,
         disconnect,
         fetchMore,

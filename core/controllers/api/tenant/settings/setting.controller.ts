@@ -3,8 +3,9 @@ import {
     Error,
     Get,
     Put,
-    CheckJwt,
     Post,
+    Delete,
+    CheckJwt,
     CheckOrganizationMember,
     CheckOrganizationRole
 } from "../../../../decorators";
@@ -18,6 +19,14 @@ import formidable from "formidable";
 import fs from "fs";
 import path from "path";
 import { organizationLogoService } from "../../../../services/organization-logo.service";
+import { getUserUuid } from "../../../../helpers/request-context.helper";
+import { UserRepository } from "../../../../databases/repositories/user.repository";
+import { TokenRepository } from "../../../../databases/repositories/token.repository";
+import { TokenType } from "../../../../databases/entities/token.entity";
+import { MailService } from "../../../../services/mail.service";
+import { Equal, Not } from "typeorm";
+import { OrganizationMemberRepository } from "../../../../databases/repositories/organization-member.repository";
+
 
 @Controller('/tenant/:slugOrganization/setting')
 export default class TenantSettingController {
@@ -107,5 +116,86 @@ export default class TenantSettingController {
             message: Messages.ORGANIZATION_UPDATED,
             entity
         })
+    }
+
+    @Delete('/request')
+    @CheckJwt()
+    @CheckOrganizationMember()
+    @CheckOrganizationRole(OrganizationMemberRole.OWNER)
+    @Error()
+    async request(req: Request, res: Response) {
+        const organization = res.locals.organization as OrganizationEntity;
+
+        const user = await UserRepository.findOneOrFail({
+            where: {
+                uuid: Equal(getUserUuid())
+            }
+        });
+
+        const code = await TokenRepository.createCodeToken(user, TokenType.delete_organization, 15);
+
+        await new MailService().send({
+            to: user.email,
+            subject: `Confirmation de suppression de ${organization.name}`,
+            template: 'delete-organization',
+            variables: {
+                firstname: user.firstname,
+                organizationName: organization.name,
+                code,
+            },
+        });
+
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.ORGANIZATION_DELETE_CODE_SENT,
+            });
+    }
+
+    @Delete('/confirm')
+    @CheckJwt()
+    @CheckOrganizationMember()
+    @CheckOrganizationRole(OrganizationMemberRole.OWNER)
+    @Error()
+    async confirm(req: Request, res: Response) {
+        const { code } = req.body;
+        const organization = res.locals.organization as OrganizationEntity;
+        const userUuid = getUserUuid();
+
+        const tokenEntity = await TokenRepository.findValidCode(code, TokenType.delete_organization, userUuid);
+
+        if (!tokenEntity || tokenEntity.isExpired() || tokenEntity.isUsed()) {
+            return res
+                .status(HttpCode.UNPROCESSABLE_ENTITY)
+                .send({
+                    message: Messages.ORGANIZATION_DELETE_CODE_INVALID,
+                });
+        }
+
+        const otherMemberships = await OrganizationMemberRepository.find({
+            where: {
+                memberUuid: Equal(userUuid),
+                organizationUuid: Not(Equal(organization.uuid)),
+            },
+            relations: {
+                organization: true
+            },
+            order: {
+                createdAt: 'ASC'
+            },
+        });
+
+        await TokenRepository.markAsUsed(tokenEntity);
+
+        await OrganizationRepository.softRemoveWithRelations(organization);
+
+        const nextOrg = otherMemberships.find(m => !m.organization.deletedAt) ?? null;
+
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.ORGANIZATION_DELETED,
+                nextOrgSlug: nextOrg?.organization?.slug ?? null,
+            });
     }
 }

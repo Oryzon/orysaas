@@ -311,7 +311,11 @@ export default class AuthController {
             });
         }
 
-        return res.status(HttpCode.OK).send({ message: Messages.FORGOT_PASSWORD_SENT });
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.FORGOT_PASSWORD_SENT
+            });
     }
 
     @Post("/reset-password")

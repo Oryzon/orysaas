@@ -243,9 +243,7 @@
                                     </div>
                                 </div>
 
-                                <v-btn color="error" variant="tonal" rounded="lg" min-width="140">
-                                    Supprimer
-                                </v-btn>
+                                <portal-tenant-organization-remove></portal-tenant-organization-remove>
                             </div>
                         </v-card-text>
                     </v-card>

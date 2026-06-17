@@ -101,6 +101,9 @@ export default class Messages {
     static ORGANIZATION_MEMBER_UPDATED = "Le rôle du membre a été mis à jour.";
     static ORGANIZATION_MEMBER_REMOVED = "Le membre a été retiré de l'organisation.";
     static ORGANIZATION_MEMBER_OWNER_CANT_BE_EDITED = "Le rôle du propriétaire ne peut pas être modifié.";
+    static ORGANIZATION_DELETE_CODE_SENT = "Un code de confirmation a été envoyé à votre adresse e-mail.";
+    static ORGANIZATION_DELETE_CODE_INVALID = "Le code saisi est invalide ou a expiré.";
+    static ORGANIZATION_DELETED = "L'organisation a été supprimée.";
 
     // -------------------------
     // Settings

@@ -1,6 +1,6 @@
 import { dataSource } from "../../config/datasource";
 import { OrganizationMemberEntity } from "../entities/organization-member.entity";
-import { Equal } from "typeorm";
+import { Equal, IsNull } from "typeorm";
 
 export const OrganizationMemberRepository = dataSource.getRepository(OrganizationMemberEntity).extend({
     async findLight(userUuid: string) {
@@ -78,7 +78,9 @@ export const OrganizationMemberRepository = dataSource.getRepository(Organizatio
 
         return Promise.all(orgas.map(async (orga: OrganizationMemberEntity) => {
             const nbMembers = await OrganizationMemberRepository.count({
-                where: { organizationUuid: Equal(orga.organizationUuid) },
+                where: {
+                    organizationUuid: Equal(orga.organizationUuid)
+                },
             });
 
             return {

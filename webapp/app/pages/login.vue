@@ -115,9 +115,8 @@
                     </v-col>
 
                     <v-col md="6" class="mt-n3 text-right">
-                        <v-btn class="mr-n3" variant="tonal" color="primary"
-                            >Mot de passe oublié ?</v-btn
-                        >
+                        <auth-forgot-password
+                        ></auth-forgot-password>
                     </v-col>
 
                     <v-col md="12" class="mt-n8">
