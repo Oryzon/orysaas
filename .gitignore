@@ -61,3 +61,6 @@ uploads/
 
 # --- Lint ---
 .eslintcache
+
+# --- IA ---
+memory/

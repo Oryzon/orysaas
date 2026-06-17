@@ -7,7 +7,7 @@ import { TokenExpiredError } from "jsonwebtoken";
 import HttpCode from "../../../config/http-code";
 import { getUserUuid } from "../../../helpers/request-context.helper";
 import { NotificationRepository } from "../../../databases/repositories/notification.repository";
-import { Equal } from "typeorm";
+import { Equal, IsNull, LessThan } from "typeorm";
 import { DateTime } from "luxon";
 import Messages from "../../../config/messages";
 
@@ -17,22 +17,57 @@ export default class NotificationsController {
     @CheckJwt()
     @Error()
     async list(req: Request, res: Response) {
-        let userUuid = getUserUuid();
+        const userUuid = getUserUuid();
 
-        // Need to add dynamic reflow and pâgination, but boring for tonight
-        let notifs = await NotificationRepository.find({
+        const cursor = req.query.cursor as string | undefined;
+        const LIMIT = 20;
+
+        let cursorDate: Date | undefined;
+
+        if (cursor) {
+            const cursorNotif = await NotificationRepository.findOne({
+                where: {
+                    uuid: Equal(cursor),
+                    userUuid: Equal(userUuid)
+                },
+                select: ['createdAt']
+            });
+
+            if (cursorNotif) {
+                cursorDate = cursorNotif.createdAt;
+            }
+        }
+
+        const items = await NotificationRepository.find({
             where: {
-                userUuid: Equal(userUuid)
+                userUuid: Equal(userUuid),
+                ...(cursorDate ? { createdAt: LessThan(cursorDate) } : {})
             },
-            take: 50,
+            take: LIMIT + 1,
             order: {
                 createdAt: 'DESC'
             }
         });
 
+        const hasMore = items.length > LIMIT;
+
+        const result = hasMore ? items.slice(0, LIMIT) : items;
+        const nextCursor = hasMore ? result[result.length - 1]!.uuid : null;
+
+        const totalUnread = await NotificationRepository.count({
+            where: {
+                userUuid: Equal(userUuid),
+                readAt: IsNull(),
+            }
+        });
+
         return res
             .status(HttpCode.OK)
-            .send(notifs);
+            .send({
+                items: result,
+                nextCursor,
+                totalUnread,
+            });
     }
 
     @Get('/read')

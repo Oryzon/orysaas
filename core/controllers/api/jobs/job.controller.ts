@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Error, CheckJwt, Post } from "../../../decorators";
+import { Controller, Get, Put, Error, CheckJwt, Post, CheckIsSaasAdmin } from "../../../decorators";
 import { Request, Response } from "express";
 import { JobSettingRepository } from "../../../databases/repositories/job-setting.repository";
 import { Equal } from "typeorm";
@@ -12,6 +12,7 @@ import { JobHistoryEntity } from "../../../databases/entities/job-history.entity
 export default class JobController {
     @Get('/:uuid/histories')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async listHistory(req: Request, res: Response){
         let uuidJob = req.params.uuid;
@@ -31,6 +32,7 @@ export default class JobController {
 
     @Put('/:uuid')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         let uuid = req.params.uuid;
@@ -63,6 +65,7 @@ export default class JobController {
 
     @Get('/:uuid/last-run')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async getLastRun(req: Request, res: Response) {
         let uuidJob = req.params.uuid;
@@ -86,6 +89,7 @@ export default class JobController {
 
     @Post('/:uuid/run')
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async run(req: Request, res: Response) {
         let uuidJob = req.params.uuid;

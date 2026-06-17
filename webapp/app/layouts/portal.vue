@@ -11,9 +11,7 @@
             <div class="drawer-header">
                 <img src="/logo.png" alt="OrySaas" width="28" height="34" />
 
-                <span class="drawer-title"
-                    >Ory<span class="text-primary">Saas</span></span
-                >
+                <span class="drawer-title">Ory<span class="text-primary">Saas</span></span>
 
                 <v-spacer></v-spacer>
                 <v-spacer></v-spacer>
@@ -34,54 +32,128 @@
 
             <v-divider />
 
+            <portal-tenant-organization-switch v-if="!user?.isSaasAdmin" :is-collapsed="isCollapsed"></portal-tenant-organization-switch>
+
             <v-list color="primary" base-color="white" nav>
+                <v-list-item rounded="xl" prepend-icon="mdi-view-dashboard" title="Tableau de bord" to="/portal/dashboard" :active="isNavActive('/portal/dashboard')" />
+
+                <v-list-subheader v-if="user?.isSaasAdmin" class="mt-2 text-uppercase text-label-large" color="grey-lighten-2">
+                    Pilotage SaaS
+                </v-list-subheader>
+
                 <v-list-item
+                    v-if="user?.isSaasAdmin"
                     rounded="xl"
-                    prepend-icon="mdi-view-dashboard"
-                    title="Tableau de bord"
-                    to="/portal/dashboard"
-                />
-
-                <v-list-subheader
-                    class="mt-2 text-uppercase text-label-large"
-                    color="grey-lighten-2"
-                    >Pilotage SaaS</v-list-subheader
-                >
+                    prepend-icon="mdi-message-processing-outline"
+                    title="Formulaire de contact"
+                    to="/portal/contacts"
+                    :active="isNavActive('/portal/contacts')"
+                ></v-list-item>
 
                 <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-file-code-outline"
+                    title="Pages"
+                    to="/portal/pages"
+                    :active="isNavActive('/portal/pages')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-menu"
+                    title="Menus"
+                    to="/portal/menus"
+                    :active="isNavActive('/portal/menus')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-cube-outline"
+                    title="Abonnements"
+                    to="/portal/plans"
+                    :active="isNavActive('/portal/plans')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-domain"
+                    title="Organisations"
+                    to="/portal/organizations"
+                    :active="isNavActive('/portal/organizations')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-account-group"
+                    title="Utilisateurs"
+                    to="/portal/users"
+                    :active="isNavActive('/portal/users')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
                     rounded="xl"
                     prepend-icon="mdi-file-tree"
                     title="Jobs"
                     to="/portal/jobs"
-                />
+                    :active="isNavActive('/portal/jobs')"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="user?.isSaasAdmin"
+                    rounded="xl"
+                    prepend-icon="mdi-cog"
+                    title="Paramètres"
+                    to="/portal/settings"
+                    :active="isNavActive('/portal/settings')"
+                ></v-list-item>
+
+                <v-list-subheader
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    class="mt-2 text-uppercase text-label-large"
+                    color="grey-lighten-2"
+                >
+                    Configuration
+                </v-list-subheader>
+
+                <v-list-item
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    rounded="xl"
+                    prepend-icon="mdi-account-group"
+                    title="Membres"
+                    :to="`/portal/${currentOrganization?.slug}/members`"
+                    :active="isNavActive(`/portal/${currentOrganization?.slug}/members`)"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    rounded="xl"
+                    prepend-icon="mdi-cog"
+                    title="Paramètres"
+                    :to="`/portal/${currentOrganization?.slug}/settings`"
+                    :active="isNavActive(`/portal/${currentOrganization?.slug}/settings`)"
+                ></v-list-item>
             </v-list>
         </v-navigation-drawer>
 
         <v-app-bar height="82" color="navbar">
-            <v-app-bar-title class="font-weight-black">{{
-                pageTitle
-            }}</v-app-bar-title>
+            <v-app-bar-title class="font-weight-black">
+                {{ pageTitle }}
+            </v-app-bar-title>
 
             <v-spacer></v-spacer>
 
-            <notifications-bell
-            ></notifications-bell>
+            <notifications-bell></notifications-bell>
 
             <v-menu>
                 <template v-slot:activator="{ props }">
-                    <v-btn
-                        :height="56"
-                        :min-width="0"
-                        variant="tonal"
-                        rounded="lg"
-                        class="mr-4 px-3"
-                        v-bind="props"
-                    >
-                        <v-avatar
-                            size="34"
-                            class="gradient-primary mr-2"
-                            rounded="0"
-                        >
+                    <v-btn :height="56" :min-width="0" variant="tonal" rounded="lg" class="mr-4 px-3" v-bind="props">
+                        <v-avatar size="34" class="gradient-primary mr-2" rounded="0">
                             {{ userInitials }}
                         </v-avatar>
 
@@ -95,7 +167,7 @@
                 </template>
 
                 <v-list width="300px">
-                    <v-list-item @click="navigateTo('/admin/profil')">
+                    <v-list-item @click="navigateTo('/portal/profil')">
                         <v-list-item-title>
                             <v-icon color="primary">mdi-cog</v-icon>
                             Profil
@@ -112,18 +184,11 @@
             </v-menu>
         </v-app-bar>
 
-        <v-navigation-drawer
-            v-model="notifOpen"
-            location="right"
-            temporary
-            width="600"
-            class="notif-drawer"
-        >
+        <v-navigation-drawer v-model="notifOpen" location="right" temporary width="600" class="notif-drawer">
             <transition name="notif-content">
                 <notifications-panel v-if="notifOpen"></notifications-panel>
             </transition>
         </v-navigation-drawer>
-
 
         <v-main>
             <v-container fluid>
@@ -134,26 +199,25 @@
 </template>
 
 <script setup lang="ts">
-const notifOpen = useState('notif:drawer:open', () => false);
+import { OrganizationMemberRoleLabel } from "~/models/OrganizationMember";
+
+const notifOpen = useState("notif:drawer:open", () => false);
 
 const { menuIsOpen, toggleMenu } = useUserPreferences();
-const { user, logout } = useAuth();
+const { user, logout, currentOrganization } = useAuth();
 const { connect, disconnect } = useNotifications();
 
 // SSE parts, important to keep for notification system.
 onMounted(() => connect());
 onUnmounted(() => disconnect());
 
-const pageTitle = useState('pageTitle');
+const pageTitle = useState("pageTitle");
 
 const route = useRoute();
 const router = useRouter();
 
 onMounted(async () => {
-    if (
-        typeof route.query.token !== "string" &&
-        typeof route.query.refreshToken !== "string"
-    ) {
+    if (typeof route.query.token !== "string" && typeof route.query.refreshToken !== "string") {
         return;
     }
 
@@ -166,6 +230,8 @@ onMounted(async () => {
 
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
+
+const isNavActive = (path: string) => route.path === path || route.path.startsWith(path + '/');
 
 const userInitials = computed(() => {
     if (!user.value) {
@@ -183,10 +249,7 @@ const userName = computed(() => {
         return "";
     }
 
-    const parts = [
-        user.value.firstname,
-        user.value.lastname ? `${user.value.lastname[0]}.` : null,
-    ].filter(Boolean);
+    const parts = [user.value.firstname, user.value.lastname ? `${user.value.lastname[0]}.` : null].filter(Boolean);
 
     return parts.length ? parts.join(" ") : user.value.email;
 });
@@ -198,6 +261,10 @@ const userRole = computed(() => {
 
     if (user.value.isSaasAdmin) {
         return "Propriétaire";
+    }
+
+    if (currentOrganization.value?.role) {
+        return OrganizationMemberRoleLabel[currentOrganization.value.role];
     }
 
     return "";
@@ -275,11 +342,7 @@ const userRole = computed(() => {
     transform: translateY(-50%);
     width: 3px;
     height: 55%;
-    background: linear-gradient(
-        to bottom,
-        var(--brand-primary),
-        var(--brand-accent)
-    );
+    background: linear-gradient(to bottom, var(--brand-primary), var(--brand-accent));
     border-radius: 0 3px 3px 0;
     z-index: 10;
 }

@@ -12,7 +12,8 @@
     "dev:core": "npm --workspace core run dev",
     "dev:webapp": "npm --workspace webapp run dev",
     "build": "npm --workspace core run build && npm --workspace webapp run build",
-    "lint": "npm --workspace core run lint && npm --workspace webapp run lint"
+    "lint": "npm --workspace core run lint && npm --workspace webapp run lint",
+    "seed": "npm --workspace core run seed --"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",

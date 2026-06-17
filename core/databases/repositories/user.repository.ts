@@ -4,8 +4,6 @@ import * as jwt from "jsonwebtoken";
 
 export const UserRepository = dataSource.getRepository(UserEntity).extend({
     generateJwtToken(user: UserEntity) {
-        let expiry = "2h";
-
         const token = jwt.sign(
             {
                 uuid: user.uuid,
@@ -13,9 +11,8 @@ export const UserRepository = dataSource.getRepository(UserEntity).extend({
                 email: user.email,
             },
             process.env.JWT_SECRET,
-            {
-                expiresIn: expiry
-            });
+            { expiresIn: "2h" }
+        );
 
         return token;
     }

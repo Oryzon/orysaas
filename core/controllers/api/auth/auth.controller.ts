@@ -1,12 +1,15 @@
 import { CheckJwt, Controller, Error, Get, Post } from "../../../decorators";
 import { Request, Response } from "express";
-import { UserEntity, UserOrigin, } from "../../../databases/entities/user.entity";
+import { UserEntity, UserOrigin } from "../../../databases/entities/user.entity";
 import { UserRepository } from "../../../databases/repositories/user.repository";
 import { TokenRepository } from "../../../databases/repositories/token.repository";
+import { OrganizationInviteRepository } from "../../../databases/repositories/organization-invite.repository";
+import { OrganizationMemberRepository } from "../../../databases/repositories/organization-member.repository";
+import { OrganizationMemberEntity } from "../../../databases/entities/organization-member.entity";
 import { MailService } from "../../../services/mail.service";
 import Messages from "../../../config/messages";
 import HttpCode from "../../../config/http-code";
-import { Equal } from "typeorm";
+import { Equal, IsNull } from "typeorm";
 import { DateTime } from "luxon";
 import { RefreshTokenRepository } from "../../../databases/repositories/refresh-token.repository";
 import { TokenType } from "../../../databases/entities/token.entity";
@@ -52,9 +55,7 @@ export default class AuthController {
         });
 
         if (existing) {
-            return res
-                .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({ message: Messages.USER_EMAIL_EXIST });
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({ message: Messages.USER_EMAIL_EXIST });
         }
 
         const user = new UserEntity();
@@ -77,11 +78,15 @@ export default class AuthController {
             template: "verify-account",
             variables: {
                 firstname,
-                verificationUrl: `${process.env.APP_URL}/verify?token=${tokenEntity.token}`,
+                verificationUrl: `${process.env.HTTP_URL}/login?token=${tokenEntity.token}`,
             },
         });
 
-        return res.status(HttpCode.OK).send({ message: Messages.USER_CREATED });
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.USER_CREATED
+            });
     }
 
     @Post("/login")
@@ -114,10 +119,13 @@ export default class AuthController {
         user.lastLogin = DateTime.now().toJSDate();
         await UserRepository.save(user);
 
+        const organization = await OrganizationMemberRepository.findLight(user.uuid);
+
         res.status(HttpCode.OK).send({
-            message: "Bon retour parmis nous !",
+            message: Messages.LOGIN_DONE,
             token: UserRepository.generateJwtToken(user),
             refreshToken: await RefreshTokenRepository.createToken(user.uuid),
+            organization: organization,
         });
     }
 
@@ -128,25 +136,18 @@ export default class AuthController {
 
         if (typeof token !== "string") {
             return res.status(HttpCode.BAD_REQUEST).send({
-                message: "Token manquant",
+                message: Messages.OAUTH_TOKEN_MISSING,
             });
         }
 
-        const tokenEntity = await TokenRepository.findValid(
-            token,
-            TokenType.social_login
-        );
+        const tokenEntity = await TokenRepository.findValid(token, TokenType.social_login);
 
         if (!tokenEntity || tokenEntity.isExpired()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_INVALID });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_INVALID });
         }
 
         if (tokenEntity.isUsed()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_ALREADY_USED });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_ALREADY_USED });
         }
 
         const user = tokenEntity.user;
@@ -157,16 +158,16 @@ export default class AuthController {
             });
         }
 
-        const jwt = UserRepository.generateJwtToken(user);
-        const refreshToken = await RefreshTokenRepository.createToken(
-            user.uuid,
-        );
+        const jwtToken = UserRepository.generateJwtToken(user);
+        const refreshToken = await RefreshTokenRepository.createToken(user.uuid);
+        const organization = await OrganizationMemberRepository.findLight(user.uuid);
 
         await TokenRepository.markAsUsed(tokenEntity);
 
         return res.status(HttpCode.OK).send({
-            token: jwt,
+            token: jwtToken,
             refreshToken,
+            organization: organization,
         });
     }
 
@@ -178,15 +179,11 @@ export default class AuthController {
         const tokenEntity = await TokenRepository.findValid(token, TokenType.verify_account);
 
         if (!tokenEntity || tokenEntity.isExpired()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_INVALID });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_INVALID });
         }
 
         if (tokenEntity.isUsed()) {
-            return res
-                .status(HttpCode.OK)
-                .send({ message: Messages.TOKEN_ALREADY_USED });
+            return res.status(HttpCode.OK).send({ message: Messages.TOKEN_ALREADY_USED });
         }
 
         const user = tokenEntity.user;
@@ -195,9 +192,42 @@ export default class AuthController {
         await UserRepository.save(user);
         await TokenRepository.markAsUsed(tokenEntity);
 
+        await OrganizationInviteRepository.acceptPendingInvites(user);
+
         return res
             .status(HttpCode.OK)
             .send({ message: Messages.ACCOUNT_VERIFIED });
+    }
+
+    @Get("/invite/check")
+    @Error()
+    async checkInvite(req: Request, res: Response) {
+        const { token } = req.query as { token: string };
+
+        const invite = await OrganizationInviteRepository.findByToken(token);
+
+        if (!invite || DateTime.now().toJSDate() > invite.expiresAt) {
+            return res
+                .status(HttpCode.NOT_FOUND)
+                .send({
+                    message: Messages.ORGANIZATION_INVITE_NOT_FOUND
+                });
+        }
+
+        if (invite.acceptedAt) {
+            return res
+                .status(HttpCode.UNPROCESSABLE_ENTITY)
+                .send({
+                    message: Messages.ORGANIZATION_INVITE_ALREADY_ACCEPTED
+                });
+        }
+
+        return res.status(HttpCode.OK).send({
+            email: invite.email,
+            role: invite.role,
+            organizationName: invite.organization.name,
+            organizationSlug: invite.organization.slug,
+        });
     }
 
     @Post("/logout")
@@ -246,11 +276,9 @@ export default class AuthController {
         });
 
         if (!user || !user.isActive) {
-            return res
-                .status(HttpCode.FORBIDDEN)
-                .send({
-                    message: Messages.USER_CAN_T_LOG_IN
-                });
+            return res.status(HttpCode.FORBIDDEN).send({
+                message: Messages.USER_CAN_T_LOG_IN,
+            });
         }
 
         return res.status(HttpCode.OK).send({
@@ -285,7 +313,9 @@ export default class AuthController {
 
         return res
             .status(HttpCode.OK)
-            .send({ message: Messages.FORGOT_PASSWORD_SENT });
+            .send({
+                message: Messages.FORGOT_PASSWORD_SENT
+            });
     }
 
     @Post("/reset-password")
@@ -340,30 +370,22 @@ export default class AuthController {
             code: req.query.code,
             authError: req.query.error,
             getAccessToken: async (code: string) => {
-                const redirectUri =
-                    process.env.GOOGLE_REDIRECT_URI ||
-                    `${process.env.API_URL}/auth/callback/google`;
+                const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${process.env.API_URL}/auth/callback/google`;
 
                 const params = new URLSearchParams();
                 params.append("code", code);
                 params.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
-                params.append(
-                    "client_secret",
-                    process.env.GOOGLE_CLIENT_SECRET || "",
-                );
+                params.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
                 params.append("redirect_uri", redirectUri);
                 params.append("grant_type", "authorization_code");
 
-                const tokenResponse = await fetch(
-                    "https://oauth2.googleapis.com/token",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: params.toString(),
+                const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
                     },
-                );
+                    body: params.toString(),
+                });
 
                 const tokenData = (await tokenResponse.json()) as {
                     access_token?: string;
@@ -376,14 +398,11 @@ export default class AuthController {
                 return tokenData.access_token;
             },
             getUserData: async (accessToken: string) => {
-                const userResponse = await fetch(
-                    "https://www.googleapis.com/oauth2/v2/userinfo",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
+                const userResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                );
+                });
 
                 const userData = (await userResponse.json()) as {
                     email?: string;
@@ -414,21 +433,10 @@ export default class AuthController {
             code: req.query.code,
             authError: req.query.error,
             getAccessToken: async (code: string) => {
-                const tokenUrl = new URL(
-                    "https://graph.facebook.com/v20.0/oauth/access_token",
-                );
-                tokenUrl.searchParams.append(
-                    "client_id",
-                    process.env.FACEBOOK_APP_ID || "",
-                );
-                tokenUrl.searchParams.append(
-                    "client_secret",
-                    process.env.FACEBOOK_APP_SECRET || "",
-                );
-                tokenUrl.searchParams.append(
-                    "redirect_uri",
-                    `${process.env.API_URL}/auth/callback/facebook`,
-                );
+                const tokenUrl = new URL("https://graph.facebook.com/v20.0/oauth/access_token");
+                tokenUrl.searchParams.append("client_id", process.env.FACEBOOK_APP_ID || "");
+                tokenUrl.searchParams.append("client_secret", process.env.FACEBOOK_APP_SECRET || "");
+                tokenUrl.searchParams.append("redirect_uri", `${process.env.API_URL}/auth/callback/facebook`);
                 tokenUrl.searchParams.append("code", code);
 
                 const tokenResponse = await fetch(tokenUrl.toString());
@@ -444,10 +452,7 @@ export default class AuthController {
             },
             getUserData: async (accessToken: string) => {
                 const userUrl = new URL("https://graph.facebook.com/me");
-                userUrl.searchParams.append(
-                    "fields",
-                    "id,name,email,first_name,last_name",
-                );
+                userUrl.searchParams.append("fields", "id,name,email,first_name,last_name");
                 userUrl.searchParams.append("access_token", accessToken);
 
                 const userResponse = await fetch(userUrl.toString());
@@ -510,14 +515,11 @@ export default class AuthController {
                 return tokenData.access_token;
             },
             getUserData: async (accessToken: string) => {
-                const userResponse = await fetch(
-                    "https://graph.microsoft.com/v1.0/me",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
+                const userResponse = await fetch("https://graph.microsoft.com/v1.0/me", {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                );
+                });
 
                 const userData = (await userResponse.json()) as {
                     userPrincipalName?: string;
@@ -541,13 +543,8 @@ export default class AuthController {
         });
     }
 
-    private async handleOAuthCallback(
-        req: Request,
-        res: Response,
-        options: OAuthCallbackOptions,
-    ) {
-        const { origin, code, authError, getAccessToken, getUserData } =
-            options;
+    private async handleOAuthCallback(req: Request, res: Response, options: OAuthCallbackOptions) {
+        const { origin, code, authError, getAccessToken, getUserData } = options;
 
         if (authError) {
             return res.redirect(`${process.env.HTTP_URL}/login`);
@@ -555,7 +552,7 @@ export default class AuthController {
 
         if (typeof code !== "string") {
             return res.status(HttpCode.BAD_REQUEST).send({
-                message: "Code d'autorisation manquant",
+                message: Messages.OAUTH_CODE_MISSING,
             });
         }
 
@@ -563,7 +560,7 @@ export default class AuthController {
 
         if (!accessToken) {
             return res.status(HttpCode.INTERNAL_ERROR).send({
-                message: "Erreur lors de la récupération du token",
+                message: Messages.OAUTH_TOKEN_FETCH_ERROR,
             });
         }
 
@@ -571,7 +568,7 @@ export default class AuthController {
 
         if (!userData?.email) {
             return res.status(HttpCode.INTERNAL_ERROR).send({
-                message: "Impossible de récupérer les informations utilisateur",
+                message: Messages.OAUTH_USER_FETCH_ERROR,
             });
         }
 
@@ -587,21 +584,12 @@ export default class AuthController {
         );
 
         if (userLoginResponse.ok === false) {
-            return (
-                res
-                    .status(userLoginResponse.status)
-                    // .send({
-                    //     message: userLoginResponse.message,
-                    // })
-                    .redirect(
-                        `${process.env.HTTP_URL}/login?error=${encodeURIComponent(userLoginResponse.message)}`,
-                    )
-            );
+            return res
+                .status(userLoginResponse.status)
+                .redirect(`${process.env.HTTP_URL}/login?error=${encodeURIComponent(userLoginResponse.message)}`);
         }
 
-        return res.redirect(
-            await this.buildPortalRedirectUrl(userLoginResponse.user),
-        );
+        return res.redirect(await this.buildPortalRedirectUrl(userLoginResponse.user));
     }
 
     private async handleOriginUserLogin(
@@ -621,9 +609,7 @@ export default class AuthController {
         });
 
         if (!user) {
-            const [firstnameFromName = "", lastnameFromName = ""] = (
-                userData.name || ""
-            ).split(" ");
+            const [firstnameFromName = "", lastnameFromName = ""] = (userData.name || "").split(" ");
 
             user = new UserEntity();
             user.email = userData.email;

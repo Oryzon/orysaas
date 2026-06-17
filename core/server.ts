@@ -3,12 +3,12 @@ import "dotenv/config";
 import express, { Request, Response, Router } from "express";
 import helmet from "helmet";
 import cors from "cors";
+import path from "path";
 import { dataSource } from "./config/datasource";
 import { controllers } from "./controllers/controller";
 import { IRouter } from "./decorators";
-import { seedPermissions } from "./helpers/seed-permissions";
-import { seedRoles } from "./helpers/seed-roles";
 import { Runner } from "./jobs/runner";
+import { showcaseSeeders } from "./seeders/showcase";
 
 class Server {
 
@@ -31,15 +31,12 @@ class Server {
         this.app.use(helmet({ crossOriginResourcePolicy: false }));
         this.app.use(express.json({ limit: '20mb' }));
         this.app.use(express.text({ limit: '5mb' }));
+        this.app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
     }
 
     public async routes() {
         // Database
         await dataSource.initialize();
-
-        // Permissions and roles seeding.
-        await seedPermissions();
-        await seedRoles();
 
         // Cron and Runner
         await Runner.init();

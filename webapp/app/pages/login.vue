@@ -85,6 +85,7 @@
                             v-model="user.email"
                             :loading="isLoading"
                             :disabled="isLoading"
+                            @keydown.enter="handleLogin"
                         ></v-text-field>
                     </v-col>
 
@@ -98,6 +99,7 @@
                             v-model="user.password"
                             :loading="isLoading"
                             :disabled="isLoading"
+                            @keydown.enter="handleLogin"
                         ></v-text-field>
                     </v-col>
 
@@ -108,13 +110,13 @@
                             :loading="isLoading"
                             :disabled="isLoading"
                             v-model="stayConnected"
+                            @keydown.enter="handleLogin"
                         ></v-checkbox>
                     </v-col>
 
                     <v-col md="6" class="mt-n3 text-right">
-                        <v-btn class="mr-n3" variant="tonal" color="primary"
-                            >Mot de passe oublié ?</v-btn
-                        >
+                        <auth-forgot-password
+                        ></auth-forgot-password>
                     </v-col>
 
                     <v-col md="12" class="mt-n8">
@@ -189,13 +191,21 @@ onMounted(async () => {
 });
 
 const handleLogin = async () => {
-    let res = await login({
+    const { valid } = await form.value.validate();
+    isFormValid.value = valid;
+
+    if (!valid) {
+        return;
+    }
+
+    await login({
         email: user.value.email,
         password: user.value.password,
         stayConnected: stayConnected.value
     });
 
-    await router.replace("/portal/dashboard/"); // fast, replaces history
+    const redirect = route.query.redirect as string | undefined;
+    await router.replace(redirect ?? "/portal/dashboard/");
 };
 </script>
 
