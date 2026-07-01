@@ -15,8 +15,6 @@ export function Error() {
             try {
                 await originalMethod.apply(this, [request, response]);
             } catch (error) {
-                console.log(error);
-
                 switch (true) {
                     case typeof error === 'object' && error?.error === 100:
                         if (error.error === 100) {
@@ -34,17 +32,28 @@ export function Error() {
                         response
                             .status(HttpCode.UNPROCESSABLE_ENTITY)
                             .send({ message: error });
+
                         break;
                     case error instanceof EntityNotFoundError: {
                         const entityName = typeof error.entityClass === 'function'
                             ? error.entityClass.name
                             : String(error.entityClass);
+
                         response
                             .status(HttpCode.NOT_FOUND)
                             .send({ message: `The entity ${entityName} hasn't been found.` });
+
                         break;
                     }
                     case error instanceof QueryFailedError:
+                        if (error.driverError.code === 'ER_DUP_ENTRY') {
+                            const label = error.message.split(' for key ')[0].split('Duplicate entry ')[1];
+
+                            return response
+                                .status(HttpCode.UNPROCESSABLE_ENTITY)
+                                .send({ message: `Il y a déjà une entité avec la valeur ${label}.` })
+                        }
+
                         response
                             .status(HttpCode.UNPROCESSABLE_ENTITY)
                             .send({ message: (error as any).sqlMessage ?? error.message });

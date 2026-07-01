@@ -12,8 +12,8 @@ import {
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { QuotaEntity } from "./quota.entity";
 import { NumericTransformer } from "../transformers/number.transformer";
+import { QuotaPlanEntity } from "./quota-plan.entity";
 
 @Entity()
 export class PlanEntity {
@@ -40,7 +40,7 @@ export class PlanEntity {
         scale: 2,
         transformer: new NumericTransformer(),
     })
-    salePrice: number;
+    sellPrice: number;
 
     @Column()
     isActive: boolean;
@@ -48,11 +48,8 @@ export class PlanEntity {
     @Column()
     slug: string;
 
-    @OneToMany(() => QuotaEntity, (quota) => quota.plan, {
-        cascade: ["insert", "update"],
-        orphanedRowAction: "delete",
-    })
-    quotas: QuotaEntity[];
+    @OneToMany(() => QuotaPlanEntity, (qp) => qp.plan)
+    quotas: QuotaPlanEntity[];
 
     @Column()
     @CreateDateColumn()

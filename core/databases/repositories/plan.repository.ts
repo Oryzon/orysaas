@@ -55,17 +55,17 @@ export const PlanRepository = dataSource.getRepository(PlanEntity).extend({
         const queryBuilder = this.createQueryBuilder("plan");
 
         if (hasActiveFilter) {
-            queryBuilder.andWhere("plan.isActive = :isActive", { isActive: filters.isActive });
+            queryBuilder.andWhere("plans.isActive = :isActive", { isActive: filters.isActive });
         }
 
         if (normalizedTitle) {
-            queryBuilder.andWhere("LOWER(plan.title) LIKE :title", {
+            queryBuilder.andWhere("LOWER(plans.title) LIKE :title", {
                 title: `%${normalizedTitle.toLowerCase()}%`,
             });
         }
 
         if (normalizedDescription) {
-            queryBuilder.andWhere("LOWER(plan.description) LIKE :description", {
+            queryBuilder.andWhere("LOWER(plans.description) LIKE :description", {
                 description: `%${normalizedDescription.toLowerCase()}%`,
             });
         }
@@ -75,7 +75,7 @@ export const PlanRepository = dataSource.getRepository(PlanEntity).extend({
 
             queryBuilder.andWhere(
                 new Brackets((qb) => {
-                    qb.where("LOWER(plan.title) LIKE :keyword", { keyword }).orWhere("LOWER(plan.description) LIKE :keyword", { keyword });
+                    qb.where("LOWER(plans.title) LIKE :keyword", { keyword }).orWhere("LOWER(plans.description) LIKE :keyword", { keyword });
                 }),
             );
         }

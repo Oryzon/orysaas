@@ -3,44 +3,51 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity,
-    Index,
-    OneToMany,
+    Entity, Index, JoinColumn, ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn,
+    UpdateDateColumn
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { QuotaKey, QuotaPeriod, QuotaUnit } from "../../../shared/quota";
-import { NumericTransformer } from "../transformers/number.transformer";
-import { QuotaPlanEntity } from "./quota-plan.entity";
+import { OrganizationEntity } from "./organization.entity";
+import { ApiKeySystem } from "../../../shared/api-key-systems";
+
+export enum ApiKeyType {
+    INTEGRATION = 'INTEGRATION',
+    CONSUMER    = 'CONSUMER',
+}
 
 @Entity()
-@Index(['key', 'period'], { unique: true })
-export class QuotaEntity {
+export class ApiKeyEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column()
-    key: QuotaKey;
+    label: string;
+
+    @Column({ type: 'enum', enum: ApiKeyType })
+    type: ApiKeyType;
+
+    @Column({ nullable: true })
+    @Index()
+    systemKey: ApiKeySystem | null;
 
     @Column()
-    unit: QuotaUnit;
+    value: string;
 
-    @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 2,
-        nullable: true,
-        transformer: new NumericTransformer(),
-    })
-    defaultValue: number | null;
+    @Column({ nullable: true })
+    @Index()
+    organizationUuid: string | null;
 
-    @Column({ type: "enum", enum: QuotaPeriod, nullable: true })
-    period: QuotaPeriod | null;
+    @ManyToOne(() => OrganizationEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'organizationUuid' })
+    organization: OrganizationEntity | null;
 
-    @OneToMany(() => QuotaPlanEntity, (qp) => qp.quota)
-    quotaPlans: QuotaPlanEntity[];
+    @Column({ nullable: true })
+    expiresAt: Date | null;
+
+    @Column({ nullable: true })
+    lastUsedAt: Date | null;
 
     @Column()
     @CreateDateColumn()

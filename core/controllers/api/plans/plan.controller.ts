@@ -8,27 +8,28 @@ import { PlanEntity } from "../../../databases/entities/plan.entity";
 
 @Controller("plan")
 export default class PlanController {
+
     @Get("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
-    async getDetails(req: Request, res: Response) {
+    async detail(req: Request, res: Response) {
         const { uuid } = req.params;
 
         const plan = await PlanRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuid),
             },
-            relations: ["quotas"],
+            relations: {
+                quotas: {
+                    quota: true,
+                }
+            },
         });
 
-        if (!plan) {
-            return res.status(HttpCode.NOT_FOUND).send({
-                message: Messages.PLAN_NOT_FOUND,
-            });
-        }
-
-        return res.status(HttpCode.OK).send(plan);
+        return res
+            .status(HttpCode.OK)
+            .send(plan);
     }
 
     @Post("/")
@@ -36,13 +37,31 @@ export default class PlanController {
     @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
-        const plan = req.body as Partial<PlanEntity>;
+        const {
+            title,
+            description,
+            isActive,
+            sellPrice,
+            purchasePrice
+        } = req.body;
 
-        const newPlan = PlanRepository.create(plan);
+        const newPlan = new PlanEntity();
+
+        newPlan.title = title;
         newPlan.slug = await PlanRepository.getSlug(newPlan.title);
+        newPlan.description = description;
+        newPlan.isActive = !!isActive;
+        newPlan.sellPrice = sellPrice;
+        newPlan.purchasePrice = purchasePrice;
+
         await PlanRepository.insert(newPlan);
 
-        return res.status(HttpCode.CREATED).send(newPlan);
+        return res
+            .status(HttpCode.CREATED)
+            .send({
+                message: Messages.PLAN_CREATED,
+                entity: newPlan
+            });
     }
 
     @Put("/:uuid")
@@ -57,19 +76,15 @@ export default class PlanController {
             where: {
                 uuid: Equal(uuid),
             },
-            relations: ["quotas"],
         });
-
-        if (!existingPlan) {
-            return res.status(HttpCode.NOT_FOUND).send({
-                message: Messages.PLAN_NOT_FOUND,
-            });
-        }
 
         const newPlan = PlanRepository.merge(existingPlan, plan);
         const updatedNewPlan = await PlanRepository.save(newPlan);
 
-        return res.status(HttpCode.OK).send(updatedNewPlan);
+        return res.status(HttpCode.OK).send({
+            message: Messages.PLAN_UPDATED,
+            entity: updatedNewPlan
+        });
     }
 
     @Delete("/:uuid")
@@ -85,14 +100,15 @@ export default class PlanController {
             },
         });
 
-        if (!existingPlan) {
-            return res.status(HttpCode.NOT_FOUND).send({
-                message: Messages.PLAN_NOT_FOUND,
+        existingPlan.setDeletedAt();
+
+        await PlanRepository.save(existingPlan);
+
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.PLAN_DELETED,
+                entity: existingPlan
             });
-        }
-
-        await PlanRepository.softRemove(existingPlan);
-
-        return res.status(HttpCode.NO_CONTENT).send();
     }
 }

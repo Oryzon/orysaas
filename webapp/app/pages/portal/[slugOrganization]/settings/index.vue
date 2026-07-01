@@ -221,6 +221,68 @@
                 </v-tabs-window-item>
 
                 <v-tabs-window-item value="api">
+                    <v-card rounded="lg" border flat>
+                        <div class="d-flex align-center justify-space-between px-6 pt-6 pb-1">
+                            <div>
+                                <div class="text-h6 font-weight-bold">Clé d'API de l'organisation</div>
+                                <div class="text-body-2 text-medium-emphasis mt-1">Ajouter, supprimer, ou modifier des clés d'API de votre organisation.</div>
+                            </div>
+
+                            <portal-tenant-organization-api-keys-add
+                                @created="addToApiKeys"
+                            ></portal-tenant-organization-api-keys-add>
+                        </div>
+
+                        <v-divider />
+
+                        <v-card-text class="pa-6">
+                            <v-row>
+                                <v-col md="12">
+                                    <v-data-table
+                                        :headers="headers"
+                                        :items="apiKeys"
+                                        :items-per-page="100"
+                                        hide-default-footer
+                                        density="compact"
+                                        :loading="isLoading"
+                                        no-data-text="Aucune clé d'API configurée."
+                                    >
+                                        <template v-slot:item.type="{ item }">
+                                            <v-chip
+                                                variant="tonal"
+                                                :color="(item as ApiKey).type === 'INTEGRATION' ? 'info' : 'secondary'"
+                                            >
+                                                {{ (item as ApiKey).type === 'INTEGRATION' ? 'Intégration' : 'Consommateur' }}
+                                            </v-chip>
+                                        </template>
+
+                                        <template v-slot:item.expiresAt="{ item }">
+                                            <v-chip
+                                                v-if="item.expiresAt"
+                                                variant="tonal"
+                                                :color="isExpired(item.expiresAt) ? 'error' : 'warning'"
+                                            >
+                                                {{ isExpired(item.expiresAt) ? 'Expirée' : $date.frenchDate(item.expiresAt) }}
+                                            </v-chip>
+
+                                            <span v-else class="text-medium-emphasis text-caption">Aucune date</span>
+                                        </template>
+
+                                        <template v-slot:item.actions="{ item }">
+                                            <portal-tenant-organization-api-keys-view
+                                                :entity="item"
+                                            ></portal-tenant-organization-api-keys-view>
+
+                                            <portal-tenant-organization-api-keys-remove
+                                                :entity="item"
+                                                @removed="removeToApiKeys"
+                                            ></portal-tenant-organization-api-keys-remove>
+                                        </template>
+                                    </v-data-table>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
                 </v-tabs-window-item>
 
                 <v-tabs-window-item value="danger">
@@ -256,6 +318,7 @@
 <script setup lang="ts">
 import type { Organization } from "~/models/Organization";
 import { OrganizationMemberRole } from "#shared/organization-roles";
+import type {ApiKey} from "~/models/ApiKey";
 
 useConfigPage("Paramètres");
 
@@ -272,12 +335,17 @@ const { currentOrganization } = useAuth();
 
 const activeTab = ref("general");
 const organization = ref<Partial<Organization>>({});
+const apiKeys = ref<Array<ApiKey>>([]);
 
 const form = ref();
 const isFormValid = ref(false);
 const logoInput = ref<HTMLInputElement | null>(null);
 
-const isLoading = computed(() => api.isLoading('setting:detail') || api.isLoading('setting:update'));
+const isLoading = computed(() =>
+    api.isLoading('setting:detail') ||
+    api.isLoading('setting:update') ||
+    api.isLoading('api-keys:list')
+);
 
 const canManage = useOrganizationCan(OrganizationMemberRole.ADMIN);
 
@@ -297,6 +365,10 @@ onMounted(async () => {
 watch(activeTab, async () => {
     if (activeTab.value === "general") {
         await getGeneral();
+    }
+
+    if (activeTab.value === "api") {
+        await getApiKeys();
     }
 });
 
@@ -342,6 +414,31 @@ const handleEditGeneral = async () => {
         toast: true
     });
 };
+
+// API Keys
+const headers = [
+    { title: 'Label', key: 'label' },
+    { title: 'Type', key: 'type' },
+    { title: 'Expiration', key: 'expiresAt' },
+    { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+];
+
+const getApiKeys = async () => {
+    apiKeys.value = await api.get<Array<ApiKey>>(`/tenant/${slugOrganization}/setting/api-keys`, {
+        loadingKey: 'api-keys:list',
+        toast: false,
+    });
+}
+
+const addToApiKeys = (data: ApiKey) => {
+    apiKeys.value.push(data);
+};
+
+const removeToApiKeys = (data: ApiKey) => {
+    apiKeys.value = apiKeys.value.filter((entity) => entity.uuid !== data.uuid);
+}
+
+const isExpired = (date: string) => new Date(date) < new Date();
 </script>
 
 <style scoped>

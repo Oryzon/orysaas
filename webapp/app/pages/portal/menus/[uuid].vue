@@ -222,22 +222,6 @@ onMounted(async () => {
 const form = ref();
 const isFormValid = ref(false);
 
-const handleUpdate = async () => {
-    const {valid} = await form.value.validate();
-    isFormValid.value = valid;
-
-    if (!valid) {
-        return;
-    }
-
-    await api.put(`/menu/${<string>route.params.uuid}`,
-        { ...menu.value },
-        {
-            loadingKey: 'menu:update',
-            toast: true
-        });
-};
-
 // Update item parts
 const formMenuItem = ref();
 const isFormMenuItemValid = ref(false);
