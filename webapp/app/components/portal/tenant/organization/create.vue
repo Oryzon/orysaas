@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="1000" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-card v-if="outlined" v-bind="activatorProps" variant="outlined" color="primary" class="mt-2" rounded="lg">
+            <v-card v-if="isSimpleButton" v-bind="activatorProps" variant="outlined" color="primary" class="mt-2" rounded="lg">
                 <v-card-text>
                     <v-row justify="center" align="center" class="mt-n1 mb-n1">
                         <v-col md="2">
@@ -134,9 +134,9 @@
 import type { Organization } from "~/models/Organization";
 
 const props = defineProps({
-    outlined: {
+    isSimpleButton: {
         type: Boolean,
-        default: true,
+        default: false,
     },
 });
 

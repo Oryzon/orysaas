@@ -12,12 +12,12 @@
                         <h1 class="dashboard-org-title text-white">Vous n’avez encore aucune organisation</h1>
 
                         <p class="dashboard-org-text mx-auto text-white">
-                            Pour commencer à utiliser le portail, vous devez créer votre première organisation. Saisissez le nom, l’adresse
+                            Pour commencer à utiliser le portail, vous devez créer votre première organisation. Saisissez le nom, l'adresse
                             et les coordonnées de votre structure pour ouvrir votre espace avec une base propre et exploitable.
                         </p>
 
                         <div class="dashboard-org-cta d-flex justify-center">
-                            <portal-tenant-organization-create :outlined="false" />
+                            <portal-tenant-organization-create />
                         </div>
                     </div>
 
@@ -35,7 +35,7 @@
                             />
                             <v-list-item
                                 prepend-icon="mdi-check-circle-outline"
-                                title="Ensuite, vous pourrez inviter vos membres et gérer vos pages"
+                                title="Ensuite, vous pourrez inviter vos membres et modifier votre interface"
                                 class="px-0"
                             />
                         </v-list>

@@ -80,7 +80,7 @@
                             </v-card-text>
                         </v-card>
 
-                        <portal-tenant-organization-create @created="addToOrganizations"></portal-tenant-organization-create>
+                        <portal-tenant-organization-create isSimpleButton @created="addToOrganizations" />
                     </v-col>
                 </v-row>
             </v-card-text>

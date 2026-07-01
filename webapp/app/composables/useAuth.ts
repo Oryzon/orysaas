@@ -118,8 +118,6 @@ export const useAuth = () => {
             toast: false,
         });
 
-        console.log("User organizations:", organizations);
-
         hasOrganization.value = organizations.length > 0;
     }
 
