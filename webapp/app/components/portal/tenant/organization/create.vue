@@ -1,13 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="1000" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-card
-                v-bind="activatorProps"
-                variant="outlined"
-                color="primary"
-                class="mt-2"
-                rounded="lg"
-            >
+            <v-card v-if="isSimpleButton" v-bind="activatorProps" variant="outlined" color="primary" class="mt-2" rounded="lg">
                 <v-card-text>
                     <v-row justify="center" align="center" class="mt-n1 mb-n1">
                         <v-col md="2">
@@ -22,6 +16,18 @@
                     </v-row>
                 </v-card-text>
             </v-card>
+
+            <v-btn
+                v-else
+                v-bind="activatorProps"
+                color="primary"
+                variant="flat"
+                rounded="lg"
+                class="mt-2 px-5 text-none"
+                prepend-icon="mdi-folder-plus"
+            >
+                Créer une nouvelle organisation
+            </v-btn>
         </template>
 
         <template v-slot:default>
@@ -45,7 +51,7 @@
                                     label="Nom de l'organisation"
                                     variant="outlined"
                                     v-model="organization.name"
-                                    :rules="[ rules.required(), rules.minLength(2) ]"
+                                    :rules="[rules.required(), rules.minLength(2)]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-text-field>
@@ -69,7 +75,7 @@
                                     label="Adresse"
                                     variant="outlined"
                                     v-model="organization.address"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-text-field>
@@ -81,7 +87,7 @@
                                     label="Code postal"
                                     variant="outlined"
                                     v-model="organization.postalCode"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-text-field>
@@ -93,7 +99,7 @@
                                     label="Ville"
                                     variant="outlined"
                                     v-model="organization.city"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-text-field>
@@ -105,7 +111,7 @@
                                     label="Pays"
                                     variant="outlined"
                                     v-model="organization.country"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-text-field>
@@ -115,13 +121,7 @@
                 </v-card-text>
 
                 <v-card-actions class="bg-surface-light mt-n2">
-                    <v-btn
-                        color="primary"
-                        variant="flat"
-                        :loading="isLoading"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="primary" variant="flat" :loading="isLoading" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Créer l'organisation
                     </v-btn>
                 </v-card-actions>
@@ -133,7 +133,14 @@
 <script setup lang="ts">
 import type { Organization } from "~/models/Organization";
 
-const emit = defineEmits(['created']);
+const props = defineProps({
+    isSimpleButton: {
+        type: Boolean,
+        default: false,
+    },
+});
+
+const emit = defineEmits(["created"]);
 
 const api = useApi();
 const rules = useValidationRules();
@@ -145,6 +152,9 @@ const isLoading = computed(() => api.isLoading("organization:create"));
 
 const organization = ref<Partial<Organization>>({});
 const logoFile = ref<File | null>(null);
+
+const { currentOrganization } = useAuth();
+const router = useRouter();
 
 const handleClose = () => {
     dialog.value = false;
@@ -162,14 +172,14 @@ const handleCreate = async () => {
     }
 
     const formData = new FormData();
-    formData.append('name', organization.value.name ?? '');
-    formData.append('address', organization.value.address ?? '');
-    formData.append('postalCode', organization.value.postalCode ?? '');
-    formData.append('city', organization.value.city ?? '');
-    formData.append('country', organization.value.country ?? '');
+    formData.append("name", organization.value.name ?? "");
+    formData.append("address", organization.value.address ?? "");
+    formData.append("postalCode", organization.value.postalCode ?? "");
+    formData.append("city", organization.value.city ?? "");
+    formData.append("country", organization.value.country ?? "");
 
     if (logoFile.value) {
-        formData.append('logo', logoFile.value);
+        formData.append("logo", logoFile.value);
     }
 
     const res = await api.post<{ message: string; entity: Organization }>(
@@ -182,8 +192,18 @@ const handleCreate = async () => {
     );
 
     if (res?.entity) {
-        emit('created', res.entity);
+        emit("created", res.entity);
         handleClose();
+
+        currentOrganization.value = {
+            slug: res.entity.slug,
+            name: res.entity.name,
+            logoUrl: res.entity.logoUrl,
+            nbMembers: res.entity.nbMembers ?? 0,
+            role: res.entity.role as any,
+        };
+
+        await router.replace("/portal/dashboard");
     }
 };
 </script>

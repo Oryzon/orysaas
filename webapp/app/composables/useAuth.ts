@@ -1,4 +1,3 @@
-// composables/useAuth.ts
 import type { User } from "~/models/User";
 import { useNuxtApp } from "#app";
 import type { OrganizationMemberRole } from "#shared/organization-roles";
@@ -103,9 +102,18 @@ export const useAuth = () => {
         rToken.value = res.refreshToken;
         currentOrganization.value = res.organization ?? null;
 
+        await refreshOrganizations();
+
         if (res.token) {
             await refreshUser(res.token);
         }
+    }
+
+    async function refreshOrganizations() {
+        const organizations = await api.get<Array<Organization>>(`/user/organizations`, {
+            loadingKey: "organizations:load",
+            toast: false,
+        });
     }
 
     async function refreshOrganization(slug?: string) {

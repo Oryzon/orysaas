@@ -1,6 +1,7 @@
 <template>
     <v-app>
         <v-navigation-drawer
+            v-if="showLeftMenu"
             :rail="isCollapsed"
             class="bg-brand-dark main-nav"
             :class="{ 'drawer-collapsed': isCollapsed }"
@@ -192,7 +193,9 @@
 
         <v-main>
             <v-container fluid>
-                <slot />
+                <portal-tenant-organization-onboarding-dashboard v-if="currentOrganization && currentOrganization.slug === null" />
+
+                <slot v-else />
             </v-container>
         </v-main>
     </v-app>
@@ -230,6 +233,7 @@ onMounted(async () => {
 
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
+const showLeftMenu = computed(() => user.value?.isSaasAdmin || (currentOrganization.value !== null && currentOrganization.value.slug !== null));
 
 const isNavActive = (path: string) => route.path === path || route.path.startsWith(path + '/');
 
@@ -241,7 +245,7 @@ const userInitials = computed(() => {
     const f = user.value.firstname?.[0] ?? "";
     const l = user.value.lastname?.[0] ?? "";
 
-    return (f + l).toUpperCase() || user.value.email[0].toUpperCase();
+    return (f + l).toUpperCase() || user.value.email[0]?.toUpperCase();
 });
 
 const userName = computed(() => {
