@@ -3,13 +3,24 @@ import { useNuxtApp } from "nuxt/app";
 export default defineNuxtRouteMiddleware(async (to) => {
     const nuxtApp = useNuxtApp();
     const { loggedIn, user, refreshUser, socialLogin } = useAuth();
+    const socialToken = Array.isArray(to.query.social_token) ? to.query.social_token[0] : to.query.social_token;
 
-    if (to.query.social_token) {
-        await socialLogin(to.query.social_token as string);
+    if (typeof socialToken === "string" && socialToken.length > 0) {
+        if (import.meta.server) {
+            // Let client-side middleware exchange the one-time social token.
+            return;
+        }
 
-        to.query = {};
+        try {
+            await socialLogin(socialToken);
+        } catch {
+            return navigateTo("/login");
+        }
 
-        return navigateTo(to, { replace: true });
+        const query = { ...to.query };
+        delete query.social_token;
+
+        return navigateTo({ path: to.path, query, hash: to.hash }, { replace: true });
     }
 
     if (!loggedIn.value) {
@@ -17,6 +28,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
 
     if (!user.value) {
-        await nuxtApp.runWithContext(() => refreshUser());
+        try {
+            await nuxtApp.runWithContext(() => refreshUser());
+        } catch {
+            return navigateTo("/login");
+        }
     }
 });

@@ -1,4 +1,3 @@
-// composables/useAuth.ts
 import type { User } from "~/models/User";
 import { useNuxtApp } from "#app";
 import type { OrganizationMemberRole } from "#shared/organization-roles";
@@ -6,7 +5,7 @@ import type { OrganizationMemberRole } from "#shared/organization-roles";
 type LoginDto = {
     stayConnected: any;
     email: string;
-    password: string
+    password: string;
 };
 
 type ResetDto = {
@@ -16,7 +15,13 @@ type ResetDto = {
     password: string;
 };
 
-type Organization = { slug: string | null; name: string | null; logoUrl: string | null; nbMembers: number; role: OrganizationMemberRole | null };
+type Organization = {
+    slug: string | null;
+    name: string | null;
+    logoUrl: string | null;
+    nbMembers: number;
+    role: OrganizationMemberRole | null;
+};
 type TokenPair = { token: string; refreshToken: string; organization?: Organization | null; message?: string };
 type ForgotPasswordDto = { email: string };
 type ResetPasswordDto = {
@@ -62,11 +67,11 @@ export const useAuth = () => {
         const maxAge = payload.stayConnected ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
 
         const rTokenWithExpiry = await nuxtApp.runWithContext(() =>
-            useCookie<string | null>('refreshToken', {
-                sameSite: 'lax',
+            useCookie<string | null>("refreshToken", {
+                sameSite: "lax",
                 secure: !import.meta.dev,
                 maxAge,
-            })
+            }),
         );
 
         rTokenWithExpiry.value = res.refreshToken;
@@ -89,13 +94,26 @@ export const useAuth = () => {
             },
         );
 
+        if (!res?.token || !res?.refreshToken) {
+            throw new Error(res?.message || "Social login failed");
+        }
+
         token.value = res.token;
         rToken.value = res.refreshToken;
         currentOrganization.value = res.organization ?? null;
 
+        await refreshOrganizations();
+
         if (res.token) {
             await refreshUser(res.token);
         }
+    }
+
+    async function refreshOrganizations() {
+        const organizations = await api.get<Array<Organization>>(`/user/organizations`, {
+            loadingKey: "organizations:load",
+            toast: false,
+        });
     }
 
     async function refreshOrganization(slug?: string) {
@@ -123,7 +141,7 @@ export const useAuth = () => {
             });
         } catch (error) {
             console.error("Failed to load user", error);
-            nuxtApp.runWithContext(() => navigateTo("/login"));
+            throw error;
         }
     }
 

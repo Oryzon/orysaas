@@ -1,13 +1,13 @@
-import type { Quota } from "./Quota";
+import type { QuotaPlan } from "./QuotaPlan";
 
 export interface Plan {
     uuid?: string;
     title: string;
     description?: string;
     purchasePrice: number;
-    salePrice: number;
+    sellPrice: number;
     isActive: boolean;
-    quotas?: Quota[];
+    quotas?: QuotaPlan[];
     uniqueKey?: string;
     createdAt?: Date;
     createdBy?: string;

@@ -5,6 +5,7 @@ import { PlanRepository } from "../../../databases/repositories/plan.repository"
 
 @Controller("plans")
 export default class PlansController {
+
     @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()

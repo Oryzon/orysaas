@@ -109,6 +109,8 @@ export default class Messages {
     // Settings
     // -------------------------
     static SETTINGS_UPDATED = "Les paramètres ont été mis à jour.";
+    static API_KEY_CREATED = "La clé d'API a été créée.";
+    static API_KEY_DELETED = "La clé d'API a été supprimée.";
 
     // -------------------------
     // Permissions
@@ -143,4 +145,22 @@ export default class Messages {
     // -------------------------
     static CONTACT_SENDED = "Votre message a bien été envoyé.";
     static CONTACT_ARCHIVED = "Le message a bien été archivé.";
+
+    // -------------------------
+    // Quotas
+    // -------------------------
+    static QUOTA_CREATED = "L'option de quota a été ajoutée.";
+    static QUOTA_UPDATED = "L'option de quota a été modifié.";
+
+    // -------------------------
+    // Quota Plan
+    // -------------------------
+    static QUOTA_PLAN_CREATED = "Le quota a été ajouté au plan.";
+    static QUOTA_PLAN_UPDATED = "Le quota a été modifié au plan.";
+    static QUOTA_PLAN_ALREADY_EXISTS = "Ce quota est déjà lié à ce plan.";
+    static QUOTA_PLAN_DELETED = "Le quota a été supprimé du plan.";
+
+    static PLAN_CREATED = "L'abonnement a été ajouté.";
+    static PLAN_UPDATED = "L'abonnement a été modifié.";
+    static PLAN_DELETED = "L'abonnement a été supprimé.";
 }

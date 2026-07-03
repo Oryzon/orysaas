@@ -1,74 +1,100 @@
 <template>
-    <v-row class="mb-4">
-        <v-col md="12" class="d-flex justify-end">
+    <v-row>
+        <v-col md="12" class="d-flex justify-end mb-n2">
+            <portal-quotas-list
+            ></portal-quotas-list>
+
             <v-btn color="secondary" variant="flat" @click="handleSearch" prepend-icon="mdi-refresh">Rafraîchir</v-btn>
             <v-btn color="primary" variant="flat" to="/portal/plans/create" prepend-icon="mdi-plus" class="ms-2">Créer</v-btn>
         </v-col>
     </v-row>
+
     <v-row>
         <v-col md="12">
             <v-card flat>
                 <v-card-text>
-                    <v-data-table
-                        :headers="headers"
-                        :items="plans"
-                        :loading="isLoading"
-                        loading-text="Chargement des abonnements en cours."
-                        no-data-text="Il n'y a pas d'abonnement."
-                        items-per-page="25"
-                    >
-                        <template v-slot:item.isActive="{ item }">
-                            <v-chip
-                                v-if="item.isActive"
-                                label
-                                append-icon="mdi-check"
-                                color="success"
-                                variant="tonal"
-                                size="small"
-                                class="font-weight-bold"
+                    <v-row>
+                        <v-col md="12">
+                            <v-data-table
+                                :headers="headers"
+                                :items="plans"
+                                :loading="isLoading"
+                                loading-text="Chargement des abonnements en cours."
+                                no-data-text="Il n'y a pas d'abonnement."
+                                items-per-page="25"
                             >
-                                Activé
-                            </v-chip>
-                            <v-chip
-                                v-else
-                                label
-                                append-icon="mdi-close"
-                                color="error"
-                                variant="tonal"
-                                size="small"
-                                class="font-weight-bold"
-                            >
-                                Non activé
-                            </v-chip>
-                        </template>
-                        <template v-slot:item.createdAt="{ item }">
-                            <span class="font-italic text-medium-emphasis text-body-2">
-                                {{ french(item.createdAt) }}
-                            </span>
-                        </template>
-                        <template v-slot:item.salePrice="{ item }">
-                            <v-chip color="primary" variant="tonal" size="small" class="font-weight-bold"> {{ item.salePrice }} € </v-chip>
-                        </template>
-                        <template v-slot:item.actions="{ item }">
-                            <div class="d-flex align-center justify-end ga-2">
-                                <portal-plans-edit :entity="item"></portal-plans-edit>
-                                <v-btn variant="text" icon color="info" :to="`/portal/plans/${item.uuid}`">
-                                    <v-icon>mdi-pencil</v-icon>
-                                </v-btn>
-                                <portal-plans-delete :entity="item" @deleted="handleDelete"></portal-plans-delete>
-                            </div>
-                        </template>
-                    </v-data-table>
+                                <template v-slot:item.isActive="{ item }">
+                                    <v-chip
+                                        v-if="item.isActive"
+                                        label
+                                        append-icon="mdi-check"
+                                        color="success"
+                                        variant="tonal"
+                                        size="small"
+                                        class="font-weight-bold"
+                                    >
+                                        Activé
+                                    </v-chip>
+
+                                    <v-chip
+                                        v-else
+                                        label
+                                        append-icon="mdi-close"
+                                        color="error"
+                                        variant="tonal"
+                                        size="small"
+                                        class="font-weight-bold"
+                                    >
+                                        Non activé
+                                    </v-chip>
+                                </template>
+
+                                <template v-slot:item.createdAt="{ item }">
+                                    {{ $date.french(item.createdAt) }}
+                                </template>
+
+                                <template v-slot:item.price="{ item }">
+                                    <v-chip
+                                        label
+                                        color="error"
+                                        prepend-icon="mdi-cash-remove"
+                                    >
+                                        {{ item.purchasePrice }} €
+                                    </v-chip>
+
+                                    <v-chip
+                                        class="ml-2"
+                                        label
+                                        color="success"
+                                        prepend-icon="mdi-cash-plus"
+                                    >
+                                        {{ item.sellPrice }} €
+                                    </v-chip>
+                                </template>
+
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn variant="text" icon color="info" :to="`/portal/plans/${item.uuid}`">
+                                        <v-icon>mdi-pencil</v-icon>
+                                    </v-btn>
+
+                                    <portal-plans-remove
+                                        :entity="item"
+                                        @removed="removeToPlans"
+                                    ></portal-plans-remove>
+                                </template>
+                            </v-data-table>
+                        </v-col>
+                    </v-row>
                 </v-card-text>
             </v-card>
         </v-col>
     </v-row>
 </template>
+
 <script setup lang="ts">
 import type { Plan } from "~/models/Plan";
 
 const api = useApi();
-const { french } = useNuxtApp().$date;
 
 useConfigPage("Abonnements");
 
@@ -87,15 +113,13 @@ const isLoading = computed(() => {
 });
 
 const headers = computed(() => {
-    let headers = [
+    return [
         { title: "Titre", key: "title" },
         { title: "Est actif ?", key: "isActive" },
         { title: "Date de création", key: "createdAt" },
-        { title: "Prix de vente", key: "salePrice" },
+        { title: "Prix", key: "price" },
         { title: "Actions", key: "actions", align: "end" },
     ];
-
-    return headers;
 });
 
 const plans = ref<Array<Plan>>([]);
@@ -106,7 +130,7 @@ const handleSearch = async () => {
     });
 };
 
-const handleDelete = async (plan: Plan) => {
+const removeToPlans = async (plan: Plan) => {
     plans.value = plans.value.filter((p) => p.uuid !== plan.uuid);
 };
 </script>

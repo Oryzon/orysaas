@@ -1,3 +1,5 @@
+import type { ApiKey } from "./ApiKey";
+
 export interface Setting {
     siret: string;
     adress: string;
@@ -10,4 +12,5 @@ export interface Setting {
     nafApeCode: string;
     identifierVat: string;
     rcsCity: string;
+    apiKeys: ApiKey[];
 }

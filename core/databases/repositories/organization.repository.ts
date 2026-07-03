@@ -65,4 +65,11 @@ export const OrganizationRepository = dataSource.getRepository(OrganizationEntit
 
         await this.save(organization);
     },
+    async getOrganizationBySlug(slug: string) {
+        return await this.findOneOrFail({
+            where: {
+                slug: Equal(slug)
+            }
+        });
+    }
 });

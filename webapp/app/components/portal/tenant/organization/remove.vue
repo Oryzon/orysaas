@@ -160,7 +160,13 @@ const confirm = async () => {
         if (res.nextOrgSlug) {
             await refreshOrganization(res.nextOrgSlug);
         } else {
-            currentOrganization.value = null;
+            currentOrganization.value = {
+                slug: null,
+                name: null,
+                logoUrl: null,
+                nbMembers: 0,
+                role: null,
+            };
         }
 
         await router.push('/portal/dashboard');

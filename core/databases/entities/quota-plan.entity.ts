@@ -3,29 +3,37 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity,
-    Index,
-    OneToMany,
+    Entity, Index, JoinColumn, ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { QuotaKey, QuotaPeriod, QuotaUnit } from "../../../shared/quota";
+import { QuotaEntity } from "./quota.entity";
+import { PlanEntity } from "./plan.entity";
 import { NumericTransformer } from "../transformers/number.transformer";
-import { QuotaPlanEntity } from "./quota-plan.entity";
 
 @Entity()
-@Index(['key', 'period'], { unique: true })
-export class QuotaEntity {
+@Index(['quotaUuid', 'planUuid', 'deletedAt'], { unique: true })
+export class QuotaPlanEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column()
-    key: QuotaKey;
+    @Index()
+    quotaUuid: string;
+
+    @ManyToOne(() => QuotaEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'quotaUuid' })
+    quota: QuotaEntity;
 
     @Column()
-    unit: QuotaUnit;
+    @Index()
+    planUuid: string;
+
+    @ManyToOne(() => PlanEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'planUuid' })
+    plan: PlanEntity;
 
     @Column({
         type: "decimal",
@@ -34,13 +42,7 @@ export class QuotaEntity {
         nullable: true,
         transformer: new NumericTransformer(),
     })
-    defaultValue: number | null;
-
-    @Column({ type: "enum", enum: QuotaPeriod, nullable: true })
-    period: QuotaPeriod | null;
-
-    @OneToMany(() => QuotaPlanEntity, (qp) => qp.quota)
-    quotaPlans: QuotaPlanEntity[];
+    value: number | null;
 
     @Column()
     @CreateDateColumn()
