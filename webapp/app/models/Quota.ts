@@ -1,4 +1,4 @@
-import {QuotaKey, QuotaPeriod, QuotaUnit} from "#shared/quota";
+import { QuotaKey, QuotaPeriod, QuotaUnit } from "#shared/quota";
 
 export interface Quota {
     uuid: string;

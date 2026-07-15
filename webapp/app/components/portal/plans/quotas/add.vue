@@ -79,6 +79,7 @@ import { QuotaKeyLabel, QuotaPeriodLabel } from "#shared/quota";
 const props = defineProps<{
     planUuid?: string
 }>();
+
 const emit = defineEmits(["created"]);
 
 const api = useApi();

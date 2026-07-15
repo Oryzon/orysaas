@@ -24,8 +24,8 @@ export const QuotaKeyLabel: Record<QuotaKey, string> = {
     [QuotaKey.WEBHOOKS]: "Webhooks",
     [QuotaKey.API_KEYS]: "Clés API",
     [QuotaKey.EXPORT_JOBS]: "Exports",
-    [QuotaKey.EMAILS_SENT]: "E-mails envoyés",
-    [QuotaKey.SMS_SENT]: "SMS envoyés",
+    [QuotaKey.EMAILS_SENT]: "Envoi d'e-mails",
+    [QuotaKey.SMS_SENT]: "Envoi de SMS",
     [QuotaKey.CONCURRENT_SESSIONS]: "Sessions simultanées",
     [QuotaKey.AUDIT_LOG_RETENTION]: "Rétention des logs d'audit",
 }
@@ -46,6 +46,15 @@ export const QuotaPeriodLabel: Record<QuotaPeriod, string> = {
     [QuotaPeriod.MONTHLY]: "Mensuel",
     [QuotaPeriod.YEARLY]: "Annuel",
     [QuotaPeriod.LIFETIME]: "A vie",
+}
+
+export const QuotaPeriodPerLabel: Record<QuotaPeriod, string> = {
+    [QuotaPeriod.HOURLY]: "par heure",
+    [QuotaPeriod.DAILY]: "par jour",
+    [QuotaPeriod.WEEKLY]: "par semaine",
+    [QuotaPeriod.MONTHLY]: "par mois",
+    [QuotaPeriod.YEARLY]: "par an",
+    [QuotaPeriod.LIFETIME]: "a vie",
 }
 
 export enum QuotaUnit {

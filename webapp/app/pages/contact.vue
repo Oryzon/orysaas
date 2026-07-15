@@ -14,7 +14,7 @@
 
                     <v-col md="12" class="mt-n12 ml-n4">
                         <v-list lines="three">
-                            <v-list-item>
+                            <v-list-item v-if="settings.email">
                                 <template v-slot:prepend>
                                     <v-avatar color="primary" rounded="12px" variant="tonal" size="60">
                                         <v-icon color="primary" size="36">mdi-email-outline</v-icon>
@@ -22,7 +22,7 @@
                                 </template>
 
                                 <v-list-item-title class="font-weight-black text-capitalize">Email</v-list-item-title>
-                                <v-list-item-subtitle class="font-weight-bold">vincent@orysaas.fr</v-list-item-subtitle>
+                                <v-list-item-subtitle class="font-weight-bold">{{ settings?.email }}</v-list-item-subtitle>
                                 <v-list-item-subtitle class="font-weight-light  text-grey">Réponse sous 2h ouvrées
                                 </v-list-item-subtitle>
                             </v-list-item>
@@ -42,7 +42,7 @@
                                 </v-list-item-subtitle>
                             </v-list-item>
 
-                            <v-list-item class="mt-n4">
+                            <v-list-item class="mt-n4" v-if="settings.phone">
                                 <template v-slot:prepend>
                                     <v-avatar color="primary" rounded="12px" variant="tonal" size="60">
                                         <v-icon color="primary" size="36">mdi-phone-outline</v-icon>
@@ -51,7 +51,7 @@
 
                                 <v-list-item-title class="font-weight-black text-capitalize">Téléphone
                                 </v-list-item-title>
-                                <v-list-item-subtitle class="font-weight-bold">+33.6.00.00.00.00</v-list-item-subtitle>
+                                <v-list-item-subtitle class="font-weight-bold">{{ settings?.phone }}</v-list-item-subtitle>
                                 <v-list-item-subtitle class="font-weight-light  text-grey">Lun-Ven : 8h - 19h
                                 </v-list-item-subtitle>
                             </v-list-item>
@@ -182,13 +182,17 @@
 </template>
 
 <script setup lang="ts">
-// @ToDo : Add the settings logic for making good things about the contact page
-
 import type { Contact } from "~/models/Contact";
 
 useConfigPage("Contact");
 
+const runtime = useRuntimeConfig();
 const api = useApi();
+
+const { data: settings } = await useFetch<{ email: string; phone: string; adress: string; city: string; postalCode: string }>(
+    `${runtime.public.apiBase}settings/public`,
+    { key: 'page:contact:settings' }
+);
 
 const rules = useValidationRules();
 const contactForm = ref();

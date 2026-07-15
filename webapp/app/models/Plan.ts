@@ -7,6 +7,8 @@ export interface Plan {
     purchasePrice: number;
     sellPrice: number;
     isActive: boolean;
+    isPopular: boolean;
+    trialPeriod: number;
     quotas?: QuotaPlan[];
     uniqueKey?: string;
     createdAt?: Date;

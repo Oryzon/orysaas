@@ -42,7 +42,9 @@ export default class PlanController {
             description,
             isActive,
             sellPrice,
-            purchasePrice
+            purchasePrice,
+            isPopular,
+            trialPeriod,
         } = req.body;
 
         const newPlan = new PlanEntity();
@@ -52,6 +54,8 @@ export default class PlanController {
         newPlan.description = description;
         newPlan.isActive = !!isActive;
         newPlan.sellPrice = sellPrice;
+        newPlan.isPopular = isPopular;
+        newPlan.trialPeriod = trialPeriod;
         newPlan.purchasePrice = purchasePrice;
 
         await PlanRepository.insert(newPlan);

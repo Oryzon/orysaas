@@ -45,6 +45,12 @@ export class PlanEntity {
     @Column()
     isActive: boolean;
 
+    @Column({ default: false })
+    isPopular: boolean;
+
+    @Column({ default: 0 })
+    trialPeriod: number; // In Day
+
     @Column()
     slug: string;
 
