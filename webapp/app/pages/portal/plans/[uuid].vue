@@ -78,6 +78,28 @@
                                     hide-details="auto"
                                 ></v-text-field>
                             </v-col>
+
+                            <v-col md="4" class="mt-n4">
+                                <v-text-field
+                                    v-model="plan.trialPeriod"
+                                    :loading="isLoading"
+                                    :disabled="isLoading"
+                                    variant="outlined"
+                                    label="Durée de la période d'essai"
+                                    hide-details="auto"
+                                ></v-text-field>
+                            </v-col>
+
+                            <v-col md="4" offset-md="4">
+                                <v-switch
+                                    class="mt-n4 float-end mr-2"
+                                    inset
+                                    color="success"
+                                    :label="plan.isPopular ? 'Populaire' : 'Non populaire'"
+                                    base-color="error"
+                                    v-model="plan.isPopular"
+                                ></v-switch>
+                            </v-col>
                         </v-row>
                     </v-form>
                 </v-card-text>

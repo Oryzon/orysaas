@@ -29,6 +29,16 @@ type SettingsPayload = Record<SettingsKey, string>;
 
 @Controller('settings')
 export default class SettingsController {
+    @Get('/public')
+    @Error()
+    async publicInfo(_req: Request, res: Response) {
+        const PUBLIC_KEYS = ['phone', 'email', 'adress', 'city', 'postalCode'] as const;
+        const entries = await Promise.all(
+            PUBLIC_KEYS.map(async (key) => [key, await SettingRepository.getValue(key)])
+        );
+        return res.status(HttpCode.OK).send(Object.fromEntries(entries));
+    }
+
     @Get('/')
     @CheckJwt()
     @CheckIsSaasAdmin()

@@ -9,7 +9,7 @@
                             <span class="font-weight-medium text-caption text-white">Première étape de configuration</span>
                         </div>
 
-                        <h1 class="dashboard-org-title text-white">Vous n’avez encore aucune organisation</h1>
+                        <h1 class="dashboard-org-title text-white">Vous n'avez encore aucune organisation</h1>
 
                         <p class="dashboard-org-text mx-auto text-white">
                             Pour commencer à utiliser le portail, vous devez créer votre première organisation. Saisissez le nom, l'adresse

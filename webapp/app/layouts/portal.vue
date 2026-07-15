@@ -193,7 +193,7 @@
 
         <v-main>
             <v-container fluid>
-                <portal-tenant-organization-onboarding-dashboard v-if="currentOrganization && currentOrganization.slug === null" />
+                <portal-tenant-organization-onboarding-dashboard v-if="!user.isSaasAdmin && currentOrganization && currentOrganization.slug === null" />
 
                 <slot v-else />
             </v-container>
