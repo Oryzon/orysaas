@@ -54,21 +54,17 @@
                                 </template>
 
                                 <template v-slot:item.price="{ item }">
-                                    <v-chip
-                                        label
-                                        color="error"
-                                        prepend-icon="mdi-cash-remove"
-                                    >
-                                        {{ item.purchasePrice }} €
-                                    </v-chip>
+                                    <span v-if="!item.prices?.length" class="text-medium-emphasis">Aucun prix</span>
 
                                     <v-chip
-                                        class="ml-2"
+                                        v-for="price in item.prices"
+                                        :key="price.uuid"
                                         label
                                         color="success"
                                         prepend-icon="mdi-cash-plus"
+                                        class="mr-1"
                                     >
-                                        {{ item.sellPrice }} €
+                                        {{ BillingIntervalLabel[price.billingInterval] }} — {{ $price(price.sellPrice) }}
                                     </v-chip>
                                 </template>
 
@@ -93,6 +89,7 @@
 
 <script setup lang="ts">
 import type { Plan } from "~/models/Plan";
+import { BillingIntervalLabel } from "#shared/billing-interval";
 
 const api = useApi();
 

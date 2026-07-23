@@ -16,6 +16,7 @@ export interface Organization {
     city: string;
     postalCode: string;
     country: string;
+    stripeCustomerId: string | null;
 
     members: OrganizationMember[];
     invites: OrganizationInvite[];

@@ -12,8 +12,8 @@ import {
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { NumericTransformer } from "../transformers/number.transformer";
 import { QuotaPlanEntity } from "./quota-plan.entity";
+import { PlanPriceEntity } from "./plan-price.entity";
 
 @Entity()
 export class PlanEntity {
@@ -26,36 +26,23 @@ export class PlanEntity {
     @Column({ nullable: true })
     description: string;
 
-    @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 2,
-        transformer: new NumericTransformer(),
-    })
-    purchasePrice: number;
-
-    @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 2,
-        transformer: new NumericTransformer(),
-    })
-    sellPrice: number;
-
     @Column()
     isActive: boolean;
 
     @Column({ default: false })
     isPopular: boolean;
 
-    @Column({ default: 0 })
-    trialPeriod: number; // In Day
-
     @Column()
     slug: string;
 
+    @Column({ nullable: true })
+    stripeProductId: string | null;
+
     @OneToMany(() => QuotaPlanEntity, (qp) => qp.plan)
     quotas: QuotaPlanEntity[];
+
+    @OneToMany(() => PlanPriceEntity, (pp) => pp.plan)
+    prices: PlanPriceEntity[];
 
     @Column()
     @CreateDateColumn()

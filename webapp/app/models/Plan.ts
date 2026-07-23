@@ -1,15 +1,15 @@
 import type { QuotaPlan } from "./QuotaPlan";
+import type { PlanPrice } from "./PlanPrice";
 
 export interface Plan {
     uuid?: string;
     title: string;
     description?: string;
-    purchasePrice: number;
-    sellPrice: number;
     isActive: boolean;
     isPopular: boolean;
-    trialPeriod: number;
+    stripeProductId?: string | null;
     quotas?: QuotaPlan[];
+    prices?: PlanPrice[];
     uniqueKey?: string;
     createdAt?: Date;
     createdBy?: string;

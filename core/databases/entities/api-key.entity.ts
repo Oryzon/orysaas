@@ -18,6 +18,7 @@ export enum ApiKeyType {
 }
 
 @Entity()
+@Index(['systemKey', 'organizationUuid', 'deletedAt'], { unique: true })
 export class ApiKeyEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
@@ -29,10 +30,9 @@ export class ApiKeyEntity {
     type: ApiKeyType;
 
     @Column({ nullable: true })
-    @Index()
     systemKey: ApiKeySystem | null;
 
-    @Column()
+    @Column({ length: 500 })
     value: string;
 
     @Column({ nullable: true })

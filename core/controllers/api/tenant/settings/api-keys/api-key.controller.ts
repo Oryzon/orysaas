@@ -68,6 +68,23 @@ export default class TenantSettingApiKeyController {
 
         let organization = await OrganizationRepository.getOrganizationBySlug(slugOrganization);
 
+        if (systemKey) {
+            const existing = await ApiKeyRepository.findOne({
+                where: {
+                    systemKey: Equal(systemKey),
+                    organizationUuid: Equal(organization.uuid),
+                },
+            });
+
+            if (existing) {
+                return res
+                    .status(HttpCode.CONFLICT)
+                    .send({
+                        message: Messages.API_KEY_ALREADY_EXISTS
+                    });
+            }
+        }
+
         const entity = new ApiKeyEntity();
 
         entity.label = label;

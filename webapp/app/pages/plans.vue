@@ -11,6 +11,31 @@
             }"
         ></pages-blocks-hero>
 
+        <v-row align="center" justify="center" class="mt-n6 mb-8">
+            <v-col md="auto">
+                <v-btn-toggle v-model="selectedInterval" mandatory rounded="4px" class="bg-surface-light" divided>
+                    <v-btn
+                        :value="BillingInterval.MONTH"
+                        variant="flat"
+                        color="primary"
+                        :class="{ 'gradient-primary': selectedInterval === BillingInterval.MONTH }"
+                    >
+                        Mensuel
+                    </v-btn>
+
+                    <v-btn
+                        :value="BillingInterval.YEAR"
+                        variant="flat"
+                        :class="{ 'gradient-primary': selectedInterval === BillingInterval.YEAR }"
+                    >
+                        Annuel
+
+                        <v-chip v-if="hasYearlyDiscount" color="success" variant="flat" size="small" class="ml-2">Remise</v-chip>
+                    </v-btn>
+                </v-btn-toggle>
+            </v-col>
+        </v-row>
+
         <v-row align="center" justify="center">
             <v-col md="11">
                 <v-row align="center" justify="center">
@@ -33,9 +58,10 @@
                                         <div v-html="plan.description"></div>
                                     </v-col>
 
-                                    <v-col md="12" class="mt-n4 mb-n2">
-                                        <span class="text-display-large font-weight-black">{{ $price(plan.sellPrice) }}</span>
-                                        <span class="text-title-medium"> / mois</span>
+                                    <v-col md="12" class="mt-n4 mb-n2" v-if="priceFor(plan)">
+                                        <span class="text-display-large font-weight-black">{{ $price(priceFor(plan)!.sellPrice) }}</span>
+                                        <span class="text-title-medium"> / {{ selectedInterval === BillingInterval.MONTH ? 'mois' : 'an' }}</span>
+                                        <v-chip v-if="priceFor(plan)?.discount" color="success" size="small" class="ml-2">-{{ priceFor(plan)!.discount }}%</v-chip>
                                     </v-col>
 
                                     <v-col md="8">
@@ -44,23 +70,25 @@
                                             :color="plan.isPopular ? 'primary' : 'navbar'"
                                             rounded="8px"
                                             to="login"
+                                            :disabled="!priceFor(plan)"
                                         >
-                                            <span v-if="plan.sellPrice === 0">Commencer gratuitement</span>
-                                            <span v-else-if="plan.trialPeriod > 0">Démarrer {{ plan.trialPeriod }}j d'essai</span>
+                                            <span v-if="!priceFor(plan)">Bientôt disponible</span>
+                                            <span v-else-if="priceFor(plan)!.sellPrice === 0">Commencer gratuitement</span>
+                                            <span v-else-if="priceFor(plan)!.trialPeriod > 0">Démarrer {{ priceFor(plan)!.trialPeriod }}j d'essai</span>
                                             <span v-else>Utiliser cette offre</span>
                                         </v-btn>
                                     </v-col>
 
-                                    <v-col md="12" class="mt-n3" v-if="plan.quotas.length > 0">
+                                    <v-col md="12" class="mt-n3" v-if="plan.quotas?.length">
                                         <v-divider color="primary" thickness="3"></v-divider>
                                     </v-col>
 
-                                    <v-col md="12" class="mt-n6" v-if="plan.quotas.length > 0">
-                                        <p v-for="quota in plan.quotas">
+                                    <v-col md="12" class="mt-n6" v-if="plan.quotas?.length">
+                                        <p v-for="quota in plan.quotas ?? []">
                                             <v-icon color="primary">mdi-check</v-icon>
-                                            {{ quota.value ?? quota.quota.defaultValue }}
+                                            {{ quota.value ?? quota.quota?.defaultValue }}
                                             {{ QuotaKeyLabel[quota.quota?.key as QuotaKey] }}
-                                            {{ QuotaPeriodPerLabel[quota.quota.period as QuotaPeriod] }}
+                                            {{ QuotaPeriodPerLabel[quota.quota?.period as QuotaPeriod] }}
                                         </p>
                                     </v-col>
                                 </v-row>
@@ -76,16 +104,30 @@
 
 <script setup lang="ts">
 import type {Plan} from "~/models/Plan";
+import type {PlanPrice} from "~/models/PlanPrice";
 import { QuotaKey, QuotaKeyLabel, QuotaPeriod, QuotaPeriodPerLabel } from "#shared/quota";
+import { BillingInterval } from "#shared/billing-interval";
 
 const runtime = useRuntimeConfig();
 
-const { data: plans, pending: isLoading } = await useFetch<{ data: Plan[] }>(
+const { data: plans, pending: isLoading } = await useFetch<Plan[]>(
     `${runtime.public.apiBase}plans/public`,
     {
         key: `page:plans`,
     }
 );
+
+const selectedInterval = ref<BillingInterval>(BillingInterval.MONTH);
+
+const priceFor = (plan: Plan): PlanPrice | undefined => {
+    return plan.prices?.find((price) => price.billingInterval === selectedInterval.value);
+};
+
+const hasYearlyDiscount = computed(() => {
+    return (plans.value ?? [])
+        .flatMap((plan) => plan.prices ?? [])
+        .some((price) => price.billingInterval === BillingInterval.YEAR && (price.discount ?? 0) > 0);
+});
 
 useSeoMeta({
     title: `Tarifs`,

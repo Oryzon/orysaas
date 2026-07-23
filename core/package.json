@@ -36,6 +36,7 @@
     "rate-limiter-flexible": "^9.1.1",
     "reflect-metadata": "^0.2.2",
     "sharp": "^0.32.6",
+    "stripe": "^22.3.2",
     "typeorm": "^0.3.26",
     "uuid": "^8.3.2",
     "winston": "^3.11.0",

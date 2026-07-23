@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import HttpCode from "../../../config/http-code";
 import { PlanRepository } from "../../../databases/repositories/plan.repository";
 import {Equal} from "typeorm";
+import { attachPlanPriceDiscounts } from "../../../helpers/plan-price.helper";
 
 @Controller("plans")
 export default class PlansController {
@@ -12,9 +13,15 @@ export default class PlansController {
     @CheckIsSaasAdmin()
     @Error()
     async list(req: Request, res: Response) {
-        const plans = await PlanRepository.find();
+        const plans = await PlanRepository.find({
+            relations: {
+                prices: true,
+            },
+        });
 
-        return res.status(HttpCode.OK).send(plans);
+        return res
+            .status(HttpCode.OK)
+            .send(plans);
     }
 
     @Get('/public')
@@ -24,9 +31,13 @@ export default class PlansController {
             select: {
                 title: true,
                 description: true,
-                sellPrice: true,
                 isPopular: true,
-                trialPeriod: true,
+                prices: {
+                    uuid: true,
+                    billingInterval: true,
+                    sellPrice: true,
+                    trialPeriod: true,
+                },
                 quotas: {
                     value: true,
                     quota: {
@@ -42,10 +53,11 @@ export default class PlansController {
             relations: {
                 quotas: {
                     quota: true
-                }
+                },
+                prices: true,
             },
             order: {
-                sellPrice: 'ASC',
+                title: 'ASC',
                 quotas: {
                     quota: {
                         key: 'ASC'
@@ -54,6 +66,13 @@ export default class PlansController {
             }
         });
 
-        return res.status(HttpCode.OK).send(plans);
+        const plansWithDiscount = plans.map((plan) => ({
+            ...plan,
+            prices: attachPlanPriceDiscounts(plan.prices),
+        }));
+
+        return res
+            .status(HttpCode.OK)
+            .send(plansWithDiscount);
     }
 }

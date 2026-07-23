@@ -9,6 +9,7 @@ import { controllers } from "./controllers/controller";
 import { IRouter } from "./decorators";
 import { Runner } from "./jobs/runner";
 import { showcaseSeeders } from "./seeders/showcase";
+import { handleStripeWebhook } from "./webhooks/stripe.webhook";
 
 class Server {
 
@@ -29,6 +30,12 @@ class Server {
         }));
 
         this.app.use(helmet({ crossOriginResourcePolicy: false }));
+
+        // Stripe signature verification needs the raw body — must be registered
+        // before the global JSON parser below, otherwise the body is already
+        // consumed/parsed by the time this route would run.
+        this.app.post('/stripe/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+
         this.app.use(express.json({ limit: '20mb' }));
         this.app.use(express.text({ limit: '5mb' }));
         this.app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
