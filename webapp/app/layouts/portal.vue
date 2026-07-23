@@ -134,6 +134,15 @@
                 <v-list-item
                     v-if="!user?.isSaasAdmin && currentOrganization?.slug"
                     rounded="xl"
+                    prepend-icon="mdi-credit-card-outline"
+                    title="Abonnement"
+                    :to="`/portal/${currentOrganization?.slug}/subscription`"
+                    :active="isNavActive(`/portal/${currentOrganization?.slug}/subscription`)"
+                ></v-list-item>
+
+                <v-list-item
+                    v-if="!user?.isSaasAdmin && currentOrganization?.slug"
+                    rounded="xl"
                     prepend-icon="mdi-cog"
                     title="Paramètres"
                     :to="`/portal/${currentOrganization?.slug}/settings`"

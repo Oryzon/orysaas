@@ -5,6 +5,8 @@ import { Equal } from "typeorm";
 import Messages from "../../../config/messages";
 import { PlanRepository } from "../../../databases/repositories/plan.repository";
 import { PlanEntity } from "../../../databases/entities/plan.entity";
+import { attachPlanPriceDiscounts } from "../../../helpers/plan-price.helper";
+import { archiveStripeProduct, syncPlanByUuid } from "../../../helpers/stripe.helper";
 
 @Controller("plan")
 export default class PlanController {
@@ -23,13 +25,18 @@ export default class PlanController {
             relations: {
                 quotas: {
                     quota: true,
-                }
+                },
+                prices: true,
             },
         });
 
+        const prices = plan.prices
+            ? attachPlanPriceDiscounts(plan.prices)
+            : plan.prices;
+
         return res
             .status(HttpCode.OK)
-            .send(plan);
+            .send({ ...plan, prices });
     }
 
     @Post("/")
@@ -41,10 +48,7 @@ export default class PlanController {
             title,
             description,
             isActive,
-            sellPrice,
-            purchasePrice,
             isPopular,
-            trialPeriod,
         } = req.body;
 
         const newPlan = new PlanEntity();
@@ -53,18 +57,18 @@ export default class PlanController {
         newPlan.slug = await PlanRepository.getSlug(newPlan.title);
         newPlan.description = description;
         newPlan.isActive = !!isActive;
-        newPlan.sellPrice = sellPrice;
         newPlan.isPopular = isPopular;
-        newPlan.trialPeriod = trialPeriod;
-        newPlan.purchasePrice = purchasePrice;
 
         await PlanRepository.insert(newPlan);
+
+        const stripeSyncError = await syncPlanByUuid(newPlan.uuid);
 
         return res
             .status(HttpCode.CREATED)
             .send({
                 message: Messages.PLAN_CREATED,
-                entity: newPlan
+                entity: newPlan,
+                stripeSyncError,
             });
     }
 
@@ -85,9 +89,12 @@ export default class PlanController {
         const newPlan = PlanRepository.merge(existingPlan, plan);
         const updatedNewPlan = await PlanRepository.save(newPlan);
 
+        const stripeSyncError = await syncPlanByUuid(updatedNewPlan.uuid);
+
         return res.status(HttpCode.OK).send({
             message: Messages.PLAN_UPDATED,
-            entity: updatedNewPlan
+            entity: updatedNewPlan,
+            stripeSyncError,
         });
     }
 
@@ -107,6 +114,8 @@ export default class PlanController {
         existingPlan.setDeletedAt();
 
         await PlanRepository.save(existingPlan);
+
+        await archiveStripeProduct(existingPlan.stripeProductId);
 
         return res
             .status(HttpCode.OK)

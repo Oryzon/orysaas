@@ -11,6 +11,7 @@ import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
 import { OrganizationMemberEntity } from "./organization-member.entity";
 import { OrganizationInviteEntity } from "./organization-invite.entity";
+import { SubscriptionEntity } from "./subscription.entity";
 
 @Entity()
 export class OrganizationEntity {
@@ -56,6 +57,9 @@ export class OrganizationEntity {
     @Column()
     country: string;
 
+    @Column({ nullable: true })
+    stripeCustomerId: string | null;
+
     @OneToMany(() => OrganizationMemberEntity, (m) => m.organization, {
         cascade: true,
     })
@@ -65,6 +69,9 @@ export class OrganizationEntity {
         cascade: true,
     })
     invites: OrganizationInviteEntity[];
+
+    @OneToMany(() => SubscriptionEntity, (s) => s.organization)
+    subscriptions: SubscriptionEntity[];
 
     @Column()
     @CreateDateColumn()

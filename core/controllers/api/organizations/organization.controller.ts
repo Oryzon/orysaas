@@ -4,6 +4,7 @@ import { Equal } from "typeorm";
 import HttpCode from "../../../config/http-code";
 import { OrganizationRepository } from "../../../databases/repositories/organization.repository";
 import { OrganizationInviteRepository } from "../../../databases/repositories/organization-invite.repository";
+import Messages from "../../../config/messages";
 
 @Controller("organization")
 export default class OrganizationController {
@@ -23,10 +24,16 @@ export default class OrganizationController {
         });
 
         if (!organization) {
-            return res.status(HttpCode.NOT_FOUND).send({ message: "Organization not found" });
+            return res
+                .status(HttpCode.NOT_FOUND)
+                .send({
+                    message: Messages.ORGANIZATION_NOT_FOUND
+                });
         }
 
-        return res.status(HttpCode.OK).send(organization);
+        return res
+            .status(HttpCode.OK)
+            .send(organization);
     }
 
     @Get("/:slug/invites")
@@ -44,6 +51,8 @@ export default class OrganizationController {
 
         const invites = await OrganizationInviteRepository.findPendingByOrganization(organization.uuid);
 
-        return res.status(HttpCode.OK).send(invites);
+        return res
+            .status(HttpCode.OK)
+            .send(invites);
     }
 }

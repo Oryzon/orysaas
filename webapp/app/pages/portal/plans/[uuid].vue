@@ -49,48 +49,7 @@
                                 </client-only>
                             </v-col>
 
-                            <v-col md="6" class="mt-n2">
-                                <v-text-field
-                                    v-model="plan.purchasePrice"
-                                    :step="0.01"
-                                    :precision="2"
-                                    :loading="isLoading"
-                                    :disabled="isLoading"
-                                    variant="outlined"
-                                    label="Prix d'achat"
-                                    type="number"
-                                    prefix="€"
-                                    hide-details="auto"
-                                ></v-text-field>
-                            </v-col>
-
-                            <v-col md="6" class="mt-n2">
-                                <v-text-field
-                                    v-model="plan.sellPrice"
-                                    :step="0.01"
-                                    :precision="2"
-                                    :loading="isLoading"
-                                    :disabled="isLoading"
-                                    variant="outlined"
-                                    label="Prix de vente"
-                                    type="number"
-                                    prefix="€"
-                                    hide-details="auto"
-                                ></v-text-field>
-                            </v-col>
-
-                            <v-col md="4" class="mt-n4">
-                                <v-text-field
-                                    v-model="plan.trialPeriod"
-                                    :loading="isLoading"
-                                    :disabled="isLoading"
-                                    variant="outlined"
-                                    label="Durée de la période d'essai"
-                                    hide-details="auto"
-                                ></v-text-field>
-                            </v-col>
-
-                            <v-col md="4" offset-md="4">
+                            <v-col md="4" offset-md="8">
                                 <v-switch
                                     class="mt-n4 float-end mr-2"
                                     inset
@@ -107,6 +66,58 @@
         </v-col>
 
         <v-col v-if="uuid !== 'create'" md="5">
+            <v-card flat class="mb-4">
+                <div class="px-6 pt-6 pb-1 d-flex align-center justify-space-between">
+                    <div>
+                        <div class="text-h6 font-weight-bold">Gestion des prix</div>
+                        <div class="text-body-2 text-medium-emphasis mt-1">Ajouter, supprimer, ou modifier les prix (mensuel, annuel...).</div>
+                    </div>
+
+                    <portal-plans-prices-add
+                        :plan-uuid="plan.uuid"
+                        @created="refreshPrices"
+                    ></portal-plans-prices-add>
+                </div>
+
+                <v-divider></v-divider>
+
+                <v-card-text>
+                    <v-row>
+                        <v-col md="12">
+                            <v-list>
+                                <v-list-item v-if="plan.prices?.length === 0">
+                                    <v-list-item>Il n'y a pas de prix sur cet abonnement.</v-list-item>
+                                </v-list-item>
+
+                                <v-list-item v-else v-for="planPrice in plan.prices">
+                                    <v-list-item-title>
+                                        {{ BillingIntervalLabel[planPrice.billingInterval] }}
+                                    </v-list-item-title>
+
+                                    <v-list-item-subtitle>
+                                        <v-chip color="primary" label>{{ $price(planPrice.sellPrice) }}</v-chip>
+                                        <v-chip v-if="planPrice.discount" color="success" label class="ml-1">-{{ planPrice.discount }}%</v-chip>
+                                        - Essai {{ planPrice.trialPeriod }}j
+                                    </v-list-item-subtitle>
+
+                                    <template v-slot:append>
+                                        <portal-plans-prices-edit
+                                            :entity="planPrice"
+                                            @updated="refreshPrices"
+                                        ></portal-plans-prices-edit>
+
+                                        <portal-plans-prices-remove
+                                            :entity="planPrice"
+                                            @removed="refreshPrices"
+                                        ></portal-plans-prices-remove>
+                                    </template>
+                                </v-list-item>
+                            </v-list>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+
             <v-card flat>
                 <div class="px-6 pt-6 pb-1 d-flex align-center justify-space-between">
                     <div>
@@ -172,7 +183,9 @@
 <script setup lang="ts">
 import { type Plan } from "~/models/Plan";
 import type {QuotaPlan} from "~/models/QuotaPlan";
-import {QuotaKey, QuotaKeyLabel, QuotaPeriod, QuotaPeriodLabel, QuotaUnit, QuotaUnitLabel} from "#shared/quota";
+import type {PlanPrice} from "~/models/PlanPrice";
+import { QuotaKey, QuotaKeyLabel, QuotaPeriod, QuotaPeriodLabel, QuotaUnit, QuotaUnitLabel } from "#shared/quota";
+import { BillingIntervalLabel } from "#shared/billing-interval";
 
 const api = useApi();
 const uuid = useRoute().params.uuid as string;
@@ -197,6 +210,7 @@ const form = ref();
 const isFormValid = ref(false);
 const rules = useValidationRules();
 const plan = ref<Partial<Plan>>({});
+const warnIfStripeSyncFailed = useStripeSyncWarning();
 
 const handleSearch = async () => {
     if (uuid !== "create") {
@@ -213,15 +227,19 @@ const handleSave = async () => {
     };
 
     if (uuid === "create") {
-        const response = await api.post<{ entity: Plan }>("plan", {
+        const response = await api.post<{ entity: Plan, stripeSyncError: string | null }>("plan", {
             ...plan.value
         }, options);
 
+        warnIfStripeSyncFailed(response.stripeSyncError);
+
         await navigateTo(`/portal/plans/${response.entity.uuid}`);
     } else {
-        const response = await api.put<{ entity: Plan }>(`plan/${uuid}`, {
+        const response = await api.put<{ entity: Plan, stripeSyncError: string | null }>(`plan/${uuid}`, {
             ...plan.value
         }, options);
+
+        warnIfStripeSyncFailed(response.stripeSyncError);
 
         plan.value = response.entity;
     }
@@ -247,5 +265,11 @@ const removeToQuotas = (data: QuotaPlan) => {
     if (plan.value.quotas) {
         plan.value.quotas = plan.value.quotas.filter((quota) => quota.uuid !== data.uuid);
     }
+}
+
+const refreshPrices = async () => {
+    plan.value.prices = await api.get<PlanPrice[]>(`plan/${plan.value.uuid}/price`, {
+        loadingKey: "plan-prices:list",
+    });
 }
 </script>

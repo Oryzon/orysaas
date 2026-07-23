@@ -70,6 +70,9 @@ export default class Messages {
     // Global
     // -------------------------
     static MISSING_PARAMETERS = "Merci de vérifier les paramètres fournis.";
+    static MISSING_SIGNATURE = "Signature invalide.";
+
+    // -------------------------
     // OAuth / Social login
     // -------------------------
     static OAUTH_TOKEN_MISSING = "Token manquant";
@@ -111,6 +114,7 @@ export default class Messages {
     static SETTINGS_UPDATED = "Les paramètres ont été mis à jour.";
     static API_KEY_CREATED = "La clé d'API a été créée.";
     static API_KEY_DELETED = "La clé d'API a été supprimée.";
+    static API_KEY_ALREADY_EXISTS = "Une clé active existe déjà pour ce système.";
 
     // -------------------------
     // Permissions
@@ -163,4 +167,19 @@ export default class Messages {
     static PLAN_CREATED = "L'abonnement a été ajouté.";
     static PLAN_UPDATED = "L'abonnement a été modifié.";
     static PLAN_DELETED = "L'abonnement a été supprimé.";
+
+    // -------------------------
+    // Plan Price
+    // -------------------------
+    static PLAN_PRICE_CREATED = "Le prix a été ajouté au plan.";
+    static PLAN_PRICE_UPDATED = "Le prix a été modifié.";
+    static PLAN_PRICE_ALREADY_EXISTS = "Un prix existe déjà pour cette périodicité sur ce plan.";
+    static PLAN_PRICE_DELETED = "Le prix a été supprimé du plan.";
+
+    // -------------------------
+    // Stripe / Abonnements
+    // -------------------------
+    static SUBSCRIPTION_PLAN_NOT_SYNCED = "Ce prix n'est pas encore synchronisé avec Stripe. Merci de contacter le propriétaire du site.";
+    static SUBSCRIPTION_ALREADY_ACTIVE = "Cette organisation a déjà un abonnement actif.";
+    static SUBSCRIPTION_NO_STRIPE_CUSTOMER = "Aucun client Stripe n'est associé à cette organisation.";
 }

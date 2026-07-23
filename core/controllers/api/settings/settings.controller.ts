@@ -7,7 +7,7 @@ import { ApiKeyEntity, ApiKeyType } from "../../../databases/entities/api-key.en
 import { encrypt, decrypt } from "../../../helpers/crypto.helper";
 import HttpCode from "../../../config/http-code";
 import Messages from "../../../config/messages";
-import {Equal} from "typeorm";
+import {Equal, IsNull} from "typeorm";
 import {randomBytes} from "crypto";
 
 const KEYS = [
@@ -36,7 +36,10 @@ export default class SettingsController {
         const entries = await Promise.all(
             PUBLIC_KEYS.map(async (key) => [key, await SettingRepository.getValue(key)])
         );
-        return res.status(HttpCode.OK).send(Object.fromEntries(entries));
+
+        return res
+            .status(HttpCode.OK)
+            .send(Object.fromEntries(entries));
     }
 
     @Get('/')
@@ -49,7 +52,9 @@ export default class SettingsController {
             ApiKeyRepository.list(),
         ]);
 
-        return res.status(HttpCode.OK).send({ ...Object.fromEntries(entries), apiKeys });
+        return res
+            .status(HttpCode.OK)
+            .send({ ...Object.fromEntries(entries), apiKeys });
     }
 
     @Get('/api-key/:uuid')
@@ -91,6 +96,23 @@ export default class SettingsController {
                 .send({
                     message: Messages.MISSING_PARAMETERS
                 });
+        }
+
+        if (systemKey) {
+            const existing = await ApiKeyRepository.findOne({
+                where: {
+                    systemKey: Equal(systemKey),
+                    organizationUuid: IsNull(),
+                },
+            });
+
+            if (existing) {
+                return res
+                    .status(HttpCode.CONFLICT)
+                    .send({
+                        message: Messages.API_KEY_ALREADY_EXISTS
+                    });
+            }
         }
 
         const entity = new ApiKeyEntity();
@@ -146,6 +168,10 @@ export default class SettingsController {
                 .map((key) => SettingRepository.setValue(key, body[key]!))
         );
 
-        return res.status(HttpCode.OK).send({ message: Messages.SETTINGS_UPDATED });
+        return res
+            .status(HttpCode.OK)
+            .send({
+                message: Messages.SETTINGS_UPDATED
+            });
     }
 }
