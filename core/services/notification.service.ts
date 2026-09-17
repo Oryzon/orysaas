@@ -9,13 +9,13 @@ class NotificationService {
         userUuid: string,
         type: T,
         payload: NotificationPayload<T>,
-        actions?: Array<NotificationAction>
+        actions?: Array<NotificationAction>,
     ): Promise<void> {
         // First, check user for avoid spam in database
         let user = await UserRepository.findOne({
             where: {
-                uuid: Equal(userUuid)
-            }
+                uuid: Equal(userUuid),
+            },
         });
 
         if (!user) {
@@ -32,7 +32,7 @@ class NotificationService {
 
         await NotificationRepository.save(notif);
 
-        sseService.push(userUuid, 'notification', {
+        sseService.push(userUuid, "notification", {
             uuid: notif.uuid,
             userUuid: notif.userUuid,
             type: notif.type,

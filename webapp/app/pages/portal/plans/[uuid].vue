@@ -22,10 +22,7 @@
                 <v-divider></v-divider>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <v-text-field
@@ -35,11 +32,11 @@
                                     variant="outlined"
                                     label="Titre"
                                     hide-details="auto"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
-                            <v-col md="12" style="height: 300px;" class="mt-n4 mb-16">
+                            <v-col md="12" style="height: 300px" class="mt-n4 mb-16">
                                 <client-only>
                                     <quill-editor
                                         toolbar="full"
@@ -70,13 +67,12 @@
                 <div class="px-6 pt-6 pb-1 d-flex align-center justify-space-between">
                     <div>
                         <div class="text-h6 font-weight-bold">Gestion des prix</div>
-                        <div class="text-body-2 text-medium-emphasis mt-1">Ajouter, supprimer, ou modifier les prix (mensuel, annuel...).</div>
+                        <div class="text-body-2 text-medium-emphasis mt-1">
+                            Ajouter, supprimer, ou modifier les prix (mensuel, annuel...).
+                        </div>
                     </div>
 
-                    <portal-plans-prices-add
-                        :plan-uuid="plan.uuid"
-                        @created="refreshPrices"
-                    ></portal-plans-prices-add>
+                    <portal-plans-prices-add :plan-uuid="plan.uuid" @created="refreshPrices"></portal-plans-prices-add>
                 </div>
 
                 <v-divider></v-divider>
@@ -96,7 +92,9 @@
 
                                     <v-list-item-subtitle>
                                         <v-chip color="primary" label>{{ $price(planPrice.sellPrice) }}</v-chip>
-                                        <v-chip v-if="planPrice.discount" color="success" label class="ml-1">-{{ planPrice.discount }}%</v-chip>
+                                        <v-chip v-if="planPrice.discount" color="success" label class="ml-1"
+                                            >-{{ planPrice.discount }}%</v-chip
+                                        >
                                         - Essai {{ planPrice.trialPeriod }}j
                                     </v-list-item-subtitle>
 
@@ -122,13 +120,12 @@
                 <div class="px-6 pt-6 pb-1 d-flex align-center justify-space-between">
                     <div>
                         <div class="text-h6 font-weight-bold">Gestion des quotas</div>
-                        <div class="text-body-2 text-medium-emphasis mt-1">Ajouter, supprimer, ou modifier des limites de quota.</div>
+                        <div class="text-body-2 text-medium-emphasis mt-1">
+                            Ajouter, supprimer, ou modifier des limites de quota.
+                        </div>
                     </div>
 
-                    <portal-plans-quotas-add
-                        :plan-uuid="plan.uuid"
-                        @created="addToQuotas"
-                    ></portal-plans-quotas-add>
+                    <portal-plans-quotas-add :plan-uuid="plan.uuid" @created="addToQuotas"></portal-plans-quotas-add>
                 </div>
 
                 <v-divider></v-divider>
@@ -147,7 +144,11 @@
                                     </v-list-item-title>
 
                                     <v-list-item-subtitle>
-                                        <v-chip color="primary" label>{{ planQuota.value ?? planQuota.quota?.defaultValue ?? 'Infini' }}</v-chip> / {{ QuotaUnitLabel[planQuota.quota?.unit as QuotaUnit] }} - Période {{ QuotaPeriodLabel[planQuota.quota?.period as QuotaPeriod].toLowerCase() }}
+                                        <v-chip color="primary" label>{{
+                                            planQuota.value ?? planQuota.quota?.defaultValue ?? "Infini"
+                                        }}</v-chip>
+                                        / {{ QuotaUnitLabel[planQuota.quota?.unit as QuotaUnit] }} - Période
+                                        {{ QuotaPeriodLabel[planQuota.quota?.period as QuotaPeriod].toLowerCase() }}
                                     </v-list-item-subtitle>
 
                                     <template v-slot:append>
@@ -182,15 +183,15 @@
 
 <script setup lang="ts">
 import { type Plan } from "~/models/Plan";
-import type {QuotaPlan} from "~/models/QuotaPlan";
-import type {PlanPrice} from "~/models/PlanPrice";
+import type { QuotaPlan } from "~/models/QuotaPlan";
+import type { PlanPrice } from "~/models/PlanPrice";
 import { QuotaKey, QuotaKeyLabel, QuotaPeriod, QuotaPeriodLabel, QuotaUnit, QuotaUnitLabel } from "#shared/quota";
 import { BillingIntervalLabel } from "#shared/billing-interval";
 
 const api = useApi();
 const uuid = useRoute().params.uuid as string;
 
-useConfigPage(uuid === 'create' ? "Création d'un abonnement" : "Modification d'un abonnement");
+useConfigPage(uuid === "create" ? "Création d'un abonnement" : "Modification d'un abonnement");
 
 definePageMeta({
     layout: "portal",
@@ -227,17 +228,25 @@ const handleSave = async () => {
     };
 
     if (uuid === "create") {
-        const response = await api.post<{ entity: Plan, stripeSyncError: string | null }>("plan", {
-            ...plan.value
-        }, options);
+        const response = await api.post<{ entity: Plan; stripeSyncError: string | null }>(
+            "plan",
+            {
+                ...plan.value,
+            },
+            options,
+        );
 
         warnIfStripeSyncFailed(response.stripeSyncError);
 
         await navigateTo(`/portal/plans/${response.entity.uuid}`);
     } else {
-        const response = await api.put<{ entity: Plan, stripeSyncError: string | null }>(`plan/${uuid}`, {
-            ...plan.value
-        }, options);
+        const response = await api.put<{ entity: Plan; stripeSyncError: string | null }>(
+            `plan/${uuid}`,
+            {
+                ...plan.value,
+            },
+            options,
+        );
 
         warnIfStripeSyncFailed(response.stripeSyncError);
 
@@ -247,7 +256,7 @@ const handleSave = async () => {
 
 const addToQuotas = (data: QuotaPlan) => {
     plan.value.quotas?.push(data);
-}
+};
 
 const updateToQuotas = (data: QuotaPlan) => {
     if (plan.value.quotas) {
@@ -259,17 +268,17 @@ const updateToQuotas = (data: QuotaPlan) => {
             return quota;
         });
     }
-}
+};
 
 const removeToQuotas = (data: QuotaPlan) => {
     if (plan.value.quotas) {
         plan.value.quotas = plan.value.quotas.filter((quota) => quota.uuid !== data.uuid);
     }
-}
+};
 
 const refreshPrices = async () => {
     plan.value.prices = await api.get<PlanPrice[]>(`plan/${plan.value.uuid}/price`, {
         loadingKey: "plan-prices:list",
     });
-}
+};
 </script>

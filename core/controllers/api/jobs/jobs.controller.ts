@@ -4,23 +4,23 @@ import { JobSettingRepository } from "../../../databases/repositories/job-settin
 import { Runner } from "../../../jobs/runner";
 import HttpCode from "../../../config/http-code";
 
-@Controller('jobs')
+@Controller("jobs")
 export default class JobsController {
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async list(req: Request, res: Response) {
         let jobs = await JobSettingRepository.find({
             order: {
-                name: 'DESC'
-            }
+                name: "DESC",
+            },
         });
 
         let jobsRegistered = Runner.list();
 
-        let result = jobs.map(job => {
-            const registered = jobsRegistered.find(r => r.meta.name === job.name);
+        let result = jobs.map((job) => {
+            const registered = jobsRegistered.find((r) => r.meta.name === job.name);
 
             return {
                 uuid: job.uuid,

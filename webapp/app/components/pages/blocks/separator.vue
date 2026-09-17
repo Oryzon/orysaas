@@ -1,10 +1,7 @@
 <template>
     <section
         class="block-separator"
-        :class="[
-            `spacing-${data.spacing || 'medium'}`,
-            `width-${data.width || 'narrow'}`
-        ]"
+        :class="[`spacing-${data.spacing || 'medium'}`, `width-${data.width || 'narrow'}`]"
     >
         <v-container>
             <!-- Line -->
@@ -23,10 +20,7 @@
             ></div>
 
             <!-- Dots -->
-            <div
-                v-else-if="data.style === 'dots'"
-                class="separator-dots"
-            >
+            <div v-else-if="data.style === 'dots'" class="separator-dots">
                 <span
                     v-for="i in 3"
                     :key="i"
@@ -37,15 +31,8 @@
             </div>
 
             <!-- Wave -->
-            <div
-                v-else-if="data.style === 'wave'"
-                class="separator-wave"
-            >
-                <svg
-                    viewBox="0 0 1200 12"
-                    preserveAspectRatio="none"
-                    :class="`thickness-${data.thickness || 'thin'}`"
-                >
+            <div v-else-if="data.style === 'wave'" class="separator-wave">
+                <svg viewBox="0 0 1200 12" preserveAspectRatio="none" :class="`thickness-${data.thickness || 'thin'}`">
                     <path
                         d="M0,6 Q300,0 600,6 T1200,6"
                         :stroke="getSeparatorColor"
@@ -56,23 +43,15 @@
             </div>
 
             <!-- Ornament -->
-            <div
-                v-else-if="data.style === 'ornement'"
-                class="separator-ornament"
-            >
-                <v-icon
-                    :color="getSeparatorColor"
-                    :size="getOrnamentSize"
-                >
-                    mdi-fleur-de-lis
-                </v-icon>
+            <div v-else-if="data.style === 'ornement'" class="separator-ornament">
+                <v-icon :color="getSeparatorColor" :size="getOrnamentSize"> mdi-fleur-de-lis </v-icon>
             </div>
         </v-container>
     </section>
 </template>
 
 <script setup lang="ts">
-import type { SeparatorData } from '~/types/cms-blocks';
+import type { SeparatorData } from "~/types/cms-blocks";
 
 const props = defineProps<{
     data: SeparatorData;
@@ -80,11 +59,11 @@ const props = defineProps<{
 
 const getSeparatorColor = computed(() => {
     if (!props.data.color) {
-        return 'rgb(var(--v-theme-on-surface))';
+        return "rgb(var(--v-theme-on-surface))";
     }
 
     // Si c'est une couleur Vuetify (primary, secondary, etc.)
-    if (!props.data.color.startsWith('#') && !props.data.color.startsWith('rgb')) {
+    if (!props.data.color.startsWith("#") && !props.data.color.startsWith("rgb")) {
         return `rgb(var(--v-theme-${props.data.color}))`;
     }
 
@@ -97,7 +76,7 @@ const getOrnamentSize = computed(() => {
         medium: 32,
         thick: 48,
     };
-    return sizes[props.data.thickness || 'thin'];
+    return sizes[props.data.thickness || "thin"];
 });
 </script>
 
@@ -170,12 +149,7 @@ const getOrnamentSize = computed(() => {
    GRADIENT
    =========================== */
 .separator-gradient {
-    background: linear-gradient(
-        to right,
-        transparent,
-        rgb(var(--v-theme-primary)),
-        transparent
-    );
+    background: linear-gradient(to right, transparent, rgb(var(--v-theme-primary)), transparent);
     opacity: 0.3;
     border-radius: 999px;
 }

@@ -5,7 +5,9 @@
                 <v-col :md="data.leftColumn.width" cols="12">
                     <v-card flat elevation="12">
                         <v-toolbar color="#1cafaf">
-                            <v-toolbar-title class="font-weight-bold text-h5">{{ data.leftColumn.title }}</v-toolbar-title>
+                            <v-toolbar-title class="font-weight-bold text-h5">{{
+                                data.leftColumn.title
+                            }}</v-toolbar-title>
                         </v-toolbar>
 
                         <v-card-text>
@@ -17,7 +19,9 @@
                 <v-col :md="data.middleColumn.width" cols="12">
                     <v-card flat elevation="12">
                         <v-toolbar color="#1cafaf">
-                            <v-toolbar-title class="font-weight-bold text-h5">{{ data.middleColumn.title }}</v-toolbar-title>
+                            <v-toolbar-title class="font-weight-bold text-h5">{{
+                                data.middleColumn.title
+                            }}</v-toolbar-title>
                         </v-toolbar>
 
                         <v-card-text>
@@ -29,7 +33,9 @@
                 <v-col :md="data.rightColumn.width" cols="12">
                     <v-card flat elevation="12">
                         <v-toolbar color="#1cafaf">
-                            <v-toolbar-title class="font-weight-bold text-h5">{{ data.rightColumn.title }}</v-toolbar-title>
+                            <v-toolbar-title class="font-weight-bold text-h5">{{
+                                data.rightColumn.title
+                            }}</v-toolbar-title>
                         </v-toolbar>
 
                         <v-card-text>
@@ -46,7 +52,7 @@
 import type { ThreeColumnsData } from "~/models/Block";
 
 defineProps<{
-    data: ThreeColumnsData,
-    blockId?: string
+    data: ThreeColumnsData;
+    blockId?: string;
 }>();
 </script>

@@ -1,6 +1,6 @@
 import { dataSource } from "../../config/datasource";
 import { SubscriptionEntity } from "../entities/subscription.entity";
-import { Equal, In } from "typeorm";
+import { Between, Equal, In, IsNull } from "typeorm";
 import { SubscriptionStatus } from "../../../shared/subscription-status";
 
 export const SubscriptionRepository = dataSource.getRepository(SubscriptionEntity).extend({
@@ -16,7 +16,23 @@ export const SubscriptionRepository = dataSource.getRepository(SubscriptionEntit
                 },
             },
             order: {
-                createdAt: 'DESC',
+                createdAt: "DESC",
+            },
+        });
+    },
+
+    async findTrialEndingSoon(from: Date, to: Date): Promise<SubscriptionEntity[]> {
+        return this.find({
+            where: {
+                status: Equal(SubscriptionStatus.TRIALING),
+                trialEndsAt: Between(from, to),
+                trialEndingNotifiedAt: IsNull(),
+            },
+            relations: {
+                planPrice: {
+                    plan: true,
+                },
+                organization: true,
             },
         });
     },

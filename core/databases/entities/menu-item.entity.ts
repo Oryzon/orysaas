@@ -1,11 +1,16 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, JoinColumn, ManyToOne, OneToMany,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -13,10 +18,10 @@ import { MenuEntity } from "./menu.entity";
 
 @Entity()
 export class MenuItemEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
-    @ManyToOne(() => MenuEntity, (menu) => menu.items, { onDelete: 'CASCADE' })
+    @ManyToOne(() => MenuEntity, (menu) => menu.items, { onDelete: "CASCADE" })
     @JoinColumn()
     menu!: MenuEntity;
 
@@ -25,7 +30,7 @@ export class MenuItemEntity {
 
     @ManyToOne(() => MenuItemEntity, (item) => item.children, {
         nullable: true,
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
     })
     @JoinColumn()
     parent!: MenuItemEntity | null;
@@ -39,14 +44,14 @@ export class MenuItemEntity {
     @Column({ length: 190 })
     label!: string;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({ type: "int", default: 0 })
     position!: number;
 
     @Column()
     url: string;
 
-    @Column({ length: 20, default: '_self' })
-    target!: '_self' | '_blank';
+    @Column({ length: 20, default: "_self" })
+    target!: "_self" | "_blank";
 
     @Column()
     isVisible: boolean;
@@ -62,7 +67,7 @@ export class MenuItemEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column( { nullable: true })
+    @Column({ nullable: true })
     updatedBy: string;
 
     @Column({ nullable: true })
@@ -87,6 +92,6 @@ export class MenuItemEntity {
     @BeforeSoftRemove()
     setDeletedAt() {
         this.deletedAt = DateTime.now().toJSDate();
-        this.deletedBy = getUserUuid()
+        this.deletedBy = getUserUuid();
     }
 }

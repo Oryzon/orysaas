@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 defineSlots<{
-    left(): any
-    right(): any
-}>()
+    left(): any;
+    right(): any;
+}>();
 </script>

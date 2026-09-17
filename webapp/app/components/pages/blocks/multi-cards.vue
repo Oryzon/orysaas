@@ -2,20 +2,8 @@
     <section>
         <v-container>
             <v-row>
-                <v-col
-                    v-for="(card, index) in data.cards"
-                    :key="index"
-                    cols="12"
-                    :md="card.width"
-                >
-                    <v-card
-                        height="100%"
-                        :color="card.color"
-                        rounded="16px"
-                        elevation="1"
-                        border="md"
-                        flat
-                    >
+                <v-col v-for="(card, index) in data.cards" :key="index" cols="12" :md="card.width">
+                    <v-card height="100%" :color="card.color" rounded="16px" elevation="1" border="md" flat>
                         <v-card-text>
                             <v-row>
                                 <v-col md="12">
@@ -44,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MultiCardsData } from '~/models/Block';
+import type { MultiCardsData } from "~/models/Block";
 
 defineProps<{
     data: MultiCardsData;

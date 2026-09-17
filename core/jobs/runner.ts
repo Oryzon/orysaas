@@ -8,14 +8,14 @@ import { JobHistoryRepository } from "../databases/repositories/job-history.repo
 import { JobHistoryStatus } from "../databases/entities/job-history.entity";
 
 interface RegisteredJobs {
-    instance: any,
-    meta: CronJobMeta,
-    setting: JobSettingEntity,
-    task?: any
+    instance: any;
+    meta: CronJobMeta;
+    setting: JobSettingEntity;
+    task?: any;
 }
 
 class RunnerClass {
-    private jobs = new Map<string, RegisteredJobs>;
+    private jobs = new Map<string, RegisteredJobs>();
 
     async init() {
         const discovered = await discover();
@@ -24,17 +24,18 @@ class RunnerClass {
             await this.register(instance, meta);
         }
 
-        console.log('[Runner] Jobs planifié(s).')
+        console.log("[Runner] Jobs planifié(s).");
     }
 
     private async register(instance: any, meta: CronJobMeta) {
         let setting = await JobSettingRepository.findOne({
             where: {
-                name: Equal(meta.name)
-            }
+                name: Equal(meta.name),
+            },
         });
 
-        if (!setting) { // The job don't exist ? Create it.
+        if (!setting) {
+            // The job don't exist ? Create it.
             setting = new JobSettingEntity();
 
             setting.name = meta.name;
@@ -49,7 +50,7 @@ class RunnerClass {
         await JobSettingRepository.save(setting);
 
         // Know, register the schedule.
-        let job: RegisteredJobs = { instance, meta, setting }
+        let job: RegisteredJobs = { instance, meta, setting };
         this.jobs.set(meta.name, job);
         this.schedule(job);
     }
@@ -68,8 +69,8 @@ class RunnerClass {
         let alreadyRunning = await JobHistoryRepository.findOne({
             where: {
                 jobUuid: Equal(job.setting.uuid),
-                status: Equal(JobHistoryStatus.RUNNING)
-            }
+                status: Equal(JobHistoryStatus.RUNNING),
+            },
         });
 
         if (alreadyRunning) {

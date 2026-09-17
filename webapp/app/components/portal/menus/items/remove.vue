@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                icon
-                variant="text"
-                color="error"
-                v-bind="activatorProps"
-            >
+            <v-btn icon variant="text" color="error" v-bind="activatorProps">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </template>
@@ -28,8 +23,14 @@
                         <v-col md="12">
                             <v-alert type="info">Cette opération est une opération définitive.</v-alert>
 
-                            <p>Vous êtes sur le point de supprimer l'élément <strong>{{ entity?.label }}</strong> du menu.</p>
-                            <p>Cet élément dirige l'utilisateur vers l'URL <strong>{{ entity?.url}}</strong>.</p>
+                            <p>
+                                Vous êtes sur le point de supprimer l'élément <strong>{{ entity?.label }}</strong> du
+                                menu.
+                            </p>
+                            <p>
+                                Cet élément dirige l'utilisateur vers l'URL <strong>{{ entity?.url }}</strong
+                                >.
+                            </p>
                             <p>L'élément a été ajouté le {{ $date.french(props.entity?.createdAt) }}.</p>
                             <p>Êtes-vous sur de vouloir continuer cette opération ?</p>
                         </v-col>
@@ -59,7 +60,7 @@ const props = defineProps<{
     entity: MenuItem;
 }>();
 
-const emit = defineEmits(['removed']);
+const emit = defineEmits(["removed"]);
 
 const api = useApi();
 const route = useRoute();
@@ -72,7 +73,7 @@ const handleClose = () => {
 };
 
 const handleRemove = async () => {
-    const res = await api.remove<{ message: string, entity: MenuItem}>(
+    const res = await api.remove<{ message: string; entity: MenuItem }>(
         `/menu/${<string>route.params.uuid}/item/${props.entity.uuid}/`,
         {
             loadingKey: "menu-item:remove",

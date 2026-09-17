@@ -1,21 +1,22 @@
 import {
-    BeforeInsert, BeforeSoftRemove,
+    BeforeInsert,
+    BeforeSoftRemove,
     BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
-    OneToMany,  // AJOUTÉ
+    OneToMany, // AJOUTÉ
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
-import { BlockEntity } from "./block.entity";  // AJOUTÉ
+import { BlockEntity } from "./block.entity"; // AJOUTÉ
 
 @Entity()
 export class PageEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column({ unique: true })
@@ -33,8 +34,7 @@ export class PageEntity {
     @Column()
     isPublished: boolean;
 
-    @OneToMany(() => BlockEntity, (block) => block.page, {
-    })
+    @OneToMany(() => BlockEntity, (block) => block.page, {})
     blocks: BlockEntity[];
 
     @Column()

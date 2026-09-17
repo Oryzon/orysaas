@@ -1,4 +1,4 @@
-export type ApiKeyType = 'INTEGRATION' | 'CONSUMER';
+export type ApiKeyType = "INTEGRATION" | "CONSUMER";
 
 export interface ApiKey {
     uuid: string;

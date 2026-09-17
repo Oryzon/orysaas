@@ -1,4 +1,4 @@
-import {CheckJwt, CheckIsSaasAdmin, Controller, Error, Get, Post, Put, Delete} from "../../../decorators";
+import { CheckJwt, CheckIsSaasAdmin, Controller, Error, Get, Post, Put, Delete } from "../../../decorators";
 import { Request, Response } from "express";
 
 import { SettingRepository } from "../../../databases/repositories/setting.repository";
@@ -7,42 +7,38 @@ import { ApiKeyEntity, ApiKeyType } from "../../../databases/entities/api-key.en
 import { encrypt, decrypt } from "../../../helpers/crypto.helper";
 import HttpCode from "../../../config/http-code";
 import Messages from "../../../config/messages";
-import {Equal, IsNull} from "typeorm";
-import {randomBytes} from "crypto";
+import { Equal, IsNull } from "typeorm";
+import { randomBytes } from "crypto";
 
 const KEYS = [
-    'siret',
-    'adress',
-    'city',
-    'postalCode',
-    'phone',
-    'email',
-    'legalForm',
-    'shareCapital',
-    'nafApeCode',
-    'identifierVat',
-    'rcsCity'
+    "siret",
+    "adress",
+    "city",
+    "postalCode",
+    "phone",
+    "email",
+    "legalForm",
+    "shareCapital",
+    "nafApeCode",
+    "identifierVat",
+    "rcsCity",
 ] as const;
 
-type SettingsKey = typeof KEYS[number];
+type SettingsKey = (typeof KEYS)[number];
 type SettingsPayload = Record<SettingsKey, string>;
 
-@Controller('settings')
+@Controller("settings")
 export default class SettingsController {
-    @Get('/public')
+    @Get("/public")
     @Error()
     async publicInfo(_req: Request, res: Response) {
-        const PUBLIC_KEYS = ['phone', 'email', 'adress', 'city', 'postalCode'] as const;
-        const entries = await Promise.all(
-            PUBLIC_KEYS.map(async (key) => [key, await SettingRepository.getValue(key)])
-        );
+        const PUBLIC_KEYS = ["phone", "email", "adress", "city", "postalCode"] as const;
+        const entries = await Promise.all(PUBLIC_KEYS.map(async (key) => [key, await SettingRepository.getValue(key)]));
 
-        return res
-            .status(HttpCode.OK)
-            .send(Object.fromEntries(entries));
+        return res.status(HttpCode.OK).send(Object.fromEntries(entries));
     }
 
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -52,12 +48,10 @@ export default class SettingsController {
             ApiKeyRepository.list(),
         ]);
 
-        return res
-            .status(HttpCode.OK)
-            .send({ ...Object.fromEntries(entries), apiKeys });
+        return res.status(HttpCode.OK).send({ ...Object.fromEntries(entries), apiKeys });
     }
 
-    @Get('/api-key/:uuid')
+    @Get("/api-key/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -66,39 +60,29 @@ export default class SettingsController {
 
         const apiKey = await ApiKeyRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuidKey)
-            }
+                uuid: Equal(uuidKey),
+            },
         });
 
         const decrypted = decrypt(apiKey.value);
 
-        return res
-            .status(HttpCode.OK)
-            .send(decrypted);
+        return res.status(HttpCode.OK).send(decrypted);
     }
 
-    @Post('/api-key')
+    @Post("/api-key")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async createApiKey(req: Request, res: Response) {
-        const {
-            label,
-            type,
-            value,
-            expiresAt,
-            systemKey
-        } = req.body;
+        const { label, type, value, expiresAt, systemKey } = req.body;
 
         if (!label || !type || !Object.values(ApiKeyType).includes(type)) {
-            return res
-                .status(HttpCode.BAD_REQUEST)
-                .send({
-                    message: Messages.MISSING_PARAMETERS
-                });
+            return res.status(HttpCode.BAD_REQUEST).send({
+                message: Messages.MISSING_PARAMETERS,
+            });
         }
 
-        if (systemKey) {
+        if (systemKey && type === ApiKeyType.INTEGRATION) {
             const existing = await ApiKeyRepository.findOne({
                 where: {
                     systemKey: Equal(systemKey),
@@ -107,11 +91,9 @@ export default class SettingsController {
             });
 
             if (existing) {
-                return res
-                    .status(HttpCode.CONFLICT)
-                    .send({
-                        message: Messages.API_KEY_ALREADY_EXISTS
-                    });
+                return res.status(HttpCode.CONFLICT).send({
+                    message: Messages.API_KEY_ALREADY_EXISTS,
+                });
             }
         }
 
@@ -132,7 +114,7 @@ export default class SettingsController {
         });
     }
 
-    @Delete('/api-key/:uuid')
+    @Delete("/api-key/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -141,8 +123,8 @@ export default class SettingsController {
 
         const apiKey = await ApiKeyRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
         apiKey.setDeletedAt();
@@ -151,11 +133,11 @@ export default class SettingsController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.API_KEY_DELETED,
-            entity: apiKey
+            entity: apiKey,
         });
     }
 
-    @Put('/')
+    @Put("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -163,15 +145,11 @@ export default class SettingsController {
         const body = req.body as Partial<SettingsPayload>;
 
         await Promise.all(
-            KEYS
-                .filter((key) => body[key] !== undefined)
-                .map((key) => SettingRepository.setValue(key, body[key]!))
+            KEYS.filter((key) => body[key] !== undefined).map((key) => SettingRepository.setValue(key, body[key]!)),
         );
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.SETTINGS_UPDATED
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.SETTINGS_UPDATED,
+        });
     }
 }

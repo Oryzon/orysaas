@@ -5,10 +5,9 @@ import HttpCode from "../../../config/http-code";
 import Messages from "../../../config/messages";
 import { ContactRepository } from "../../../databases/repositories/contact.repository";
 
-@Controller('contacts')
+@Controller("contacts")
 export default class ContactsController {
-
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()

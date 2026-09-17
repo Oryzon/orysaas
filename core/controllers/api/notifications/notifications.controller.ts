@@ -11,9 +11,9 @@ import { Equal, IsNull, LessThan } from "typeorm";
 import { DateTime } from "luxon";
 import Messages from "../../../config/messages";
 
-@Controller('notifications')
+@Controller("notifications")
 export default class NotificationsController {
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @Error()
     async list(req: Request, res: Response) {
@@ -28,9 +28,9 @@ export default class NotificationsController {
             const cursorNotif = await NotificationRepository.findOne({
                 where: {
                     uuid: Equal(cursor),
-                    userUuid: Equal(userUuid)
+                    userUuid: Equal(userUuid),
                 },
-                select: ['createdAt']
+                select: ["createdAt"],
             });
 
             if (cursorNotif) {
@@ -41,12 +41,12 @@ export default class NotificationsController {
         const items = await NotificationRepository.find({
             where: {
                 userUuid: Equal(userUuid),
-                ...(cursorDate ? { createdAt: LessThan(cursorDate) } : {})
+                ...(cursorDate ? { createdAt: LessThan(cursorDate) } : {}),
             },
             take: LIMIT + 1,
             order: {
-                createdAt: 'DESC'
-            }
+                createdAt: "DESC",
+            },
         });
 
         const hasMore = items.length > LIMIT;
@@ -58,49 +58,46 @@ export default class NotificationsController {
             where: {
                 userUuid: Equal(userUuid),
                 readAt: IsNull(),
-            }
+            },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                items: result,
-                nextCursor,
-                totalUnread,
-            });
+        return res.status(HttpCode.OK).send({
+            items: result,
+            nextCursor,
+            totalUnread,
+        });
     }
 
-    @Get('/read')
+    @Get("/read")
     @CheckJwt()
     @Error()
     async readAll(req: Request, res: Response) {
         let userUuid = getUserUuid();
 
-        await NotificationRepository.update({
-            userUuid: Equal(userUuid)
-        }, {
-            readAt: DateTime.now().toJSDate(),
-        });
+        await NotificationRepository.update(
+            {
+                userUuid: Equal(userUuid),
+            },
+            {
+                readAt: DateTime.now().toJSDate(),
+            },
+        );
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.NOTIFICATIONS_READED
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.NOTIFICATIONS_READED,
+        });
     }
 
-    @Get('/stream')
+    @Get("/stream")
     @Error()
     async stream(req: Request, res: Response) {
         // SSE don't allow custom header, for the jwt is sent from the front as token
         const token = req.query.token as string;
 
         if (!token) {
-            return res
-                .status(HttpCode.FORBIDDEN)
-                .send({
-                    message: Messages.USER_NOT_AUTHED
-                });
+            return res.status(HttpCode.FORBIDDEN).send({
+                message: Messages.USER_NOT_AUTHED,
+            });
         }
 
         let userUuid: string;
@@ -110,35 +107,31 @@ export default class NotificationsController {
             userUuid = payload.uuid;
         } catch (err) {
             if (err instanceof TokenExpiredError) {
-                return res
-                    .status(HttpCode.UNAUTHORIZED)
-                    .send({
-                        message: Messages.TOKEN_INVALID
-                    });
+                return res.status(HttpCode.UNAUTHORIZED).send({
+                    message: Messages.TOKEN_INVALID,
+                });
             }
 
-            return res
-                .status(HttpCode.FORBIDDEN)
-                .send({
-                    message: Messages.TOKEN_INVALID
-                });
+            return res.status(HttpCode.FORBIDDEN).send({
+                message: Messages.TOKEN_INVALID,
+            });
         }
 
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.setHeader('X-Accel-Buffering', 'no');
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        res.setHeader("X-Accel-Buffering", "no");
         res.flushHeaders();
 
         sseService.add(userUuid, res);
 
-        res.write('event: connected\ndata: {}\n\n');
+        res.write("event: connected\ndata: {}\n\n");
 
         const heartbeat = setInterval(() => {
-            res.write(': ping\n\n');
+            res.write(": ping\n\n");
         }, 30000);
 
-        req.on('close', () => {
+        req.on("close", () => {
             clearInterval(heartbeat);
             sseService.remove(userUuid, res);
         });

@@ -3,7 +3,9 @@
         <!-- Dernières modifications -->
         <v-col md="12">
             <h3 class="text-h6 mb-1">Dernières modifications</h3>
-            <p class="text-body-2 text-medium-emphasis mb-0">Bandeau affiché en haut du hero pour valoriser une nouveauté.</p>
+            <p class="text-body-2 text-medium-emphasis mb-0">
+                Bandeau affiché en haut du hero pour valoriser une nouveauté.
+            </p>
         </v-col>
 
         <v-col md="2">
@@ -63,7 +65,7 @@
 
             <v-card variant="outlined">
                 <v-card-title class="d-flex align-center justify-space-between">
-                    <span>{{ localData.image ? 'Image actuelle' : 'Aucune image' }}</span>
+                    <span>{{ localData.image ? "Image actuelle" : "Aucune image" }}</span>
 
                     <v-btn
                         v-if="!localData.image"
@@ -90,12 +92,7 @@
                     <div v-if="localData.image" class="mb-4">
                         <v-card elevation="2">
                             <div class="image-wrapper">
-                                <v-img
-                                    :src="localData.image"
-                                    max-height="300"
-                                    cover
-                                    class="image-preview"
-                                ></v-img>
+                                <v-img :src="localData.image" max-height="300" cover class="image-preview"></v-img>
 
                                 <div class="image-actions">
                                     <v-btn
@@ -120,21 +117,11 @@
                         </v-card>
                     </div>
 
-                    <v-alert
-                        v-else
-                        type="info"
-                        variant="tonal"
-                        class="mt-4"
-                    >
+                    <v-alert v-else type="info" variant="tonal" class="mt-4">
                         Aucune image. Uploadez une capture d'écran de votre SaaS.
                     </v-alert>
 
-                    <v-progress-linear
-                        v-if="uploading"
-                        indeterminate
-                        color="primary"
-                        class="mt-4"
-                    ></v-progress-linear>
+                    <v-progress-linear v-if="uploading" indeterminate color="primary" class="mt-4"></v-progress-linear>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -219,12 +206,7 @@
                             <p class="text-body-2 text-medium-emphasis mb-0">Badges de réassurance sous les CTA.</p>
                         </div>
 
-                        <v-btn
-                            color="primary"
-                            prepend-icon="mdi-plus"
-                            variant="tonal"
-                            @click="addCondition"
-                        >
+                        <v-btn color="primary" prepend-icon="mdi-plus" variant="tonal" @click="addCondition">
                             Ajouter
                         </v-btn>
                     </div>
@@ -279,7 +261,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: SuperHeroData];
+    "update:modelValue": [value: SuperHeroData];
 }>();
 
 const localData = ref<SuperHeroData>({
@@ -290,11 +272,11 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
 
 const buttonVariants = [
-    { title: 'Plat', value: 'flat' },
-    { title: 'Élevé', value: 'elevated' },
-    { title: 'Tonalité', value: 'tonal' },
-    { title: 'Contour', value: 'outlined' },
-    { title: 'Texte', value: 'text' },
+    { title: "Plat", value: "flat" },
+    { title: "Élevé", value: "elevated" },
+    { title: "Tonalité", value: "tonal" },
+    { title: "Contour", value: "outlined" },
+    { title: "Texte", value: "text" },
 ];
 
 const triggerFileInput = () => {
@@ -313,11 +295,11 @@ const handleFileUpload = async (event: Event) => {
 
     try {
         const formData = new FormData();
-        formData.append('files', files[0]);
+        formData.append("files", files[0]);
 
         const response = await api.post<{ success: boolean; images: any[] }>(`/image/`, formData, {
-            loadingKey: 'image:upload',
-            toast: true
+            loadingKey: "image:upload",
+            toast: true,
         });
 
         if (response.images && response.images.length > 0) {
@@ -326,15 +308,15 @@ const handleFileUpload = async (event: Event) => {
             emitUpdate();
         }
     } catch (error) {
-        console.error('Erreur upload:', error);
+        console.error("Erreur upload:", error);
     } finally {
         uploading.value = false;
-        target.value = '';
+        target.value = "";
     }
 };
 
 const removeImage = () => {
-    localData.value.image = '';
+    localData.value.image = "";
     emitUpdate();
 };
 
@@ -342,7 +324,7 @@ const addCondition = () => {
     if (!localData.value.conditions) {
         localData.value.conditions = [];
     }
-    localData.value.conditions.push({ text: '' });
+    localData.value.conditions.push({ text: "" });
     emitUpdate();
 };
 
@@ -352,14 +334,18 @@ const removeCondition = (index: number) => {
 };
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localData.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localData.value)));
 };
 
-watch(() => props.modelValue, (newVal) => {
-    localData.value = {
-        ...JSON.parse(JSON.stringify(newVal)),
-    };
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localData.value = {
+            ...JSON.parse(JSON.stringify(newVal)),
+        };
+    },
+    { deep: true },
+);
 </script>
 
 <style scoped>

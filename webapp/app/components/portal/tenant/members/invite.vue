@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                color="primary"
-                variant="flat"
-                prepend-icon="mdi-account-plus"
-                v-bind="activatorProps"
-            >
+            <v-btn color="primary" variant="flat" prepend-icon="mdi-account-plus" v-bind="activatorProps">
                 Inviter
             </v-btn>
         </template>
@@ -32,7 +27,7 @@
                                     label="Adresse e-mail"
                                     variant="outlined"
                                     v-model="invite.email"
-                                    :rules="[ rules.required(), rules.isEmail() ]"
+                                    :rules="[rules.required(), rules.isEmail()]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-text-field>
@@ -47,7 +42,7 @@
                                     :items="roleItems"
                                     item-title="label"
                                     item-value="value"
-                                    :rules="[ rules.required()] "
+                                    :rules="[rules.required()]"
                                     :loading="isLoading"
                                     :disabled="isLoading"
                                 ></v-select>

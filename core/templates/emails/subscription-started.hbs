@@ -1,0 +1,22 @@
+{{#> layout}}
+<p>Bonjour <strong>{{firstname}}</strong>,</p>
+
+<p>L'abonnement de <strong>{{organizationName}}</strong> est confirmé. Merci pour votre confiance !</p>
+
+<div class="badge">{{planTitle}}</div>
+
+<table class="table">
+    <tr>
+        <td class="label">Plan</td>
+        <td class="value">{{planTitle}}</td>
+    </tr>
+    <tr>
+        <td class="label">Montant</td>
+        <td class="value">{{price}} {{billingIntervalLabel}}</td>
+    </tr>
+</table>
+
+<a href="{{manageUrl}}" class="btn">Gérer mon abonnement</a>
+
+<p>Vous pouvez suivre votre consommation et gérer votre facturation à tout moment depuis votre espace.</p>
+{{/layout}}

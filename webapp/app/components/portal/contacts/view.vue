@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="1200" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                icon
-                variant="text"
-                color="info"
-                v-bind="activatorProps"
-            >
+            <v-btn icon variant="text" color="info" v-bind="activatorProps">
                 <v-icon>mdi-eye</v-icon>
             </v-btn>
         </template>
@@ -93,7 +88,7 @@ const props = defineProps<{
     entity: Contact;
 }>();
 
-const emit = defineEmits(['archived']);
+const emit = defineEmits(["archived"]);
 
 const api = useApi();
 const route = useRoute();

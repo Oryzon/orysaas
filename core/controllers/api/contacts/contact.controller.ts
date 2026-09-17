@@ -5,21 +5,14 @@ import HttpCode from "../../../config/http-code";
 import Messages from "../../../config/messages";
 import { ContactRepository } from "../../../databases/repositories/contact.repository";
 import { Equal } from "typeorm";
+import { MailService } from "../../../services/mail.service";
 
-@Controller('contact')
+@Controller("contact")
 export default class ContactController {
-
-    @Post('/')
+    @Post("/")
     @Error()
     async create(req: Request, res: Response) {
-        const {
-            firstname,
-            lastname,
-            email,
-            company,
-            subject,
-            message
-        } = req.body;
+        const { firstname, lastname, email, company, subject, message } = req.body;
 
         let entity = new ContactEntity();
 
@@ -33,11 +26,41 @@ export default class ContactController {
         await ContactRepository.insert(entity);
 
         return res.status(HttpCode.OK).send({
-            message: Messages.CONTACT_SENDED
+            message: Messages.CONTACT_SENDED,
         });
     }
 
-    @Delete('/:uuid')
+    @Post("/:uuid/reply")
+    @CheckJwt()
+    @CheckIsSaasAdmin()
+    @Error()
+    async reply(req: Request, res: Response) {
+        const uuid = req.params.uuid;
+        const { message } = req.body;
+
+        const contact = await ContactRepository.findOneOrFail({
+            where: {
+                uuid: Equal(uuid),
+            },
+        });
+
+        await new MailService().send({
+            to: contact.email,
+            subject: `Réponse à votre message : ${contact.subject}`,
+            template: "contact-reply",
+            variables: {
+                firstname: contact.firstname,
+                originalMessage: contact.message,
+                replyMessage: message,
+            },
+        });
+
+        return res.status(HttpCode.OK).send({
+            message: Messages.CONTACT_REPLY_SENT,
+        });
+    }
+
+    @Delete("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -46,8 +69,8 @@ export default class ContactController {
 
         let contact = await ContactRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
         contact.setDeletedAt();
@@ -56,7 +79,7 @@ export default class ContactController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.CONTACT_ARCHIVED,
-            entity: contact
-        })
+            entity: contact,
+        });
     }
 }

@@ -8,6 +8,8 @@ export default class HttpCode {
     static NOT_FOUND: number = 404;
     static MULTIPLE_CHOICE: number = 300;
     static CONFLICT: number = 409;
+    static PAYMENT_REQUIRED: number = 402;
     static UNPROCESSABLE_ENTITY: number = 422;
+    static TOO_MANY_REQUESTS: number = 429;
     static INTERNAL_ERROR: number = 500;
 }

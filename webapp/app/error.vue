@@ -5,12 +5,7 @@
 
             <div class="error-content">
                 <!-- Logo -->
-                <v-img
-                    src="/logo.png"
-                    alt="OryScorp"
-                    width="240"
-                    class="mx-auto mb-8"
-                />
+                <v-img src="/logo.png" alt="OryScorp" width="240" class="mx-auto mb-8" />
 
                 <v-icon size="64" color="primary" class="mb-4">mdi-robot-confused-outline</v-icon>
 
@@ -33,12 +28,12 @@ const runtime = useRuntimeConfig();
 
 useSeoMeta({
     title: `Oopsie... - ${runtime.public.title}`,
-    description: 'Encore un utilisateur perdu...',
-    ogTitle: 'OryScorp — Agence web développement sur mesure',
-    ogDescription: 'Sites vitrines, scripts, outils métier. Des solutions digitales adaptées à votre activité.',
-    ogImage: 'https://oryscorp.fr/og-image.jpg',
-    ogUrl: 'https://oryscorp.fr',
-    twitterCard: 'summary_large_image'
+    description: "Encore un utilisateur perdu...",
+    ogTitle: "OryScorp — Agence web développement sur mesure",
+    ogDescription: "Sites vitrines, scripts, outils métier. Des solutions digitales adaptées à votre activité.",
+    ogImage: "https://oryscorp.fr/og-image.jpg",
+    ogUrl: "https://oryscorp.fr",
+    twitterCard: "summary_large_image",
 });
 </script>
 

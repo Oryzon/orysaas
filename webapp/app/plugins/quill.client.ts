@@ -1,11 +1,11 @@
-import { QuillEditor } from '@vueup/vue-quill';
+import { QuillEditor } from "@vueup/vue-quill";
 
-declare module 'vue' {
+declare module "vue" {
     interface GlobalComponents {
         QuillEditor: typeof QuillEditor;
     }
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-    nuxtApp.vueApp.component('QuillEditor', QuillEditor);
+    nuxtApp.vueApp.component("QuillEditor", QuillEditor);
 });

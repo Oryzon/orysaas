@@ -8,44 +8,41 @@ import Messages from "../../../config/messages";
 import { JobHistoryRepository } from "../../../databases/repositories/job-history.repository";
 import { JobHistoryEntity } from "../../../databases/entities/job-history.entity";
 
-@Controller('job')
+@Controller("job")
 export default class JobController {
-    @Get('/:uuid/histories')
+    @Get("/:uuid/histories")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
-    async listHistory(req: Request, res: Response){
+    async listHistory(req: Request, res: Response) {
         let uuidJob = req.params.uuid;
 
         let histories = await JobHistoryRepository.find({
             where: {
-                jobUuid: Equal(uuidJob)
+                jobUuid: Equal(uuidJob),
             },
             order: {
-                createdAt: 'DESC'
+                createdAt: "DESC",
             },
-            take: 30
+            take: 30,
         });
 
         return res.status(HttpCode.OK).send(histories);
     }
 
-    @Put('/:uuid')
+    @Put("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         let uuid = req.params.uuid;
 
-        let {
-            expression,
-            isEnabled
-        } = req.body;
+        let { expression, isEnabled } = req.body;
 
         let job = await JobSettingRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
         if (expression) {
@@ -63,7 +60,7 @@ export default class JobController {
         });
     }
 
-    @Get('/:uuid/last-run')
+    @Get("/:uuid/last-run")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -72,22 +69,22 @@ export default class JobController {
 
         const lastRun = await JobHistoryRepository.findOne({
             where: {
-                jobUuid: Equal(uuidJob)
+                jobUuid: Equal(uuidJob),
             },
             order: {
-                createdAt: 'DESC'
-            }
+                createdAt: "DESC",
+            },
         });
 
         if (lastRun) {
-            return res.status(HttpCode.OK).send(lastRun)
+            return res.status(HttpCode.OK).send(lastRun);
         }
 
         // No last run ? so give empty
         return res.status(HttpCode.OK).send(new JobHistoryEntity());
     }
 
-    @Post('/:uuid/run')
+    @Post("/:uuid/run")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -96,8 +93,8 @@ export default class JobController {
 
         let job = await JobSettingRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuidJob)
-            }
+                uuid: Equal(uuidJob),
+            },
         });
 
         let registeredJobs = Runner.get(job.name);
@@ -105,7 +102,7 @@ export default class JobController {
         Runner.execute(registeredJobs, req.body);
 
         return res.status(HttpCode.OK).send({
-            message: Messages.JOB_RUNNED
+            message: Messages.JOB_RUNNED,
         });
     }
 }

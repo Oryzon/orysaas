@@ -1,14 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="800" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="text"
-                color="dark"
-                prepend-icon="mdi-plus"
-            >
-                Créer
-            </v-btn>
+            <v-btn v-bind="activatorProps" variant="text" color="dark" prepend-icon="mdi-plus"> Créer </v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
@@ -24,10 +17,7 @@
                 </v-toolbar>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <v-select
@@ -50,7 +40,7 @@
                                     v-model="menuItem.label"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -62,7 +52,7 @@
                                     v-model="menuItem.target"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     :items="targets"
                                 ></v-select>
                             </v-col>
@@ -78,7 +68,7 @@
                                 >
                                     <template v-slot:append-inner>
                                         <portal-pages-search-for-menu
-                                            @selected="(data) => menuItem.url = data"
+                                            @selected="(data) => (menuItem.url = data)"
                                         ></portal-pages-search-for-menu>
                                     </template>
                                 </v-text-field>
@@ -107,7 +97,8 @@
                         @click="handleCreate"
                         :disabled="!isFormValid || isLoading"
                         :loading="isLoading"
-                    >Créer</v-btn>
+                        >Créer</v-btn
+                    >
                 </v-card-actions>
             </v-card>
         </template>
@@ -120,10 +111,10 @@ import { targets, type MenuItem, buildMenuTree, flattenMenuTreeForSelect } from 
 const api = useApi();
 const dialog = ref(false);
 
-const emit = defineEmits(['created']);
+const emit = defineEmits(["created"]);
 
 const isLoading = computed(() => {
-    return api.isLoading('menu-item:create') || api.isLoading('menu-item:parents');
+    return api.isLoading("menu-item:create") || api.isLoading("menu-item:parents");
 });
 
 const form = ref();
@@ -136,7 +127,9 @@ let availableParents = ref<Array<MenuItem>>([]);
 
 watch(dialog, async (newVal) => {
     if (newVal) {
-        availableParents.value = <Array<MenuItem>><unknown>await api.get(`menu/${<string>route.params.uuid}/items`, { loadingKey: 'menu-item:parents'});
+        availableParents.value = <Array<MenuItem>>(
+            (<unknown>await api.get(`menu/${<string>route.params.uuid}/items`, { loadingKey: "menu-item:parents" }))
+        );
     }
 });
 
@@ -147,7 +140,7 @@ const formatedAvailableParents = computed(() => {
 const handleClose = () => {
     dialog.value = false;
     menuItem.value = {};
-}
+};
 
 const handleCreate = async () => {
     const { valid } = await form.value.validate();
@@ -157,14 +150,16 @@ const handleCreate = async () => {
         return;
     }
 
-    let res = await api.post<{message: string, entity: MenuItem}>(`/menu/${<string>route.params.uuid}/item`,
+    let res = await api.post<{ message: string; entity: MenuItem }>(
+        `/menu/${<string>route.params.uuid}/item`,
         { ...menuItem.value },
         {
-            loadingKey: 'menu-item:create',
-            toast: true
-        });
+            loadingKey: "menu-item:create",
+            toast: true,
+        },
+    );
 
     emit("created", res.entity);
     handleClose();
-}
+};
 </script>

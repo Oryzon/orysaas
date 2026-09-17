@@ -43,19 +43,9 @@
         </v-col>
 
         <v-col md="6" v-if="localData.style !== 'gradient'" class="mt-n8">
-            <v-menu
-                v-model="showColorPicker"
-                location="bottom"
-                :close-on-content-click="false"
-            >
+            <v-menu v-model="showColorPicker" location="bottom" :close-on-content-click="false">
                 <template v-slot:activator="{ props }">
-                    <v-text-field
-                        v-model="localData.color"
-                        label="Couleur"
-                        variant="outlined"
-                        readonly
-                        v-bind="props"
-                    >
+                    <v-text-field v-model="localData.color" label="Couleur" variant="outlined" readonly v-bind="props">
                         <template #prepend-inner>
                             <div
                                 class="color-preview"
@@ -87,9 +77,7 @@
 
         <v-col cols="12" class="mt-n8">
             <v-card variant="outlined">
-                <v-card-title class="text-caption text-medium-emphasis">
-                    Prévisualisation
-                </v-card-title>
+                <v-card-title class="text-caption text-medium-emphasis"> Prévisualisation </v-card-title>
 
                 <pages-blocks-separator :data="localData" />
             </v-card>
@@ -106,46 +94,50 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: SeparatorData];
+    "update:modelValue": [value: SeparatorData];
 }>();
 
 const localData = ref<SeparatorData>(JSON.parse(JSON.stringify(props.modelValue)));
 
 const styleOptions = [
-    { value: 'line', title: 'Ligne simple', icon: 'mdi-minus' },
-    { value: 'gradient', title: 'Dégradé', icon: 'mdi-gradient-horizontal' },
-    { value: 'dots', title: 'Points', icon: 'mdi-dots-horizontal' },
-    { value: 'wave', title: 'Vague', icon: 'mdi-wave' },
-    { value: 'ornement', title: 'Ornement', icon: 'mdi-fleur-de-lis' },
+    { value: "line", title: "Ligne simple", icon: "mdi-minus" },
+    { value: "gradient", title: "Dégradé", icon: "mdi-gradient-horizontal" },
+    { value: "dots", title: "Points", icon: "mdi-dots-horizontal" },
+    { value: "wave", title: "Vague", icon: "mdi-wave" },
+    { value: "ornement", title: "Ornement", icon: "mdi-fleur-de-lis" },
 ];
 
 const thicknessOptions = [
-    { value: 'thin', title: 'Fine (1px)' },
-    { value: 'medium', title: 'Moyenne (2px)' },
-    { value: 'thick', title: 'Épaisse (4px)' },
+    { value: "thin", title: "Fine (1px)" },
+    { value: "medium", title: "Moyenne (2px)" },
+    { value: "thick", title: "Épaisse (4px)" },
 ];
 
 const widthOptions = [
-    { value: 'full', title: 'Pleine largeur' },
-    { value: 'narrow', title: 'Étroite (60%)' },
-    { value: 'ultranarrow', title: 'Très étroite (30%)' },
+    { value: "full", title: "Pleine largeur" },
+    { value: "narrow", title: "Étroite (60%)" },
+    { value: "ultranarrow", title: "Très étroite (30%)" },
 ];
 
 const spacingOptions = [
-    { value: 'small', title: 'Petit (32px)' },
-    { value: 'medium', title: 'Moyen (64px)' },
-    { value: 'large', title: 'Grand (96px)' },
+    { value: "small", title: "Petit (32px)" },
+    { value: "medium", title: "Moyen (64px)" },
+    { value: "large", title: "Grand (96px)" },
 ];
 
 const showColorPicker = ref(false);
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localData.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localData.value)));
 };
 
-watch(() => props.modelValue, (newVal) => {
-    localData.value = JSON.parse(JSON.stringify(newVal));
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localData.value = JSON.parse(JSON.stringify(newVal));
+    },
+    { deep: true },
+);
 </script>
 
 <style scoped>

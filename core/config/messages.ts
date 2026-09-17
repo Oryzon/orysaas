@@ -12,7 +12,8 @@ export default class Messages {
     static USER_NOT_ENABLE = "Votre compte n'est pas actif.";
     static USER_IS_LOGOUT = "Votre session n'est plus disponible, merci de vous identifier à nouveau.";
     static NEED_PASSWORD_RESET = "Merci de changer votre mot de passe.";
-    static REFRESH_TOKEN_NOT_FOUND = "Désolé, nous n'avons pas pu vous ré-identifier, merci de saisir vos informations de connexion.";
+    static REFRESH_TOKEN_NOT_FOUND =
+        "Désolé, nous n'avons pas pu vous ré-identifier, merci de saisir vos informations de connexion.";
     static REFRESH_TOKEN_REVOKED = "Cette session de connexion a été révoquée.";
     static REFRESH_TOKEN_EXPIRED = "Cette session de connexion a expiré, merci de vous reconnecter.";
     static REGISTER_IS_DISABLE = "Les inscriptions sont fermées.";
@@ -24,7 +25,8 @@ export default class Messages {
     static RESET_PASSWORD_INVALID_TOKEN = "Ce lien de réinitialisation est invalide ou a expiré.";
     static RESET_PASSWORD_PASSWORDS_DONT_MATCH = "Les mots de passe ne correspondent pas.";
     static RESET_PASSWORD_TOO_SHORT = "Le mot de passe doit contenir au moins 8 caractères.";
-    static RESET_PASSWORD_DONE = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
+    static RESET_PASSWORD_DONE =
+        "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
     static USER_NOT_AUTHED = "Vous n'êtes pas identifié.";
 
     // -------------------------
@@ -39,8 +41,10 @@ export default class Messages {
     static USER_CAN_T_BE_REMOVED_HIMSELF = "Vous ne pouvez pas vous supprimer vous-même.";
     static USER_PROFILE_UPDATED = "Votre profil a été mis à jour.";
     static USER_PASSWORD_UPDATED = "Votre mot de passe a été mis à jour.";
-    static USER_CANNOT_CHANGE_PASSWORD = "Vous ne pouvez pas modifier votre mot de passe car vous utilisez une connexion sociale.";
-    static USER_SA_CAN_T_BE_RESETED = "Cet utilisateur ne peut pas être réinitialisé, il s'agit d'un super-administrateur.";
+    static USER_CANNOT_CHANGE_PASSWORD =
+        "Vous ne pouvez pas modifier votre mot de passe car vous utilisez une connexion sociale.";
+    static USER_SA_CAN_T_BE_RESETED =
+        "Cet utilisateur ne peut pas être réinitialisé, il s'agit d'un super-administrateur.";
     static USER_ALREADY_IN_ROLE = "L'utilisateur possède déjà ce rôle.";
     static USER_ADDED_IN_ROLE = "Rôle assigné avec succès.";
 
@@ -149,6 +153,7 @@ export default class Messages {
     // -------------------------
     static CONTACT_SENDED = "Votre message a bien été envoyé.";
     static CONTACT_ARCHIVED = "Le message a bien été archivé.";
+    static CONTACT_REPLY_SENT = "Votre réponse a bien été envoyée.";
 
     // -------------------------
     // Quotas
@@ -179,7 +184,14 @@ export default class Messages {
     // -------------------------
     // Stripe / Abonnements
     // -------------------------
-    static SUBSCRIPTION_PLAN_NOT_SYNCED = "Ce prix n'est pas encore synchronisé avec Stripe. Merci de contacter le propriétaire du site.";
+    static SUBSCRIPTION_PLAN_NOT_SYNCED =
+        "Ce prix n'est pas encore synchronisé avec Stripe. Merci de contacter le propriétaire du site.";
     static SUBSCRIPTION_ALREADY_ACTIVE = "Cette organisation a déjà un abonnement actif.";
     static SUBSCRIPTION_NO_STRIPE_CUSTOMER = "Aucun client Stripe n'est associé à cette organisation.";
+
+    // -------------------------
+    // Quota enforcement
+    // -------------------------
+    static QUOTA_EXCEEDED = "Le quota de votre abonnement est atteint.";
+    static QUOTA_NO_SUBSCRIPTION = "Vous n'avez pas d'abonnement qui permet cette action.";
 }

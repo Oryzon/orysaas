@@ -75,7 +75,10 @@ export const PlanRepository = dataSource.getRepository(PlanEntity).extend({
 
             queryBuilder.andWhere(
                 new Brackets((qb) => {
-                    qb.where("LOWER(plans.title) LIKE :keyword", { keyword }).orWhere("LOWER(plans.description) LIKE :keyword", { keyword });
+                    qb.where("LOWER(plans.title) LIKE :keyword", { keyword }).orWhere(
+                        "LOWER(plans.description) LIKE :keyword",
+                        { keyword },
+                    );
                 }),
             );
         }

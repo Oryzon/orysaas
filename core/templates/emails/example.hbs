@@ -1,0 +1,52 @@
+{{!--
+  copie ce fichier pour démarrer un nouveau template (genre payment-received.hbs).
+
+  tout s'écrit dans {{#> layout}} ... {{/layout}}, le layout gère déjà le fond,
+  le container, le header en dégradé et le footer, toi tu écris juste ce qu'il
+  y a au milieu.
+
+  les couleurs viennent de shared/brand.ts, faut pas mettre de hex en dur ici,
+  sinon ça casse le principe : change brand.ts et tous les emails suivent.
+
+  le dégradé du header dépend du variant : 'brand' (défaut), 'success' ou
+  'danger'. ajoute le tien dans TEMPLATE_VARIANTS (mail.service.ts), comme ça
+  t'as rien à passer en plus quand tu envoies, c'est automatique.
+
+  classes déjà dispo dans le layout, à réutiliser plutôt que d'en inventer :
+    .btn / .badge / .code-box .code .code-hint / .table (+ td.label, td.value, tr.total) / .fallback-link
+
+  pour l'envoi :
+
+    await new MailService().send({
+        to: user.email,
+        subject: "...",
+        template: 'example',
+        variables: { firstname: user.firstname },
+    });
+
+  appName et theme sont ajoutés automatiquement, pas la peine de les passer.
+--}}
+{{#> layout}}
+<p>Bonjour <strong>{{firstname}}</strong>,</p>
+
+<p>Ceci est un paragraphe de contenu standard.</p>
+
+<div class="badge">Exemple de badge</div>
+
+<a href="{{actionUrl}}" class="btn">Bouton d'action</a>
+
+<p>Vous pouvez aussi utiliser un tableau récapitulatif :</p>
+
+<table class="table">
+    <tr>
+        <td class="label">Libellé</td>
+        <td class="value">Valeur</td>
+    </tr>
+    <tr class="total">
+        <td class="label">Total</td>
+        <td class="value">42,00 €</td>
+    </tr>
+</table>
+
+<p class="fallback-link">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br /><a href="{{actionUrl}}">{{actionUrl}}</a></p>
+{{/layout}}

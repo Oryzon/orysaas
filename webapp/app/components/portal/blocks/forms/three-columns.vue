@@ -21,7 +21,7 @@
                     ></v-select>
                 </v-col>
 
-                <v-col md="12" style="height: 500px;" class="mt-n8 mb-16">
+                <v-col md="12" style="height: 500px" class="mt-n8 mb-16">
                     <client-only>
                         <quill-editor
                             toolbar="full"
@@ -55,7 +55,7 @@
                     ></v-select>
                 </v-col>
 
-                <v-col md="12" style="height: 500px;" class="mt-n8 mb-16">
+                <v-col md="12" style="height: 500px" class="mt-n8 mb-16">
                     <client-only>
                         <quill-editor
                             toolbar="full"
@@ -89,7 +89,7 @@
                     ></v-select>
                 </v-col>
 
-                <v-col md="12" style="height: 500px;" class="mt-n8 mb-16">
+                <v-col md="12" style="height: 500px" class="mt-n8 mb-16">
                     <client-only>
                         <quill-editor
                             toolbar="full"
@@ -113,25 +113,29 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: ThreeColumnsData];
+    "update:modelValue": [value: ThreeColumnsData];
 }>();
 
 const localData = ref<ThreeColumnsData>(JSON.parse(JSON.stringify(props.modelValue)));
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localData.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localData.value)));
 };
 
 const widthSelect = [
-    { title: '2', value: 2 },
-    { title: '4 (Un quart de page)', value: 4 },
-    { title: '6 (Moitié de page)', value: 6 },
-    { title: '8 (Trois quart de page)', value: 8 },
-    { title: '10', value: 10 },
+    { title: "2", value: 2 },
+    { title: "4 (Un quart de page)", value: 4 },
+    { title: "6 (Moitié de page)", value: 6 },
+    { title: "8 (Trois quart de page)", value: 8 },
+    { title: "10", value: 10 },
 ];
 
 // Watch pour synchroniser si le parent change
-watch(() => props.modelValue, (newVal) => {
-    localData.value = JSON.parse(JSON.stringify(newVal));
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localData.value = JSON.parse(JSON.stringify(newVal));
+    },
+    { deep: true },
+);
 </script>

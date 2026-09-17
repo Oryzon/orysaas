@@ -1,9 +1,9 @@
 import type { JobSetting } from "~/models/JobSetting";
 
 export enum JobHistoryStatus {
-    SUCCESS = 'SUCCESS',
-    FAIL = 'FAIL',
-    RUNNING = 'RUNNING'
+    SUCCESS = "SUCCESS",
+    FAIL = "FAIL",
+    RUNNING = "RUNNING",
 }
 
 export interface JobHistory {

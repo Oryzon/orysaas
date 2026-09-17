@@ -1,5 +1,7 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
@@ -16,7 +18,7 @@ import { NumericTransformer } from "../transformers/number.transformer";
 import { QuotaPlanEntity } from "./quota-plan.entity";
 
 @Entity()
-@Index(['key', 'period'], { unique: true })
+@Index(["key", "period"], { unique: true })
 export class QuotaEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;

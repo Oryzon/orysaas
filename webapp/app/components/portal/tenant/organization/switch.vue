@@ -1,19 +1,30 @@
 <template>
-    <div class="org-switcher" :class="{ 'org-switcher-collapsed': props.isCollapsed }" @click="dialogSwitchOrga = !dialogSwitchOrga">
+    <div
+        class="org-switcher"
+        :class="{ 'org-switcher-collapsed': props.isCollapsed }"
+        @click="dialogSwitchOrga = !dialogSwitchOrga"
+    >
         <v-avatar
             size="36"
             rounded="lg"
             class="flex-shrink-0"
             :class="{ 'gradient-primary': !currentOrganization?.logoUrl, 'bg-white': !!currentOrganization?.logoUrl }"
         >
-            <v-img v-if="currentOrganization?.logoUrl" :src="currentOrganization.logoUrl!" :alt="currentOrganization.name ?? ''" cover />
+            <v-img
+                v-if="currentOrganization?.logoUrl"
+                :src="currentOrganization.logoUrl!"
+                :alt="currentOrganization.name ?? ''"
+                cover
+            />
             <span v-else>{{ getInitials(currentOrganization?.name) }}</span>
         </v-avatar>
 
         <transition name="org-content">
             <div v-if="!props.isCollapsed" class="org-info">
                 <div class="org-name">{{ currentOrganization?.name ?? "Aucune organisation" }}</div>
-                <div class="org-sub" v-if="currentOrganization?.name">{{ currentOrganization?.nbMembers ?? 0 }} utilisateurs</div>
+                <div class="org-sub" v-if="currentOrganization?.name">
+                    {{ currentOrganization?.nbMembers ?? 0 }} utilisateurs
+                </div>
             </div>
         </transition>
 
@@ -57,7 +68,10 @@
                                             size="48"
                                             rounded="lg"
                                             class="flex-shrink-0 mt-n2 mb-n2"
-                                            :class="{ 'gradient-primary': !organization?.logoUrl, 'bg-white': !!organization?.logoUrl }"
+                                            :class="{
+                                                'gradient-primary': !organization?.logoUrl,
+                                                'bg-white': !!organization?.logoUrl,
+                                            }"
                                         >
                                             <v-img
                                                 v-if="organization?.logoUrl"
@@ -73,7 +87,9 @@
                                     <v-col md="10">
                                         <h2 class="mt-2">{{ organization.name }}</h2>
                                         <p class="mt-n4">
-                                            {{ organization.nbMembers }} utilisateur{{ (organization.nbMembers ?? 0) > 1 ? "s" : "" }}
+                                            {{ organization.nbMembers }} utilisateur{{
+                                                (organization.nbMembers ?? 0) > 1 ? "s" : ""
+                                            }}
                                         </p>
                                     </v-col>
                                 </v-row>
@@ -95,7 +111,6 @@ const props = defineProps<{ isCollapsed: boolean }>();
 
 const { currentOrganization } = useAuth();
 const router = useRouter();
-
 
 // Switch Orga Mod
 const api = useApi();

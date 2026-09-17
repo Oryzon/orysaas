@@ -6,8 +6,8 @@ export const controllers = async () => {
     let files = new Glob("controllers/**/*", {});
 
     for await (const file of files) {
-        if (file.toLowerCase().endsWith('.ts') && file !== 'controllers/controller.ts') {
-            const [exportName] = file.split('.ts');
+        if (file.toLowerCase().endsWith(".ts") && file !== "controllers/controller.ts") {
+            const [exportName] = file.split(".ts");
             let tmp = await import(`../${exportName}`);
 
             if (tmp.default) {
@@ -17,4 +17,4 @@ export const controllers = async () => {
     }
 
     return controllersImport;
-}
+};

@@ -6,10 +6,10 @@ import { Equal, IsNull, MoreThan } from "typeorm";
 
 export const RefreshTokenRepository = dataSource.getRepository(RefreshTokenEntity).extend({
     createClient() {
-        return crypto.randomBytes(32).toString('base64url');
+        return crypto.randomBytes(32).toString("base64url");
     },
     calculateServer(value: string) {
-        return crypto.createHmac('sha256', process.env.PEPPER_REFRESH).update(value).digest('hex');
+        return crypto.createHmac("sha256", process.env.PEPPER_REFRESH).update(value).digest("hex");
     },
     async createToken(userUuid: string) {
         let rToken = this.createClient();
@@ -38,9 +38,6 @@ export const RefreshTokenRepository = dataSource.getRepository(RefreshTokenEntit
     async revoke(clientToken: string) {
         const hash = this.calculateServer(clientToken);
 
-        await this.update(
-            { token: Equal(hash) },
-            { revokedAt: DateTime.now().toJSDate() }
-        );
+        await this.update({ token: Equal(hash) }, { revokedAt: DateTime.now().toJSDate() });
     },
 });

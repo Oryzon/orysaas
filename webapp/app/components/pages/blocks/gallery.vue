@@ -15,7 +15,11 @@
             :md="data.showRightColumn ? 5 : 3"
             @click="openLightbox(index)"
         >
-            <v-card v-if="data.showRightColumn && (image.alt || image.caption || image.link)" class="card-image-wrapper" elevation="4">
+            <v-card
+                v-if="data.showRightColumn && (image.alt || image.caption || image.link)"
+                class="card-image-wrapper"
+                elevation="4"
+            >
                 <v-toolbar color="#1cafaf" v-if="image.alt">
                     <v-toolbar-title>
                         {{ image.alt }}
@@ -25,22 +29,10 @@
                 <v-row no-gutters>
                     <v-col cols="12" md="6">
                         <div class="gallery-image-wrapper-right" @click="openLightbox(index)">
-                            <v-img
-                                :src="image.url"
-                                :alt="image.alt || 'Image'"
-                                aspect-ratio="1"
-                                cover
-                            >
+                            <v-img :src="image.url" :alt="image.alt || 'Image'" aspect-ratio="1" cover>
                                 <template v-slot:placeholder>
-                                    <v-row
-                                        align="center"
-                                        class="fill-height ma-0"
-                                        justify="center"
-                                    >
-                                        <v-progress-circular
-                                            color="grey-lighten-5"
-                                            indeterminate
-                                        ></v-progress-circular>
+                                    <v-row align="center" class="fill-height ma-0" justify="center">
+                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
                                     </v-row>
                                 </template>
                             </v-img>
@@ -58,23 +50,10 @@
             </v-card>
 
             <div v-else class="gallery-image-wrapper">
-                <v-img
-                    :src="image.url"
-                    :alt="image.alt || 'Image'"
-                    aspect-ratio="1"
-                    class="gallery-image"
-                    cover
-                >
+                <v-img :src="image.url" :alt="image.alt || 'Image'" aspect-ratio="1" class="gallery-image" cover>
                     <template v-slot:placeholder>
-                        <v-row
-                            align="center"
-                            class="fill-height ma-0"
-                            justify="center"
-                        >
-                            <v-progress-circular
-                                color="grey-lighten-5"
-                                indeterminate
-                            ></v-progress-circular>
+                        <v-row align="center" class="fill-height ma-0" justify="center">
+                            <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
                         </v-row>
                     </template>
                 </v-img>
@@ -94,11 +73,7 @@
                     @click="openLightbox(index)"
                 >
                     <div class="masonry-image-wrapper">
-                        <v-img
-                            :src="image.url"
-                            :alt="image.alt || 'Image'"
-                            class="masonry-image"
-                        >
+                        <v-img :src="image.url" :alt="image.alt || 'Image'" class="masonry-image">
                             <template #placeholder>
                                 <div class="d-flex align-center justify-center fill-height">
                                     <v-progress-circular indeterminate color="primary"></v-progress-circular>

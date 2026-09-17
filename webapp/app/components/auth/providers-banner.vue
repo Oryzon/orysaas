@@ -47,7 +47,10 @@ const loginWithGoogle = () => {
         key: "google",
         rootUrl: "https://accounts.google.com/o/oauth2/v2/auth",
         clientId: config.public.googleClientId,
-        scope: ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"].join(" "),
+        scope: [
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email",
+        ].join(" "),
         extraParams: {
             access_type: "offline",
             prompt: "consent",

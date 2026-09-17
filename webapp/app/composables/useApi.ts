@@ -20,10 +20,7 @@ export interface ApiOptions<TBody = any> {
 
 export const useApi = () => {
     // Global maps live across components
-    const loaders = useState<Record<string, boolean>>(
-        "api:loaders",
-        () => ({}),
-    );
+    const loaders = useState<Record<string, boolean>>("api:loaders", () => ({}));
     const controllers = ref<Map<string, AbortController>>(new Map());
 
     const loading = ref(false);
@@ -63,9 +60,7 @@ export const useApi = () => {
             return;
         }
 
-        const t = nuxtApp.$toast as
-            | undefined
-            | ((msg: string, opts?: any) => void);
+        const t = nuxtApp.$toast as undefined | ((msg: string, opts?: any) => void);
 
         if (t) {
             t(message, { type });
@@ -80,12 +75,10 @@ export const useApi = () => {
         };
 
         // Content-Type: auto-skip for FormData
-        const isForm =
-            typeof FormData !== "undefined" && opts?.body instanceof FormData;
+        const isForm = typeof FormData !== "undefined" && opts?.body instanceof FormData;
 
         if (!isForm && (opts?.json ?? true)) {
-            headers["Content-Type"] =
-                headers["Content-Type"] || "application/json";
+            headers["Content-Type"] = headers["Content-Type"] || "application/json";
         }
 
         if (opts?.auth !== false) {
@@ -203,10 +196,7 @@ export const useApi = () => {
                     })) as T;
 
                     if (opts.toast) {
-                        showToast(
-                            "success",
-                            (data as any)?.message ?? "Action OK.",
-                        );
+                        showToast("success", (data as any)?.message ?? "Action OK.");
                     }
 
                     return data;
@@ -214,9 +204,7 @@ export const useApi = () => {
                     const replayStatus = err?.status ?? err?.response?.status;
 
                     if (replayStatus === 401) {
-                        await nuxtApp.runWithContext(() =>
-                            navigateTo("/login"),
-                        );
+                        await nuxtApp.runWithContext(() => navigateTo("/login"));
                         throw err;
                     }
 
@@ -253,25 +241,14 @@ export const useApi = () => {
     };
 
     // Shorthand helpers
-    const get = <T = unknown>(url: string, opts?: ApiOptions) =>
-        request<T>("GET", url, opts);
-    const post = <T = unknown, B = any>(
-        url: string,
-        body?: B,
-        opts?: ApiOptions<B>,
-    ) => request<T, B>("POST", url, { ...(opts || {}), body });
-    const put = <T = unknown, B = any>(
-        url: string,
-        body?: B,
-        opts?: ApiOptions<B>,
-    ) => request<T, B>("PUT", url, { ...(opts || {}), body });
-    const patch = <T = unknown, B = any>(
-        url: string,
-        body?: B,
-        opts?: ApiOptions<B>,
-    ) => request<T, B>("PATCH", url, { ...(opts || {}), body });
-    const remove = <T = unknown>(url: string, opts?: ApiOptions) =>
-        request<T>("DELETE", url, opts);
+    const get = <T = unknown>(url: string, opts?: ApiOptions) => request<T>("GET", url, opts);
+    const post = <T = unknown, B = any>(url: string, body?: B, opts?: ApiOptions<B>) =>
+        request<T, B>("POST", url, { ...(opts || {}), body });
+    const put = <T = unknown, B = any>(url: string, body?: B, opts?: ApiOptions<B>) =>
+        request<T, B>("PUT", url, { ...(opts || {}), body });
+    const patch = <T = unknown, B = any>(url: string, body?: B, opts?: ApiOptions<B>) =>
+        request<T, B>("PATCH", url, { ...(opts || {}), body });
+    const remove = <T = unknown>(url: string, opts?: ApiOptions) => request<T>("DELETE", url, opts);
 
     return {
         // core

@@ -1,14 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="1200" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="flat"
-                color="primary"
-                prepend-icon="mdi-plus"
-            >
-                Créer
-            </v-btn>
+            <v-btn v-bind="activatorProps" variant="flat" color="primary" prepend-icon="mdi-plus"> Créer </v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
@@ -24,10 +17,7 @@
                 </v-toolbar>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="6">
                                 <v-text-field
@@ -37,7 +27,7 @@
                                     v-model="page.title"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -49,7 +39,7 @@
                                     v-model="page.slug"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -61,7 +51,7 @@
                                     v-model="page.metaTitle"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -73,7 +63,7 @@
                                     v-model="page.metaDescription"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     rows="3"
                                 ></v-textarea>
                             </v-col>
@@ -81,15 +71,10 @@
                     </v-form>
                 </v-card-text>
 
-                <v-card-actions class="bg-surface-light mt-n2" >
+                <v-card-actions class="bg-surface-light mt-n2">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        @click="handleCreate"
-                        :disabled="!isFormValid"
-                    >Créer</v-btn>
+                    <v-btn color="success" variant="flat" @click="handleCreate" :disabled="!isFormValid">Créer</v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -102,10 +87,10 @@ import { type Page } from "~/models/Page";
 const api = useApi();
 const dialog = ref(false);
 
-const emit = defineEmits(['created']);
+const emit = defineEmits(["created"]);
 
 const isLoading = computed(() => {
-    return api.isLoading('page:create');
+    return api.isLoading("page:create");
 });
 
 const form = ref();
@@ -126,14 +111,16 @@ const handleCreate = async () => {
         return;
     }
 
-    let res = await api.post<{message: string, entity: Page}>(`/page`,
+    let res = await api.post<{ message: string; entity: Page }>(
+        `/page`,
         { ...page.value },
         {
-            loadingKey: 'page:create',
-            toast: true
-        });
+            loadingKey: "page:create",
+            toast: true,
+        },
+    );
 
     emit("created", res.entity);
     handleClose();
-}
+};
 </script>

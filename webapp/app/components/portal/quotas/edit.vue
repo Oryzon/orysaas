@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="text"
-                color="info"
-                icon="mdi-pencil"
-            ></v-btn>
+            <v-btn v-bind="activatorProps" variant="text" color="info" icon="mdi-pencil"></v-btn>
         </template>
 
         <template v-slot:default>
@@ -22,10 +17,7 @@
                 </v-toolbar>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <v-select
@@ -34,7 +26,7 @@
                                     :items="labelKey"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="local.key"
                                     hide-details="auto"
                                 ></v-select>
@@ -47,7 +39,7 @@
                                     :items="labelPeriod"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="local.period"
                                     hide-details="auto"
                                 ></v-select>
@@ -60,7 +52,7 @@
                                     :items="labelUnit"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="local.unit"
                                     hide-details="auto"
                                 ></v-select>
@@ -83,12 +75,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="info"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleUpdate"
-                    >
+                    <v-btn color="info" variant="flat" :disabled="!isFormValid || isLoading" @click="handleUpdate">
                         Enregistrer
                     </v-btn>
                 </v-card-actions>
@@ -102,7 +89,7 @@ import type { Quota } from "~/models/Quota";
 import { QuotaKeyLabel, QuotaPeriodLabel, QuotaUnitLabel } from "#shared/quota";
 
 const props = defineProps<{ entity: Quota }>();
-const emit = defineEmits(['updated']);
+const emit = defineEmits(["updated"]);
 
 const api = useApi();
 const rules = useValidationRules();
@@ -111,7 +98,7 @@ const form = ref();
 const isFormValid = ref(false);
 const local = ref<Partial<Quota>>({ ...props.entity });
 
-const isLoading = computed(() => api.isLoading('quota:update'));
+const isLoading = computed(() => api.isLoading("quota:update"));
 
 watch(dialog, (open) => {
     if (open) {
@@ -119,17 +106,13 @@ watch(dialog, (open) => {
     }
 });
 
-const labelKey = computed(() =>
-    Object.entries(QuotaKeyLabel).map(([key, label]) => ({ value: key, title: label }))
-);
+const labelKey = computed(() => Object.entries(QuotaKeyLabel).map(([key, label]) => ({ value: key, title: label })));
 
 const labelPeriod = computed(() =>
-    Object.entries(QuotaPeriodLabel).map(([key, label]) => ({ value: key, title: label }))
+    Object.entries(QuotaPeriodLabel).map(([key, label]) => ({ value: key, title: label })),
 );
 
-const labelUnit = computed(() =>
-    Object.entries(QuotaUnitLabel).map(([key, label]) => ({ value: key, title: label }))
-);
+const labelUnit = computed(() => Object.entries(QuotaUnitLabel).map(([key, label]) => ({ value: key, title: label })));
 
 const handleClose = () => {
     dialog.value = false;
@@ -143,11 +126,11 @@ const handleUpdate = async () => {
     }
 
     const res = await api.put<{ entity: Quota }>(`/quota/${props.entity.uuid}`, local.value, {
-        loadingKey: 'quota:update',
+        loadingKey: "quota:update",
         toast: true,
     });
 
-    emit('updated', res.entity);
+    emit("updated", res.entity);
     handleClose();
 };
 </script>

@@ -9,8 +9,8 @@ export const MenuRepository = dataSource.getRepository(MenuEntity).extend({
                 key: Equal(key),
                 isActive: Equal(true),
                 items: {
-                    isVisible: Equal(true)
-                }
+                    isVisible: Equal(true),
+                },
             },
             relations: {
                 items: true,
@@ -18,5 +18,5 @@ export const MenuRepository = dataSource.getRepository(MenuEntity).extend({
         });
 
         return menu?.items ?? null;
-    }
+    },
 });

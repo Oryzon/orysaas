@@ -16,19 +16,17 @@ export function CheckIsSaasAdmin() {
 
             const user = await UserRepository.findOneOrFail({
                 where: {
-                    uuid: Equal(userUuid)
-                }
+                    uuid: Equal(userUuid),
+                },
             });
 
             if (!user.isSaasAdmin) {
-                return res
-                    .status(HttpCode.FORBIDDEN)
-                    .send({
-                        message: Messages.PERMISSION_FORBIDDEN
-                    });
+                return res.status(HttpCode.FORBIDDEN).send({
+                    message: Messages.PERMISSION_FORBIDDEN,
+                });
             }
 
             return originalMethod.apply(this, args);
-        }
-    }
+        };
+    };
 }

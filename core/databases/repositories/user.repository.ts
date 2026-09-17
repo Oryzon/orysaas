@@ -11,9 +11,9 @@ export const UserRepository = dataSource.getRepository(UserEntity).extend({
                 email: user.email,
             },
             process.env.JWT_SECRET,
-            { expiresIn: "2h" }
+            { expiresIn: "2h" },
         );
 
         return token;
-    }
+    },
 });

@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FaqData } from '~/models/Block';
+import type { FaqData } from "~/models/Block";
 
 defineProps<{
     data: FaqData;
@@ -73,7 +73,9 @@ const toggle = (index: number) => {
     font-size: 0.95rem;
     font-weight: 500;
     text-align: left;
-    transition: background-color 0.2s, color 0.2s;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
 }
 
 .faq-item--active .faq-question {

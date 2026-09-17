@@ -7,9 +7,9 @@ import { Equal } from "typeorm";
 import { MenuEntity } from "../../../databases/entities/menu.entity";
 import Messages from "../../../config/messages";
 
-@Controller('menu')
+@Controller("menu")
 export default class MenuController {
-    @Get('/:uuid')
+    @Get("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -18,31 +18,27 @@ export default class MenuController {
 
         let menu = await MenuRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
+                uuid: Equal(uuid),
             },
             relations: {
-                items: true
+                items: true,
             },
             order: {
                 items: {
-                    position: 'ASC'
-                }
-            }
+                    position: "ASC",
+                },
+            },
         });
 
         return res.status(HttpCode.OK).send(menu);
     }
 
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
-        let {
-            key,
-            label,
-            isActive
-        } = req.body;
+        let { key, label, isActive } = req.body;
 
         let menu = new MenuEntity();
 
@@ -55,10 +51,10 @@ export default class MenuController {
         return res.status(HttpCode.OK).send({
             message: Messages.MENU_CREATED,
             entity: menu,
-        })
+        });
     }
 
-    @Put('/:uuid')
+    @Put("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -67,14 +63,11 @@ export default class MenuController {
 
         let menu = await MenuRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
-        let {
-            label,
-            isActive
-        } = req.body;
+        let { label, isActive } = req.body;
 
         menu.label = label;
         menu.isActive = isActive;
@@ -87,7 +80,7 @@ export default class MenuController {
         });
     }
 
-    @Delete('/:uuid')
+    @Delete("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -96,8 +89,8 @@ export default class MenuController {
 
         let menu = await MenuRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
         menu.setDeletedAt();
 
@@ -105,7 +98,7 @@ export default class MenuController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.MENU_DELETED,
-            entity: menu
+            entity: menu,
         });
     }
 }

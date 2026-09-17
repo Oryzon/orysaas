@@ -4,30 +4,18 @@
             <v-toolbar-title>Blocs de contenu</v-toolbar-title>
 
             <v-toolbar-items>
-                <portal-blocks-ui-selector
-                    @select="addBlock"
-                ></portal-blocks-ui-selector>
+                <portal-blocks-ui-selector @select="addBlock"></portal-blocks-ui-selector>
             </v-toolbar-items>
         </v-toolbar>
 
         <v-card-text>
             <v-row>
                 <v-col md="12">
-                    <v-alert
-                        v-if="localBlocks.length === 0"
-                        type="info"
-                        variant="tonal"
-                        class="mb-6"
-                    >
+                    <v-alert v-if="localBlocks.length === 0" type="info" variant="tonal" class="mb-6">
                         Aucun bloc pour le moment.
                     </v-alert>
 
-                    <draggable
-                        v-model="localBlocks"
-                        item-key="uuid"
-                        handle=".drag-handle"
-                        @end="onDragEnd"
-                    >
+                    <draggable v-model="localBlocks" item-key="uuid" handle=".drag-handle" @end="onDragEnd">
                         <template #item="{ element, index }">
                             <portal-blocks-ui-item
                                 :block="element"
@@ -44,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import draggable from 'vuedraggable';
+import draggable from "vuedraggable";
 import type { Block } from "~/models/Block";
 
 interface Props {
@@ -53,19 +41,23 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: Block[]];
+    "update:modelValue": [value: Block[]];
 }>();
 
 const { createNewBlock } = useCmsBlocks();
 
 const localBlocks = ref<Block[]>(JSON.parse(JSON.stringify(props.modelValue ?? [])));
 
-watch(() => props.modelValue, (newVal) => {
-    localBlocks.value = JSON.parse(JSON.stringify(newVal ?? []));
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localBlocks.value = JSON.parse(JSON.stringify(newVal ?? []));
+    },
+    { deep: true },
+);
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localBlocks.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localBlocks.value)));
 };
 
 const addBlock = (type: string) => {

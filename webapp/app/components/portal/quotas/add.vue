@@ -1,13 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                class="mr-2"
-                v-bind="activatorProps"
-                variant="flat"
-                color="success"
-                prepend-icon="mdi-plus"
-            >
+            <v-btn class="mr-2" v-bind="activatorProps" variant="flat" color="success" prepend-icon="mdi-plus">
                 Nouveau quota
             </v-btn>
         </template>
@@ -25,10 +19,7 @@
                 </v-toolbar>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <v-select
@@ -37,7 +28,7 @@
                                     :items="labelKey"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="quota.key"
                                     hide-details="auto"
                                 ></v-select>
@@ -50,7 +41,7 @@
                                     :items="labelPeriod"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="quota.period"
                                     hide-details="auto"
                                 ></v-select>
@@ -63,7 +54,7 @@
                                     :items="labelUnit"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="quota.unit"
                                     hide-details="auto"
                                 ></v-select>
@@ -86,12 +77,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Créer
                     </v-btn>
                 </v-card-actions>
@@ -107,32 +93,32 @@ import { QuotaKeyLabel, QuotaPeriodLabel, QuotaUnitLabel } from "#shared/quota";
 const api = useApi();
 const dialog = ref(false);
 const quota = ref<Partial<Quota>>({});
-const emit = defineEmits(['created']);
+const emit = defineEmits(["created"]);
 
 const rules = useValidationRules();
 const form = ref();
 const isFormValid = ref(false);
 
-const isLoading = computed(() => api.isLoading('quotas:create'));
+const isLoading = computed(() => api.isLoading("quotas:create"));
 
 const labelKey = computed(() => {
     return Object.entries(QuotaKeyLabel).map(([key, label]) => ({
         value: key,
-        title: label
+        title: label,
     }));
 });
 
 const labelPeriod = computed(() => {
     return Object.entries(QuotaPeriodLabel).map(([key, label]) => ({
         value: key,
-        title: label
+        title: label,
     }));
 });
 
 const labelUnit = computed(() => {
     return Object.entries(QuotaUnitLabel).map(([key, label]) => ({
         value: key,
-        title: label
+        title: label,
     }));
 });
 
@@ -148,11 +134,11 @@ const handleCreate = async () => {
     }
 
     const res = await api.post<{ entity: Quota }>(`/quota`, quota.value, {
-        loadingKey: 'quota:create',
+        loadingKey: "quota:create",
         toast: true,
     });
 
-    emit('created', res.entity);
+    emit("created", res.entity);
     handleClose();
-}
+};
 </script>

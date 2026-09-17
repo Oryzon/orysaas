@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="500" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="tonal"
-                color="primary"
-                icon
-            >
+            <v-btn v-bind="activatorProps" variant="tonal" color="primary" icon>
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
         </template>
@@ -34,7 +29,7 @@
                                     :items="quotaItems"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="newQuotaPlan.quotaUuid"
                                 ></v-select>
                             </v-col>
@@ -57,12 +52,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Ajouter
                     </v-btn>
                 </v-card-actions>
@@ -77,7 +67,7 @@ import type { QuotaPlan } from "~/models/QuotaPlan";
 import { QuotaKeyLabel, QuotaPeriodLabel } from "#shared/quota";
 
 const props = defineProps<{
-    planUuid?: string
+    planUuid?: string;
 }>();
 
 const emit = defineEmits(["created"]);
@@ -90,13 +80,13 @@ const isFormValid = ref(false);
 const quotas = ref<Quota[]>([]);
 const newQuotaPlan = ref<Partial<QuotaPlan>>({});
 
-const isLoading = computed(() => api.isLoading('plan-quota:add') || api.isLoading('quotas:list'));
+const isLoading = computed(() => api.isLoading("plan-quota:add") || api.isLoading("quotas:list"));
 
 const quotaItems = computed(() =>
     quotas.value.map((q) => ({
         value: q.uuid,
-        title: `${QuotaKeyLabel[q.key]}${q.period ? ' — ' + QuotaPeriodLabel[q.period] : ''}`,
-    }))
+        title: `${QuotaKeyLabel[q.key]}${q.period ? " — " + QuotaPeriodLabel[q.period] : ""}`,
+    })),
 );
 
 watch(dialog, async (open) => {
@@ -104,7 +94,7 @@ watch(dialog, async (open) => {
         return;
     }
 
-    quotas.value = await api.get<Quota[]>('/quotas', { loadingKey: 'quotas:list', toast: false });
+    quotas.value = await api.get<Quota[]>("/quotas", { loadingKey: "quotas:list", toast: false });
 });
 
 const handleClose = () => {
@@ -124,11 +114,11 @@ const handleCreate = async () => {
     }
 
     const res = await api.post<{ entity: QuotaPlan }>(`/plan/${props.planUuid}/quota`, newQuotaPlan.value, {
-        loadingKey: 'plan-quota:add',
+        loadingKey: "plan-quota:add",
         toast: true,
     });
 
-    emit('created', res.entity);
+    emit("created", res.entity);
     handleClose();
 };
 </script>

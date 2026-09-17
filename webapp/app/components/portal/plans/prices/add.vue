@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="500" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="tonal"
-                color="primary"
-                icon
-            >
+            <v-btn v-bind="activatorProps" variant="tonal" color="primary" icon>
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
         </template>
@@ -34,7 +29,7 @@
                                     :items="billingIntervalItems"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="newPlanPrice.billingInterval"
                                 ></v-select>
                             </v-col>
@@ -49,7 +44,7 @@
                                     prefix="€"
                                     :disabled="isLoading"
                                     :loading="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="newPlanPrice.sellPrice"
                                 ></v-text-field>
                             </v-col>
@@ -86,12 +81,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Ajouter
                     </v-btn>
                 </v-card-actions>
@@ -105,7 +95,7 @@ import type { PlanPrice } from "~/models/PlanPrice";
 import { BillingInterval, BillingIntervalLabel } from "#shared/billing-interval";
 
 const props = defineProps<{
-    planUuid?: string
+    planUuid?: string;
 }>();
 
 const emit = defineEmits(["created"]);
@@ -118,7 +108,7 @@ const isFormValid = ref(false);
 const newPlanPrice = ref<Partial<PlanPrice>>({});
 const warnIfStripeSyncFailed = useStripeSyncWarning();
 
-const isLoading = computed(() => api.isLoading('plan-price:add'));
+const isLoading = computed(() => api.isLoading("plan-price:add"));
 
 const billingIntervalItems = Object.values(BillingInterval).map((interval) => ({
     value: interval,
@@ -137,14 +127,18 @@ const handleCreate = async () => {
         return;
     }
 
-    const res = await api.post<{ entity: PlanPrice, stripeSyncError: string | null }>(`/plan/${props.planUuid}/price`, newPlanPrice.value, {
-        loadingKey: 'plan-price:add',
-        toast: true,
-    });
+    const res = await api.post<{ entity: PlanPrice; stripeSyncError: string | null }>(
+        `/plan/${props.planUuid}/price`,
+        newPlanPrice.value,
+        {
+            loadingKey: "plan-price:add",
+            toast: true,
+        },
+    );
 
     warnIfStripeSyncFailed(res.stripeSyncError);
 
-    emit('created', res.entity);
+    emit("created", res.entity);
     handleClose();
 };
 </script>

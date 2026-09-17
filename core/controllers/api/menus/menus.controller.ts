@@ -3,18 +3,17 @@ import { Request, Response } from "express";
 import HttpCode from "../../../config/http-code";
 import { MenuRepository } from "../../../databases/repositories/menu.repository";
 
-@Controller('menus')
+@Controller("menus")
 export default class MenusController {
-
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async list(req: Request, res: Response) {
         let menus = await MenuRepository.find({
             order: {
-                createdAt: 'DESC'
-            }
+                createdAt: "DESC",
+            },
         });
 
         return res.status(HttpCode.OK).send(menus);

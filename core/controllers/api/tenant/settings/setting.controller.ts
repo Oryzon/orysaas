@@ -7,7 +7,7 @@ import {
     Delete,
     CheckJwt,
     CheckOrganizationMember,
-    CheckOrganizationRole
+    CheckOrganizationRole,
 } from "../../../../decorators";
 import { Request, Response } from "express";
 import { OrganizationRepository } from "../../../../databases/repositories/organization.repository";
@@ -27,21 +27,17 @@ import { MailService } from "../../../../services/mail.service";
 import { Equal, Not } from "typeorm";
 import { OrganizationMemberRepository } from "../../../../databases/repositories/organization-member.repository";
 
-
-@Controller('/tenant/:slugOrganization/setting')
+@Controller("/tenant/:slugOrganization/setting")
 export default class TenantSettingController {
-
-    @Get('/details')
+    @Get("/details")
     @CheckJwt()
     @CheckOrganizationMember()
     @Error()
     async details(req: Request, res: Response) {
-        return res
-            .status(HttpCode.OK)
-            .send(res.locals.organization);
+        return res.status(HttpCode.OK).send(res.locals.organization);
     }
 
-    @Post('/logo')
+    @Post("/logo")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -49,7 +45,7 @@ export default class TenantSettingController {
     async uploadLogo(req: Request, res: Response) {
         const organization = res.locals.organization as OrganizationEntity;
 
-        const tmpDir = path.join(process.cwd(), 'uploads', 'tmp');
+        const tmpDir = path.join(process.cwd(), "uploads", "tmp");
         fs.mkdirSync(tmpDir, { recursive: true });
 
         const form = formidable({ uploadDir: tmpDir, keepExtensions: true, maxFileSize: 5 * 1024 * 1024 });
@@ -57,24 +53,20 @@ export default class TenantSettingController {
         const file = files.logo?.[0];
 
         if (!file) {
-            return res
-                .status(HttpCode.BAD_REQUEST)
-                .send({ message: Messages.ORGANIZATION_LOGO_FILE_MISSING });
+            return res.status(HttpCode.BAD_REQUEST).send({ message: Messages.ORGANIZATION_LOGO_FILE_MISSING });
         }
 
         organization.logoUrl = await organizationLogoService.save(file, organization.uuid, req);
 
         await OrganizationRepository.save(organization);
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_LOGO_UPDATED,
-                logoUrl: organization.logoUrl
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_LOGO_UPDATED,
+            logoUrl: organization.logoUrl,
+        });
     }
 
-    @Put('/')
+    @Put("/")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -114,11 +106,11 @@ export default class TenantSettingController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.ORGANIZATION_UPDATED,
-            entity
-        })
+            entity,
+        });
     }
 
-    @Delete('/request')
+    @Delete("/request")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.OWNER)
@@ -128,8 +120,8 @@ export default class TenantSettingController {
 
         const user = await UserRepository.findOneOrFail({
             where: {
-                uuid: Equal(getUserUuid())
-            }
+                uuid: Equal(getUserUuid()),
+            },
         });
 
         const code = await TokenRepository.createCodeToken(user, TokenType.delete_organization, 15);
@@ -137,7 +129,7 @@ export default class TenantSettingController {
         await new MailService().send({
             to: user.email,
             subject: `Confirmation de suppression de ${organization.name}`,
-            template: 'delete-organization',
+            template: "delete-organization",
             variables: {
                 firstname: user.firstname,
                 organizationName: organization.name,
@@ -145,14 +137,12 @@ export default class TenantSettingController {
             },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_DELETE_CODE_SENT,
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_DELETE_CODE_SENT,
+        });
     }
 
-    @Delete('/confirm')
+    @Delete("/confirm")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.OWNER)
@@ -165,11 +155,9 @@ export default class TenantSettingController {
         const tokenEntity = await TokenRepository.findValidCode(code, TokenType.delete_organization, userUuid);
 
         if (!tokenEntity || tokenEntity.isExpired() || tokenEntity.isUsed()) {
-            return res
-                .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({
-                    message: Messages.ORGANIZATION_DELETE_CODE_INVALID,
-                });
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({
+                message: Messages.ORGANIZATION_DELETE_CODE_INVALID,
+            });
         }
 
         const otherMemberships = await OrganizationMemberRepository.find({
@@ -178,10 +166,10 @@ export default class TenantSettingController {
                 organizationUuid: Not(Equal(organization.uuid)),
             },
             relations: {
-                organization: true
+                organization: true,
             },
             order: {
-                createdAt: 'ASC'
+                createdAt: "ASC",
             },
         });
 
@@ -189,13 +177,11 @@ export default class TenantSettingController {
 
         await OrganizationRepository.softRemoveWithRelations(organization);
 
-        const nextOrg = otherMemberships.find(m => !m.organization.deletedAt) ?? null;
+        const nextOrg = otherMemberships.find((m) => !m.organization.deletedAt) ?? null;
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_DELETED,
-                nextOrgSlug: nextOrg?.organization?.slug ?? null,
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_DELETED,
+            nextOrgSlug: nextOrg?.organization?.slug ?? null,
+        });
     }
 }

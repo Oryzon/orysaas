@@ -1,11 +1,14 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, OneToMany,
+    Entity,
+    OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -13,7 +16,7 @@ import { MenuItemEntity } from "./menu-item.entity";
 
 @Entity()
 export class MenuEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column()
@@ -39,7 +42,7 @@ export class MenuEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column( { nullable: true })
+    @Column({ nullable: true })
     updatedBy: string;
 
     @Column({ nullable: true })
@@ -64,6 +67,6 @@ export class MenuEntity {
     @BeforeSoftRemove()
     setDeletedAt() {
         this.deletedAt = DateTime.now().toJSDate();
-        this.deletedBy = getUserUuid()
+        this.deletedBy = getUserUuid();
     }
 }

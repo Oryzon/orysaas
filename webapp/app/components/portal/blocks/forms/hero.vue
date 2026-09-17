@@ -30,7 +30,7 @@
         <v-col md="12" class="mt-n8">
             <v-card variant="outlined">
                 <v-card-title class="d-flex align-center justify-space-between">
-                    <span>{{ localData.backgroundImage ? 'Image actuelle' : 'Aucune image' }}</span>
+                    <span>{{ localData.backgroundImage ? "Image actuelle" : "Aucune image" }}</span>
 
                     <v-btn
                         v-if="!localData.backgroundImage"
@@ -88,21 +88,11 @@
                         </v-card>
                     </div>
 
-                    <v-alert
-                        v-else
-                        type="info"
-                        variant="tonal"
-                        class="mt-4"
-                    >
+                    <v-alert v-else type="info" variant="tonal" class="mt-4">
                         Aucune image de fond. Cliquez sur "Ajouter une image" pour en uploader une.
                     </v-alert>
 
-                    <v-progress-linear
-                        v-if="uploading"
-                        indeterminate
-                        color="primary"
-                        class="mt-4"
-                    ></v-progress-linear>
+                    <v-progress-linear v-if="uploading" indeterminate color="primary" class="mt-4"></v-progress-linear>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -178,7 +168,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: HeroData];
+    "update:modelValue": [value: HeroData];
 }>();
 
 // État local
@@ -190,30 +180,30 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
 
 const buttonVariants = [
-    { title: 'Plat', value: 'flat' },
-    { title: 'Élevé', value: 'elevated' },
-    { title: 'Tonalité', value: 'tonal' },
-    { title: 'Contour', value: 'outlined' },
-    { title: 'Texte', value: 'text' },
+    { title: "Plat", value: "flat" },
+    { title: "Élevé", value: "elevated" },
+    { title: "Tonalité", value: "tonal" },
+    { title: "Contour", value: "outlined" },
+    { title: "Texte", value: "text" },
 ];
 
 const backgroundPositions = [
-    { title: 'Centré', value: 'center' },
-    { title: 'Haut', value: 'top' },
-    { title: 'Bas', value: 'bottom' },
-    { title: 'Gauche', value: 'left' },
-    { title: 'Droite', value: 'right' },
-    { title: 'Haut gauche', value: 'top left' },
-    { title: 'Haut droite', value: 'top right' },
-    { title: 'Bas gauche', value: 'bottom left' },
-    { title: 'Bas droite', value: 'bottom right' },
+    { title: "Centré", value: "center" },
+    { title: "Haut", value: "top" },
+    { title: "Bas", value: "bottom" },
+    { title: "Gauche", value: "left" },
+    { title: "Droite", value: "right" },
+    { title: "Haut gauche", value: "top left" },
+    { title: "Haut droite", value: "top right" },
+    { title: "Bas gauche", value: "bottom left" },
+    { title: "Bas droite", value: "bottom right" },
 ];
 
 const backgroundSizes = [
-    { title: 'Couvrir (recommandé)', value: 'cover' },
-    { title: 'Contenir', value: 'contain' },
-    { title: 'Étirer', value: '100% 100%' },
-    { title: 'Auto', value: 'auto' },
+    { title: "Couvrir (recommandé)", value: "cover" },
+    { title: "Contenir", value: "contain" },
+    { title: "Étirer", value: "100% 100%" },
+    { title: "Auto", value: "auto" },
 ];
 
 const triggerFileInput = () => {
@@ -232,11 +222,11 @@ const handleFileUpload = async (event: Event) => {
 
     try {
         const formData = new FormData();
-        formData.append('files', files[0]); // Une seule image pour le hero
+        formData.append("files", files[0]); // Une seule image pour le hero
 
         const response = await api.post<{ success: boolean; images: any[] }>(`/image/`, formData, {
-            loadingKey: 'image:upload',
-            toast: true
+            loadingKey: "image:upload",
+            toast: true,
         });
 
         if (response.images && response.images.length > 0) {
@@ -245,27 +235,31 @@ const handleFileUpload = async (event: Event) => {
             emitUpdate();
         }
     } catch (error) {
-        console.error('Erreur upload:', error);
+        console.error("Erreur upload:", error);
     } finally {
         uploading.value = false;
-        target.value = '';
+        target.value = "";
     }
 };
 
 const removeImage = () => {
-    localData.value.backgroundImage = '';
+    localData.value.backgroundImage = "";
     emitUpdate();
 };
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localData.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localData.value)));
 };
 
-watch(() => props.modelValue, (newVal) => {
-    localData.value = {
-        ...JSON.parse(JSON.stringify(newVal)),
-    };
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localData.value = {
+            ...JSON.parse(JSON.stringify(newVal)),
+        };
+    },
+    { deep: true },
+);
 </script>
 
 <style scoped>

@@ -27,18 +27,18 @@ export const JobHistoryRepository = dataSource.getRepository(JobHistoryEntity).e
 
         return log;
     },
-    async addLog(uuid: string, message: string, level: 'info' | 'warn' | 'error' | 'success' = 'info') {
+    async addLog(uuid: string, message: string, level: "info" | "warn" | "error" | "success" = "info") {
         const history = await this.findOneOrFail({ where: { uuid } });
 
         history.logs = [
-            ...history.logs ?? [],
+            ...(history.logs ?? []),
             {
                 timestamp: new Date().toISOString(),
                 message,
                 level,
-            }
+            },
         ];
 
         await this.save(history);
-    }
+    },
 });

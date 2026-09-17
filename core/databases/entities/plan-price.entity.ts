@@ -1,9 +1,15 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, Index, JoinColumn, ManyToOne, OneToMany,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
@@ -15,7 +21,7 @@ import { BillingInterval } from "../../../shared/billing-interval";
 import { SubscriptionEntity } from "./subscription.entity";
 
 @Entity()
-@Index(['planUuid', 'billingInterval', 'deletedAt'], { unique: true })
+@Index(["planUuid", "billingInterval", "deletedAt"], { unique: true })
 export class PlanPriceEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
@@ -52,8 +58,8 @@ export class PlanPriceEntity {
     @Index()
     planUuid: string;
 
-    @ManyToOne(() => PlanEntity, (plan) => plan.prices, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'planUuid' })
+    @ManyToOne(() => PlanEntity, (plan) => plan.prices, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "planUuid" })
     plan: PlanEntity;
 
     @OneToMany(() => SubscriptionEntity, (s) => s.planPrice)

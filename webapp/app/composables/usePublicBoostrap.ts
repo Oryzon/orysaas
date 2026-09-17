@@ -10,10 +10,7 @@ interface PublicBootstrap {
 export function usePublicBootstrap() {
     const api = useApi();
 
-    const bootstrap = useState<PublicBootstrap | null>(
-        'public-bootstrap',
-        () => null,
-    );
+    const bootstrap = useState<PublicBootstrap | null>("public-bootstrap", () => null);
 
     const isLoaded = computed(() => !!bootstrap.value);
 
@@ -22,7 +19,7 @@ export function usePublicBootstrap() {
             return;
         }
 
-        bootstrap.value = await api.get<PublicBootstrap>('/public/');
+        bootstrap.value = await api.get<PublicBootstrap>("/public/");
     };
 
     return {

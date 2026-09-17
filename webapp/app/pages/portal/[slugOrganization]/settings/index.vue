@@ -1,12 +1,7 @@
 <template>
     <v-row>
         <v-col md="12">
-            <v-tabs
-                v-model="activeTab"
-                color="primary"
-                align-tabs="start"
-                class="settings-tabs"
-            >
+            <v-tabs v-model="activeTab" color="primary" align-tabs="start" class="settings-tabs">
                 <v-tab value="general" prepend-icon="mdi-cog-outline">Général</v-tab>
                 <v-tab value="notifications" prepend-icon="mdi-bell-outline">Notifications</v-tab>
                 <v-tab value="api" prepend-icon="mdi-key-outline">API</v-tab>
@@ -21,11 +16,20 @@
                         <div class="d-flex align-center justify-space-between px-6 pt-6 pb-1">
                             <div>
                                 <div class="text-h6 font-weight-bold">Informations de l'organisation</div>
-                                <div class="text-body-2 text-medium-emphasis mt-1">Modifiez le nom et l'identifiant de votre organisation.</div>
+                                <div class="text-body-2 text-medium-emphasis mt-1">
+                                    Modifiez le nom et l'identifiant de votre organisation.
+                                </div>
                             </div>
 
                             <div class="logo-upload" @click="triggerLogoInput">
-                                <v-avatar size="68" rounded="lg" :class="{ 'gradient-primary': !organization.logoUrl, 'bg-white': !!organization.logoUrl }">
+                                <v-avatar
+                                    size="68"
+                                    rounded="lg"
+                                    :class="{
+                                        'gradient-primary': !organization.logoUrl,
+                                        'bg-white': !!organization.logoUrl,
+                                    }"
+                                >
                                     <v-img v-if="organization.logoUrl" :src="organization.logoUrl" cover />
                                     <span v-else>{{ orgInitials }}</span>
                                 </v-avatar>
@@ -47,10 +51,7 @@
                         <v-divider />
 
                         <v-card-text class="pa-6">
-                            <v-form
-                                ref="form"
-                                v-model="isFormValid"
-                            >
+                            <v-form ref="form" v-model="isFormValid">
                                 <v-row>
                                     <v-col cols="12" md="6">
                                         <v-text-field
@@ -58,7 +59,7 @@
                                             label="Nom"
                                             variant="outlined"
                                             v-model="organization.name"
-                                            :rules="[ rules.required(), rules.minLength(2) ]"
+                                            :rules="[rules.required(), rules.minLength(2)]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -83,7 +84,7 @@
                                             variant="outlined"
                                             v-model="organization.legalForm"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -95,7 +96,7 @@
                                             variant="outlined"
                                             v-model="organization.shareCapital"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -107,7 +108,7 @@
                                             variant="outlined"
                                             v-model="organization.cityRegistry"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -119,7 +120,7 @@
                                             variant="outlined"
                                             v-model="organization.nafCode"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -131,7 +132,7 @@
                                             variant="outlined"
                                             v-model="organization.siret"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -143,7 +144,7 @@
                                             variant="outlined"
                                             v-model="organization.vatCode"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -155,7 +156,7 @@
                                             variant="outlined"
                                             v-model="organization.address"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -167,7 +168,7 @@
                                             variant="outlined"
                                             v-model="organization.postalCode"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -179,7 +180,7 @@
                                             variant="outlined"
                                             v-model="organization.city"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
@@ -191,14 +192,13 @@
                                             variant="outlined"
                                             v-model="organization.country"
                                             hide-details="auto"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :loading="isLoading"
                                             :disabled="isLoading"
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
                             </v-form>
-
                         </v-card-text>
 
                         <v-card-actions class="mt-n2 mr-4 bg-grey-lighten-5 justify-end" v-if="canManage">
@@ -217,15 +217,16 @@
                     </v-card>
                 </v-tabs-window-item>
 
-                <v-tabs-window-item value="notifications">
-                </v-tabs-window-item>
+                <v-tabs-window-item value="notifications"> </v-tabs-window-item>
 
                 <v-tabs-window-item value="api">
                     <v-card rounded="lg" border flat>
                         <div class="d-flex align-center justify-space-between px-6 pt-6 pb-1">
                             <div>
                                 <div class="text-h6 font-weight-bold">Clé d'API de l'organisation</div>
-                                <div class="text-body-2 text-medium-emphasis mt-1">Ajouter, supprimer, ou modifier des clés d'API de votre organisation.</div>
+                                <div class="text-body-2 text-medium-emphasis mt-1">
+                                    Ajouter, supprimer, ou modifier des clés d'API de votre organisation.
+                                </div>
                             </div>
 
                             <portal-tenant-organization-api-keys-add
@@ -252,7 +253,11 @@
                                                 variant="tonal"
                                                 :color="(item as ApiKey).type === 'INTEGRATION' ? 'info' : 'secondary'"
                                             >
-                                                {{ (item as ApiKey).type === 'INTEGRATION' ? 'Intégration' : 'Consommateur' }}
+                                                {{
+                                                    (item as ApiKey).type === "INTEGRATION"
+                                                        ? "Intégration"
+                                                        : "Consommateur"
+                                                }}
                                             </v-chip>
                                         </template>
 
@@ -262,7 +267,11 @@
                                                 variant="tonal"
                                                 :color="isExpired(item.expiresAt) ? 'error' : 'warning'"
                                             >
-                                                {{ isExpired(item.expiresAt) ? 'Expirée' : $date.frenchDate(item.expiresAt) }}
+                                                {{
+                                                    isExpired(item.expiresAt)
+                                                        ? "Expirée"
+                                                        : $date.frenchDate(item.expiresAt)
+                                                }}
                                             </v-chip>
 
                                             <span v-else class="text-medium-emphasis text-caption">Aucune date</span>
@@ -318,7 +327,7 @@
 <script setup lang="ts">
 import type { Organization } from "~/models/Organization";
 import { OrganizationMemberRole } from "#shared/organization-roles";
-import type {ApiKey} from "~/models/ApiKey";
+import type { ApiKey } from "~/models/ApiKey";
 
 useConfigPage("Paramètres");
 
@@ -341,10 +350,8 @@ const form = ref();
 const isFormValid = ref(false);
 const logoInput = ref<HTMLInputElement | null>(null);
 
-const isLoading = computed(() =>
-    api.isLoading('setting:detail') ||
-    api.isLoading('setting:update') ||
-    api.isLoading('api-keys:list')
+const isLoading = computed(
+    () => api.isLoading("setting:detail") || api.isLoading("setting:update") || api.isLoading("api-keys:list"),
 );
 
 const canManage = useOrganizationCan(OrganizationMemberRole.ADMIN);
@@ -353,8 +360,8 @@ const orgInitials = computed(() => getInitials(organization.value?.name));
 
 const getGeneral = async () => {
     organization.value = await api.get<Organization>(`/tenant/${slugOrganization}/setting/details`, {
-        loadingKey: 'setting:detail',
-        toast: false
+        loadingKey: "setting:detail",
+        toast: false,
     });
 };
 
@@ -386,10 +393,10 @@ const handleLogoChange = async (event: Event) => {
     organization.value.logoUrl = URL.createObjectURL(file);
 
     const formData = new FormData();
-    formData.append('logo', file);
+    formData.append("logo", file);
 
     const res = await api.post<{ logoUrl: string }>(`/tenant/${slugOrganization}/setting/logo`, formData, {
-        loadingKey: 'setting:logo',
+        loadingKey: "setting:logo",
         toast: true,
     });
 
@@ -407,28 +414,32 @@ const handleEditGeneral = async () => {
         return;
     }
 
-    await api.put(`/tenant/${slugOrganization}/setting`, {
-        ...organization.value
-    }, {
-        loadingKey: 'setting:update',
-        toast: true
-    });
+    await api.put(
+        `/tenant/${slugOrganization}/setting`,
+        {
+            ...organization.value,
+        },
+        {
+            loadingKey: "setting:update",
+            toast: true,
+        },
+    );
 };
 
 // API Keys
 const headers = [
-    { title: 'Label', key: 'label' },
-    { title: 'Type', key: 'type' },
-    { title: 'Expiration', key: 'expiresAt' },
-    { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+    { title: "Label", key: "label" },
+    { title: "Type", key: "type" },
+    { title: "Expiration", key: "expiresAt" },
+    { title: "Actions", key: "actions", sortable: false, align: "end" as const },
 ];
 
 const getApiKeys = async () => {
     apiKeys.value = await api.get<Array<ApiKey>>(`/tenant/${slugOrganization}/setting/api-keys`, {
-        loadingKey: 'api-keys:list',
+        loadingKey: "api-keys:list",
         toast: false,
     });
-}
+};
 
 const addToApiKeys = (data: ApiKey) => {
     apiKeys.value.push(data);
@@ -436,7 +447,7 @@ const addToApiKeys = (data: ApiKey) => {
 
 const removeToApiKeys = (data: ApiKey) => {
     apiKeys.value = apiKeys.value.filter((entity) => entity.uuid !== data.uuid);
-}
+};
 
 const isExpired = (date: string) => new Date(date) < new Date();
 </script>

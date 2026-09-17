@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{pageTitle}}</title>
+    <style>
+        body { font-family: 'Roboto', Arial, sans-serif; background: {{theme.bg}}; margin: 0; padding: 40px 0; }
+        .container { max-width: 560px; margin: 0 auto; background: {{theme.container}}; border-radius: 12px; overflow: hidden; }
+        .header { background: linear-gradient(135deg, {{theme.headerFrom}} 0%, {{theme.headerTo}} 100%); padding: 32px 40px; }
+        .header table { width: 100%; }
+        .header h1 { color: white; margin: 0; font-size: 24px; font-weight: 700; }
+        .header-logo { height: 36px; width: auto; display: block; border: 0; }
+        .body { padding: 40px; }
+        .body p { color: {{theme.textBody}}; font-size: 15px; line-height: 1.7; margin: 0 0 20px; }
+        .body p strong { color: {{theme.textStrong}}; }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, {{theme.headerFrom}} 0%, {{theme.headerTo}} 100%);
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            margin: 8px 0 24px;
+        }
+        .badge {
+            display: inline-block;
+            background: {{theme.badgeBg}};
+            color: {{theme.badgeText}};
+            border: 1px solid {{theme.badgeBorder}};
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .code-box {
+            background: {{theme.badgeBg}};
+            border: 1px solid {{theme.badgeBorder}};
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin: 8px 0 28px;
+        }
+        .code { font-size: 42px; font-weight: 900; letter-spacing: 10px; color: {{theme.headerFrom}}; font-family: 'Courier New', monospace; }
+        .code-hint { color: {{theme.textFooter}}; font-size: 13px; margin-top: 8px; }
+        .table { width: 100%; border-collapse: collapse; margin: 8px 0 24px; }
+        .table td { padding: 10px 0; font-size: 14px; border-bottom: 1px solid {{theme.border}}; }
+        .table td.label { color: {{theme.textFooter}}; }
+        .table td.value { color: {{theme.textStrong}}; text-align: right; font-weight: 600; }
+        .table tr.total td { border-bottom: none; padding-top: 16px; font-size: 16px; }
+        .fallback-link { color: {{theme.textFooter}}; font-size: 13px; line-height: 1.6; }
+        .fallback-link a { color: {{theme.link}}; text-decoration: none; word-break: break-all; }
+        .footer { padding: 24px 40px; border-top: 1px solid {{theme.border}}; }
+        .footer p { color: {{theme.textFooter}}; font-size: 13px; margin: 0 0 6px; line-height: 1.6; }
+        .footer p:last-child { margin-bottom: 0; }
+        .footer a { color: {{theme.link}}; text-decoration: none; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td align="left" valign="middle"><h1>{{appName}}</h1></td>
+                    {{#if logoUrl}}
+                    <td align="right" valign="middle"><img src="{{logoUrl}}" alt="{{appName}}" class="header-logo" /></td>
+                    {{/if}}
+                </tr>
+            </table>
+        </div>
+
+        <div class="body">
+            {{> @partial-block }}
+        </div>
+
+        <div class="footer">
+            {{#if footerNote}}
+                <p>{{footerNote}}</p>
+            {{else}}
+                <p>Cet e-mail vous a été envoyé automatiquement, merci de ne pas y répondre.</p>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>

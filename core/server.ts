@@ -12,7 +12,6 @@ import { showcaseSeeders } from "./seeders/showcase";
 import { handleStripeWebhook } from "./webhooks/stripe.webhook";
 
 class Server {
-
     private app: express.Application;
 
     constructor() {
@@ -21,24 +20,26 @@ class Server {
     }
 
     public configuration() {
-        this.app.set('port', process.env.PORT || 3001);
+        this.app.set("port", process.env.PORT || 3001);
 
-        const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) ?? [];
-        this.app.use(cors({
-            origin: process.env.NODE_ENV === 'production' ? allowedOrigins : true,
-            credentials: true,
-        }));
+        const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) ?? [];
+        this.app.use(
+            cors({
+                origin: process.env.NODE_ENV === "production" ? allowedOrigins : true,
+                credentials: true,
+            }),
+        );
 
         this.app.use(helmet({ crossOriginResourcePolicy: false }));
 
         // Stripe signature verification needs the raw body — must be registered
         // before the global JSON parser below, otherwise the body is already
         // consumed/parsed by the time this route would run.
-        this.app.post('/stripe/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+        this.app.post("/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
 
-        this.app.use(express.json({ limit: '20mb' }));
-        this.app.use(express.text({ limit: '5mb' }));
-        this.app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+        this.app.use(express.json({ limit: "20mb" }));
+        this.app.use(express.text({ limit: "5mb" }));
+        this.app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
     }
 
     public async routes() {
@@ -53,16 +54,16 @@ class Server {
         });
 
         const info: Array<{
-            method: string,
-            path: string,
-            handler: string
+            method: string;
+            path: string;
+            handler: string;
         }> = [];
 
         const controllersToParse = await controllers();
 
         controllersToParse.forEach((controllerClass) => {
-            const basePath = Reflect.getMetadata('base_path', controllerClass.default);
-            const routers: IRouter[] = Reflect.getMetadata('routers', controllerClass.default);
+            const basePath = Reflect.getMetadata("base_path", controllerClass.default);
+            const routers: IRouter[] = Reflect.getMetadata("routers", controllerClass.default);
 
             const controllerInstance = new controllerClass.default();
 
@@ -84,7 +85,7 @@ class Server {
         });
 
         // Route doc disponible uniquement hors production
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.NODE_ENV !== "production") {
             this.app.get("/doc", (req: Request, res: Response) => {
                 res.send(info);
             });
@@ -93,14 +94,14 @@ class Server {
 
     public async start() {
         await this.routes();
-        this.app.listen(this.app.get('port'), () => {
-            console.log(`Server is listening ${this.app.get('port')} port.`);
+        this.app.listen(this.app.get("port"), () => {
+            console.log(`Server is listening ${this.app.get("port")} port.`);
         });
     }
 }
 
 const server = new Server();
 server.start().catch((err) => {
-    console.error('Failed to start server:', err);
+    console.error("Failed to start server:", err);
     process.exit(1);
 });

@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="500" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="text"
-                color="info"
-                icon
-            >
+            <v-btn v-bind="activatorProps" variant="text" color="info" icon>
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </template>
@@ -34,7 +29,7 @@
                                     :items="billingIntervalItems"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="local.billingInterval"
                                 ></v-select>
                             </v-col>
@@ -49,7 +44,7 @@
                                     prefix="€"
                                     :disabled="isLoading"
                                     :loading="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="local.sellPrice"
                                 ></v-text-field>
                             </v-col>
@@ -86,12 +81,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Modifier
                     </v-btn>
                 </v-card-actions>
@@ -105,7 +95,7 @@ import type { PlanPrice } from "~/models/PlanPrice";
 import { BillingInterval, BillingIntervalLabel } from "#shared/billing-interval";
 
 const props = defineProps<{
-    entity: PlanPrice
+    entity: PlanPrice;
 }>();
 const emit = defineEmits(["updated"]);
 
@@ -117,7 +107,7 @@ const isFormValid = ref(false);
 const local = ref<Partial<PlanPrice>>({});
 const warnIfStripeSyncFailed = useStripeSyncWarning();
 
-const isLoading = computed(() => api.isLoading('plan-price:edit'));
+const isLoading = computed(() => api.isLoading("plan-price:edit"));
 
 const billingIntervalItems = Object.values(BillingInterval).map((interval) => ({
     value: interval,
@@ -144,16 +134,18 @@ const handleCreate = async () => {
         return;
     }
 
-    const res = await api.put<{ entity: PlanPrice, stripeSyncError: string | null }>(`/plan/${local.value.planUuid}/price/${local.value.uuid}`,
+    const res = await api.put<{ entity: PlanPrice; stripeSyncError: string | null }>(
+        `/plan/${local.value.planUuid}/price/${local.value.uuid}`,
         local.value,
         {
-            loadingKey: 'plan-price:edit',
+            loadingKey: "plan-price:edit",
             toast: true,
-    });
+        },
+    );
 
     warnIfStripeSyncFailed(res.stripeSyncError);
 
-    emit('updated', res.entity);
+    emit("updated", res.entity);
     handleClose();
 };
 </script>

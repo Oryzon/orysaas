@@ -7,9 +7,14 @@
             <v-col md="5">
                 <v-row>
                     <v-col md="12">
-                        <h1 class="text-display-large font-weight-black">Parlons<br/> de votre projet.</h1>
-                        <p class="font-weight-light text-headline-small text-grey">Une démo, une question technique, un
-                            partenariat...<br/> On est joignable.</p>
+                        <h1 class="text-display-large font-weight-black">
+                            Parlons<br />
+                            de votre projet.
+                        </h1>
+                        <p class="font-weight-light text-headline-small text-grey">
+                            Une démo, une question technique, un partenariat...<br />
+                            On est joignable.
+                        </p>
                     </v-col>
 
                     <v-col md="12" class="mt-n12 ml-n4">
@@ -22,8 +27,11 @@
                                 </template>
 
                                 <v-list-item-title class="font-weight-black text-capitalize">Email</v-list-item-title>
-                                <v-list-item-subtitle class="font-weight-bold">{{ settings?.email }}</v-list-item-subtitle>
-                                <v-list-item-subtitle class="font-weight-light  text-grey">Réponse sous 2h ouvrées
+                                <v-list-item-subtitle class="font-weight-bold">{{
+                                    settings?.email
+                                }}</v-list-item-subtitle>
+                                <v-list-item-subtitle class="font-weight-light text-grey"
+                                    >Réponse sous 2h ouvrées
                                 </v-list-item-subtitle>
                             </v-list-item>
 
@@ -34,11 +42,14 @@
                                     </v-avatar>
                                 </template>
 
-                                <v-list-item-title class="font-weight-black text-capitalize">Formulaire
+                                <v-list-item-title class="font-weight-black text-capitalize"
+                                    >Formulaire
                                 </v-list-item-title>
-                                <v-list-item-subtitle class="font-weight-bold">Disponible maintenant
+                                <v-list-item-subtitle class="font-weight-bold"
+                                    >Disponible maintenant
                                 </v-list-item-subtitle>
-                                <v-list-item-subtitle class="font-weight-light text-grey">24h/24 - 7j/7
+                                <v-list-item-subtitle class="font-weight-light text-grey"
+                                    >24h/24 - 7j/7
                                 </v-list-item-subtitle>
                             </v-list-item>
 
@@ -49,10 +60,14 @@
                                     </v-avatar>
                                 </template>
 
-                                <v-list-item-title class="font-weight-black text-capitalize">Téléphone
+                                <v-list-item-title class="font-weight-black text-capitalize"
+                                    >Téléphone
                                 </v-list-item-title>
-                                <v-list-item-subtitle class="font-weight-bold">{{ settings?.phone }}</v-list-item-subtitle>
-                                <v-list-item-subtitle class="font-weight-light  text-grey">Lun-Ven : 8h - 19h
+                                <v-list-item-subtitle class="font-weight-bold">{{
+                                    settings?.phone
+                                }}</v-list-item-subtitle>
+                                <v-list-item-subtitle class="font-weight-light text-grey"
+                                    >Lun-Ven : 8h - 19h
                                 </v-list-item-subtitle>
                             </v-list-item>
                         </v-list>
@@ -61,18 +76,14 @@
             </v-col>
 
             <v-col md="5">
-                <v-card
-                    rounded="16px"
-                    color="white"
-                >
+                <v-card rounded="16px" color="white">
                     <v-card-text class="pa-10 text-black">
-                        <v-form
-                            ref="contactForm"
-                            v-model="isFormValid"
-                        >
+                        <v-form ref="contactForm" v-model="isFormValid">
                             <v-row>
                                 <v-col md="6">
-                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">Prénom <span class="font-weight-black text-error">*</span></div>
+                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">
+                                        Prénom <span class="font-weight-black text-error">*</span>
+                                    </div>
 
                                     <v-text-field
                                         hide-details="auto"
@@ -82,12 +93,14 @@
                                         v-model="contact.firstname"
                                         :loading="isLoading"
                                         :disabled="isLoading"
-                                        :rules="[ rules.required() ]"
+                                        :rules="[rules.required()]"
                                     ></v-text-field>
                                 </v-col>
 
                                 <v-col md="6">
-                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">Nom <span class="font-weight-black text-error">*</span></div>
+                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">
+                                        Nom <span class="font-weight-black text-error">*</span>
+                                    </div>
 
                                     <v-text-field
                                         hide-details="auto"
@@ -97,12 +110,14 @@
                                         v-model="contact.lastname"
                                         :loading="isLoading"
                                         :disabled="isLoading"
-                                        :rules="[ rules.required() ]"
+                                        :rules="[rules.required()]"
                                     ></v-text-field>
                                 </v-col>
 
                                 <v-col md="12" class="mt-n4">
-                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">E-mail <span class="font-weight-black text-error">*</span></div>
+                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">
+                                        E-mail <span class="font-weight-black text-error">*</span>
+                                    </div>
 
                                     <v-text-field
                                         hide-details="auto"
@@ -112,12 +127,14 @@
                                         v-model="contact.email"
                                         :loading="isLoading"
                                         :disabled="isLoading"
-                                        :rules="[ rules.required() ]"
+                                        :rules="[rules.required()]"
                                     ></v-text-field>
                                 </v-col>
 
                                 <v-col md="12" class="mt-n4">
-                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">Société</div>
+                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">
+                                        Société
+                                    </div>
 
                                     <v-text-field
                                         hide-details="auto"
@@ -131,7 +148,9 @@
                                 </v-col>
 
                                 <v-col md="12" class="mt-n4">
-                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">Sujet</div>
+                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">
+                                        Sujet
+                                    </div>
 
                                     <v-chip
                                         v-for="subject in availableSubjects"
@@ -139,11 +158,14 @@
                                         :color="subject === contact.subject ? 'primary' : ''"
                                         :variant="subject === contact.subject ? 'tonal' : 'outlined'"
                                         @click="handleChangeSubject(subject)"
-                                    >{{ subject }}</v-chip>
+                                        >{{ subject }}</v-chip
+                                    >
                                 </v-col>
 
                                 <v-col md="12" class="mt-n4">
-                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">Message <span class="font-weight-black text-error">*</span></div>
+                                    <div class="text-body-large text-medium-emphasis font-weight-medium mb-1">
+                                        Message <span class="font-weight-black text-error">*</span>
+                                    </div>
 
                                     <v-textarea
                                         hide-details="auto"
@@ -154,21 +176,28 @@
                                         rows="6"
                                         :loading="isLoading"
                                         :disabled="isLoading"
-                                        :rules="[ rules.required(), rules.maxLength(2000) ]"
+                                        :rules="[rules.required(), rules.maxLength(2000)]"
                                     ></v-textarea>
                                 </v-col>
 
                                 <v-col md="12" class="mt-n8 ml-n3">
-                                    <v-checkbox color="primary" :rules="[ rules.required() ]" hide-details="auto">
+                                    <v-checkbox color="primary" :rules="[rules.required()]" hide-details="auto">
                                         <template #label>
-                                            J'accepte la&nbsp;<a href="" class="text-primary">politique de
-                                            confidentialité</a>&nbsp;<span class="font-weight-black text-error">*</span>
+                                            J'accepte la&nbsp;<a href="" class="text-primary"
+                                                >politique de confidentialité</a
+                                            >&nbsp;<span class="font-weight-black text-error">*</span>
                                         </template>
                                     </v-checkbox>
                                 </v-col>
 
                                 <v-col md="12">
-                                    <v-btn color="primary" block append-icon="mdi-send" size="large" @click="handleSend">
+                                    <v-btn
+                                        color="primary"
+                                        block
+                                        append-icon="mdi-send"
+                                        size="large"
+                                        @click="handleSend"
+                                    >
                                         Envoyer le message
                                     </v-btn>
                                 </v-col>
@@ -189,25 +218,28 @@ useConfigPage("Contact");
 const runtime = useRuntimeConfig();
 const api = useApi();
 
-const { data: settings } = await useFetch<{ email: string; phone: string; adress: string; city: string; postalCode: string }>(
-    `${runtime.public.apiBase}settings/public`,
-    { key: 'page:contact:settings' }
-);
+const { data: settings } = await useFetch<{
+    email: string;
+    phone: string;
+    adress: string;
+    city: string;
+    postalCode: string;
+}>(`${runtime.public.apiBase}settings/public`, { key: "page:contact:settings" });
 
 const rules = useValidationRules();
 const contactForm = ref();
 const isFormValid = ref(false);
 
-const contact = ref<Partial<Contact>>({subject: 'Question commerciale'});
-const availableSubjects = ref(['Question commerciale', 'Demander une démo', 'Support technique', 'Partenariat']);
+const contact = ref<Partial<Contact>>({ subject: "Question commerciale" });
+const availableSubjects = ref(["Question commerciale", "Demander une démo", "Support technique", "Partenariat"]);
 
 const isLoading = computed(() => {
-    return api.isLoading('contact:send');
+    return api.isLoading("contact:send");
 });
 
 const handleChangeSubject = (newSubject: string) => {
     contact.value.subject = newSubject;
-}
+};
 
 const handleSend = async () => {
     const { valid } = await contactForm.value.validate();
@@ -217,15 +249,17 @@ const handleSend = async () => {
         return;
     }
 
-    await api.post("/contact",
-        {...contact.value},
+    await api.post(
+        "/contact",
+        { ...contact.value },
         {
             loadingKey: "contact:send",
-            toast: true
-        });
+            toast: true,
+        },
+    );
 
     contact.value = {};
-}
+};
 </script>
 
 <style scoped>

@@ -3,5 +3,5 @@ export const useConfigPage = (title: string) => {
         title: `${title}`,
     });
 
-    useState('pageTitle', () => title).value = title;
-}
+    useState("pageTitle", () => title).value = title;
+};

@@ -75,11 +75,7 @@
                         >
                             <template #item="{ element, index }">
                                 <div class="image-item">
-                                    <v-card
-                                        class="image-card"
-                                        elevation="2"
-                                        @click="openLightbox(index)"
-                                    >
+                                    <v-card class="image-card" elevation="2" @click="openLightbox(index)">
                                         <div class="image-wrapper">
                                             <v-img
                                                 :src="element.url"
@@ -111,8 +107,11 @@
                                         </div>
 
                                         <div class="image-info pa-2">
-                                            <div class="text-caption text-truncate" :title="element.alt || element.originalName">
-                                                {{ element.alt || element.originalName || 'Sans nom' }}
+                                            <div
+                                                class="text-caption text-truncate"
+                                                :title="element.alt || element.originalName"
+                                            >
+                                                {{ element.alt || element.originalName || "Sans nom" }}
                                             </div>
                                         </div>
                                     </v-card>
@@ -121,31 +120,15 @@
                         </draggable>
                     </div>
 
-                    <v-alert
-                        v-else
-                        type="info"
-                        variant="tonal"
-                        class="mt-4"
-                    >
-                        Il n'y a pas d'image.
-                    </v-alert>
+                    <v-alert v-else type="info" variant="tonal" class="mt-4"> Il n'y a pas d'image. </v-alert>
 
-                    <v-progress-linear
-                        v-if="uploading"
-                        indeterminate
-                        color="primary"
-                        class="mt-4"
-                    ></v-progress-linear>
+                    <v-progress-linear v-if="uploading" indeterminate color="primary" class="mt-4"></v-progress-linear>
                 </v-card-text>
             </v-card>
         </v-col>
     </v-row>
 
-    <v-dialog
-        v-model="lightboxOpen"
-        max-width="90vw"
-        @click:outside="closeLightbox"
-    >
+    <v-dialog v-model="lightboxOpen" max-width="90vw" @click:outside="closeLightbox">
         <v-card class="lightbox-card">
             <v-card-text class="pa-0 position-relative">
                 <v-img
@@ -183,7 +166,6 @@
                     @click.stop="nextImage"
                 ></v-btn>
             </v-card-text>
-
 
             <v-card-text v-if="lightboxImage" class="text-center">
                 <div class="text-subtitle-1 font-weight-bold">
@@ -233,7 +215,12 @@
                         ></v-text-field>
                     </v-col>
 
-                    <v-col md="12" class="mt-n8 mb-16" style="height: 500px; margin-bottom: 90px;" v-if="localData.showRightColumn">
+                    <v-col
+                        md="12"
+                        class="mt-n8 mb-16"
+                        style="height: 500px; margin-bottom: 90px"
+                        v-if="localData.showRightColumn"
+                    >
                         <client-only>
                             <quill-editor
                                 toolbar="full"
@@ -253,11 +240,7 @@
                     </v-col>
 
                     <v-col md="12" class="mt-n8">
-                        <v-text-field
-                            v-model="editingImage.link"
-                            label="Lien"
-                            variant="outlined"
-                        ></v-text-field>
+                        <v-text-field v-model="editingImage.link" label="Lien" variant="outlined"></v-text-field>
                     </v-col>
 
                     <v-col md="12" class="mt-n12">
@@ -274,16 +257,14 @@
             <v-card-actions class="bg-surface-light mt-n10">
                 <v-spacer></v-spacer>
 
-                <v-btn color="success" @click="saveEdit" variant="tonal">
-                    Modifier
-                </v-btn>
+                <v-btn color="success" @click="saveEdit" variant="tonal"> Modifier </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 
 <script setup lang="ts">
-import draggable from 'vuedraggable';
+import draggable from "vuedraggable";
 import type { GalleryData, GalleryImage } from "~/models/Block";
 
 const api = useApi();
@@ -295,13 +276,13 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: GalleryData];
+    "update:modelValue": [value: GalleryData];
 }>();
 
 const layoutOptions = [
-    { title: 'Grille', value: 'grid' },
-    { title: 'Masonry', value: 'masonry' },
-    { title: 'Slider', value: 'slider' }
+    { title: "Grille", value: "grid" },
+    { title: "Masonry", value: "masonry" },
+    { title: "Slider", value: "slider" },
 ];
 
 const localData = ref<GalleryData>(JSON.parse(JSON.stringify(props.modelValue)));
@@ -362,12 +343,12 @@ const handleFileUpload = async (event: Event) => {
         const formData = new FormData();
 
         for (let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
+            formData.append("files", files[i]);
         }
 
         const response = await api.post<{ success: boolean; images: any[] }>(`/image/`, formData, {
-            loadingKey: 'image:upload',
-            toast: true
+            loadingKey: "image:upload",
+            toast: true,
         });
 
         if (!localData.value.images) {
@@ -378,18 +359,18 @@ const handleFileUpload = async (event: Event) => {
             localData.value.images!.push({
                 uuid: img.uuid,
                 url: runtime.public.apiBase + img.url,
-                alt: img.originalName.replace(/\.[^/.]+$/, ''),
-                caption: '',
-                originalName: img.originalName
+                alt: img.originalName.replace(/\.[^/.]+$/, ""),
+                caption: "",
+                originalName: img.originalName,
             });
         });
 
         emitUpdate();
     } catch (error) {
-        console.error('Erreur upload:', error);
+        console.error("Erreur upload:", error);
     } finally {
         uploading.value = false;
-        target.value = '';
+        target.value = "";
     }
 };
 
@@ -425,12 +406,16 @@ const cancelEdit = () => {
 };
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localData.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localData.value)));
 };
 
-watch(() => props.modelValue, (newVal) => {
-    localData.value = JSON.parse(JSON.stringify(newVal));
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localData.value = JSON.parse(JSON.stringify(newVal));
+    },
+    { deep: true },
+);
 </script>
 
 <style scoped>

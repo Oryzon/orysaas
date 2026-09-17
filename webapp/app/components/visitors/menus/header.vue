@@ -1,11 +1,6 @@
 <template>
     <template v-if="!asList">
-        <v-menu
-            v-if="hasChildren"
-            open-on-hover
-            close-on-content-click
-            offset-y
-        >
+        <v-menu v-if="hasChildren" open-on-hover close-on-content-click offset-y>
             <template #activator="{ props: menuProps }">
                 <v-btn
                     v-bind="menuProps"
@@ -45,12 +40,7 @@
     </template>
 
     <template v-else>
-        <v-menu
-            v-if="hasChildren"
-            offset-x
-            open-on-hover
-            close-on-content-click
-        >
+        <v-menu v-if="hasChildren" offset-x open-on-hover close-on-content-click>
             <template #activator="{ props: menuProps }">
                 <v-list-item
                     v-bind="menuProps"
@@ -90,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MenuItemNode } from '~/models/MenuItem';
+import type { MenuItemNode } from "~/models/MenuItem";
 
 const props = defineProps<{
     item: MenuItemNode;
@@ -99,20 +89,18 @@ const props = defineProps<{
 
 const asList = computed(() => props.asList ?? false);
 
-const hasChildren = computed(
-    () => props.item.children && props.item.children.length > 0,
-);
+const hasChildren = computed(() => props.item.children && props.item.children.length > 0);
 
 const route = useRoute();
 
-const isExternal = (url: string | undefined) => !!url && (url.startsWith('http://') || url.startsWith('https://'));
+const isExternal = (url: string | undefined) => !!url && (url.startsWith("http://") || url.startsWith("https://"));
 
 const isCurrentRoute = (url: string | undefined) => {
     if (!url || isExternal(url)) {
         return false;
     }
 
-    const normalized = url.startsWith('/') ? url : `/${url}`;
+    const normalized = url.startsWith("/") ? url : `/${url}`;
     return route.path === normalized;
 };
 
@@ -121,6 +109,6 @@ const buildTo = (url: string | undefined) => {
         return undefined;
     }
 
-    return url.startsWith('/') ? url : `/${url}`;
+    return url.startsWith("/") ? url : `/${url}`;
 };
 </script>

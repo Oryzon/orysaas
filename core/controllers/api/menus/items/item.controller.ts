@@ -7,22 +7,16 @@ import { MenuItemEntity } from "../../../../databases/entities/menu-item.entity"
 import HttpCode from "../../../../config/http-code";
 import Messages from "../../../../config/messages";
 
-@Controller('/menu/:uuidMenu/item')
+@Controller("/menu/:uuidMenu/item")
 export default class MenuItemController {
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
         let uuidMenu = req.params.uuidMenu;
 
-        let {
-            label,
-            url,
-            target,
-            isVisible,
-            parentUuid,
-        } = req.body;
+        let { label, url, target, isVisible, parentUuid } = req.body;
 
         let nextPositionItem = await MenuItemRepository.nextPosition(uuidMenu, parentUuid);
 
@@ -40,11 +34,11 @@ export default class MenuItemController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.MENU_ITEM_CREATED,
-            entity: menuItem
+            entity: menuItem,
         });
     }
 
-    @Put('/:uuidItem')
+    @Put("/:uuidItem")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -55,17 +49,11 @@ export default class MenuItemController {
         let item = await MenuItemRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuidItem),
-                menuUuid: Equal(uuidMenu)
-            }
+                menuUuid: Equal(uuidMenu),
+            },
         });
 
-        let {
-            label,
-            url,
-            target,
-            isVisible,
-            parentUuid,
-        } = req.body;
+        let { label, url, target, isVisible, parentUuid } = req.body;
 
         item.label = label;
         item.url = url;
@@ -81,7 +69,7 @@ export default class MenuItemController {
         });
     }
 
-    @Put('/:uuidItem/:order')
+    @Put("/:uuidItem/:order")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -93,13 +81,13 @@ export default class MenuItemController {
         let item = await MenuItemRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuidItem),
-                menuUuid: Equal(uuidMenu)
-            }
+                menuUuid: Equal(uuidMenu),
+            },
         });
 
         let itemToMove = await MenuItemRepository.getItemToMove(item.menuUuid, item.parentUuid, order, item.position);
 
-        let tmpItem = {...item};
+        let tmpItem = { ...item };
         item.position = itemToMove.position;
         itemToMove.position = tmpItem.position;
 
@@ -107,11 +95,11 @@ export default class MenuItemController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.MENU_ITEM_MOVED,
-            entity: [item, itemToMove]
+            entity: [item, itemToMove],
         });
     }
 
-    @Delete('/:uuidItem')
+    @Delete("/:uuidItem")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -122,11 +110,11 @@ export default class MenuItemController {
         let item = await MenuItemRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuidItem),
-                menuUuid: Equal(uuidMenu)
+                menuUuid: Equal(uuidMenu),
             },
             relations: {
-                children: true
-            }
+                children: true,
+            },
         });
 
         item.setDeletedAt();
@@ -143,16 +131,16 @@ export default class MenuItemController {
 
         let refreshedMenu = await MenuItemRepository.find({
             where: {
-                menuUuid: Equal(item.menuUuid)
+                menuUuid: Equal(item.menuUuid),
             },
             order: {
-                position: 'ASC'
-            }
+                position: "ASC",
+            },
         });
 
         return res.status(HttpCode.OK).send({
             message: Messages.MENU_ITEM_REMOVED,
             entity: refreshedMenu,
-        })
+        });
     }
 }

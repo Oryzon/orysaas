@@ -9,29 +9,29 @@ import { getUserUuid } from "../../helpers/request-context.helper";
 export const OrganizationRepository = dataSource.getRepository(OrganizationEntity).extend({
     async getSlug(name: string) {
         let tmpSlug = name
-                                .toLowerCase()
-                                .normalize('NFD')
-                                .replace(/[̀-ͯ]/g, '')
-                                .replace(/[^a-z0-9\s-]/g, '')
-                                .trim()
-                                .replace(/\s+/g, '-');
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[̀-ͯ]/g, "")
+            .replace(/[^a-z0-9\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-");
 
         let existing = await this.findOne({
             where: {
-                slug: Like('%' + tmpSlug + '%')
+                slug: Like("%" + tmpSlug + "%"),
             },
             order: {
-                slug: "DESC"
-            }
+                slug: "DESC",
+            },
         });
 
         if (existing) {
-            let tmpSlugTwo = existing.slug.split('_');
+            let tmpSlugTwo = existing.slug.split("_");
 
             if (tmpSlugTwo.length > 1) {
-                tmpSlug += '_' + (Number(tmpSlugTwo[1]) + 1);
+                tmpSlug += "_" + (Number(tmpSlugTwo[1]) + 1);
             } else {
-                tmpSlug += '_1';
+                tmpSlug += "_1";
             }
         }
 
@@ -43,21 +43,21 @@ export const OrganizationRepository = dataSource.getRepository(OrganizationEntit
 
         await OrganizationMemberRepository.update(
             {
-                organizationUuid: Equal(organization.uuid)
+                organizationUuid: Equal(organization.uuid),
             },
             {
                 deletedAt: now,
-                deletedBy: userUuid
+                deletedBy: userUuid,
             },
         );
 
         await OrganizationInviteRepository.update(
             {
-                organizationUuid: Equal(organization.uuid)
+                organizationUuid: Equal(organization.uuid),
             },
             {
                 deletedAt: now,
-                deletedBy: userUuid
+                deletedBy: userUuid,
             },
         );
 
@@ -68,8 +68,8 @@ export const OrganizationRepository = dataSource.getRepository(OrganizationEntit
     async getOrganizationBySlug(slug: string) {
         return await this.findOneOrFail({
             where: {
-                slug: Equal(slug)
-            }
+                slug: Equal(slug),
+            },
         });
-    }
+    },
 });

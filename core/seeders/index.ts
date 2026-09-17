@@ -23,17 +23,19 @@ if (!seeders[name]) {
     process.exit(1);
 }
 
-setRequestContext({uuid: process.env.UUID_SYSTEM ?? "seeder"});
+setRequestContext({ uuid: process.env.UUID_SYSTEM ?? "seeder" });
 
-dataSource.initialize().then(async () => {
+dataSource
+    .initialize()
+    .then(async () => {
         console.log(`▶ Seeder "${name}" démarré...`);
 
         await seeders[name]();
 
         console.log(`✓ Seeder "${name}" terminé.`);
         process.exit(0);
-
-    }).catch((err) => {
+    })
+    .catch((err) => {
         console.error(`✗ Erreur :`, err);
 
         process.exit(1);

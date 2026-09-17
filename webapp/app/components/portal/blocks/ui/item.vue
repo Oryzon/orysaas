@@ -1,9 +1,7 @@
 <template>
     <v-card class="block-item mb-4" :class="{ 'block-item--hidden': !block.visible }">
         <v-card-title class="d-flex align-center pa-3 bg-grey-lighten-4">
-            <v-icon class="drag-handle mr-3">
-                mdi-drag-vertical
-            </v-icon>
+            <v-icon class="drag-handle mr-3"> mdi-drag-vertical </v-icon>
 
             <v-chip class="mr-3">
                 {{ blockTypeLabel }}
@@ -11,33 +9,19 @@
 
             <v-spacer />
 
-            <v-btn
-                icon
-                variant="text"
-                color="primary"
-                @click="$emit('toggle-visibility')"
-            >
+            <v-btn icon variant="text" color="primary" @click="$emit('toggle-visibility')">
                 <v-icon>
-                    {{ block.visible ? 'mdi-eye' : 'mdi-eye-off' }}
+                    {{ block.visible ? "mdi-eye" : "mdi-eye-off" }}
                 </v-icon>
             </v-btn>
 
-            <v-btn
-                icon
-                variant="text"
-                color="error"
-                @click="$emit('delete')"
-            >
+            <v-btn icon variant="text" color="error" @click="$emit('delete')">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
 
-            <v-btn
-                icon
-                variant="text"
-                @click="expanded = !expanded"
-            >
+            <v-btn icon variant="text" @click="expanded = !expanded">
                 <v-icon>
-                    {{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+                    {{ expanded ? "mdi-chevron-up" : "mdi-chevron-down" }}
                 </v-icon>
             </v-btn>
         </v-card-title>
@@ -64,9 +48,9 @@ interface Props {
 const props = defineProps<Props>();
 
 defineEmits<{
-    'update:data': [value: Record<string, any>];
-    'toggle-visibility': [];
-    'delete': [];
+    "update:data": [value: Record<string, any>];
+    "toggle-visibility": [];
+    delete: [];
 }>();
 
 const { getBlockType } = useCmsBlocks();
@@ -87,24 +71,24 @@ import {
     PortalBlocksFormsSeparator,
     PortalBlocksFormsSuperHero,
     PortalBlocksFormsFaq,
-    PortalBlocksFormsMultiCards
+    PortalBlocksFormsMultiCards,
 } from "#components";
 
 const formComponent = computed(() => {
     const components: Record<string, any> = {
-        'hero': PortalBlocksFormsHero,
-        'super-hero': PortalBlocksFormsSuperHero,
-        'one-columns': PortalBlocksFormsOneColumns,
-        'two-columns': PortalBlocksFormsTwoColumns,
-        'three-columns': PortalBlocksFormsThreeColumns,
-        'gallery': PortalBlocksFormsGallery,
-        'separator': PortalBlocksFormsSeparator,
-        'cta': PortalBlocksFormsCta,
-        'faq': PortalBlocksFormsFaq,
-        'multi-cards': PortalBlocksFormsMultiCards
+        hero: PortalBlocksFormsHero,
+        "super-hero": PortalBlocksFormsSuperHero,
+        "one-columns": PortalBlocksFormsOneColumns,
+        "two-columns": PortalBlocksFormsTwoColumns,
+        "three-columns": PortalBlocksFormsThreeColumns,
+        gallery: PortalBlocksFormsGallery,
+        separator: PortalBlocksFormsSeparator,
+        cta: PortalBlocksFormsCta,
+        faq: PortalBlocksFormsFaq,
+        "multi-cards": PortalBlocksFormsMultiCards,
     };
 
-    return components[props.block.type] || 'div';
+    return components[props.block.type] || "div";
 });
 </script>
 

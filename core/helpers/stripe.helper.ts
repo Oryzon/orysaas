@@ -14,7 +14,7 @@ import { OrganizationMemberRole } from "../../shared/organization-roles";
 import { SubscriptionStatus } from "../../shared/subscription-status";
 
 export async function getStripeClient(): Promise<Stripe> {
-    const secretKey = await ApiKeyRepository.findBySystemKey('STRIPE');
+    const secretKey = await ApiKeyRepository.findBySystemKey("STRIPE");
 
     if (!secretKey) {
         throw new Error("Clé Stripe non configurée (Paramètres > Clés d'API).");
@@ -28,7 +28,7 @@ function resolveStripeId(value: string | { id: string } | null | undefined): str
         return undefined;
     }
 
-    return typeof value === 'string' ? value : value.id;
+    return typeof value === "string" ? value : value.id;
 }
 
 // ---------------------------------------------------------------------------
@@ -44,7 +44,7 @@ async function syncPlanPrice(stripe: Stripe, plan: PlanEntity, price: PlanPriceE
         const created = await stripe.prices.create({
             product: plan.stripeProductId!,
             unit_amount: unitAmount,
-            currency: 'eur',
+            currency: "eur",
             recurring: { interval: price.billingInterval },
             active: price.isActive,
         });
@@ -59,26 +59,24 @@ async function syncPlanPrice(stripe: Stripe, plan: PlanEntity, price: PlanPriceE
 
     if (existing.unit_amount === unitAmount) {
         if (existing.active !== price.isActive) {
-            await stripe.prices.update(
-                price.stripePriceId, {
-                    active: price.isActive
-                }
-            );
+            await stripe.prices.update(price.stripePriceId, {
+                active: price.isActive,
+            });
         }
 
         return;
     }
 
     await stripe.prices.update(price.stripePriceId, {
-        active: false
+        active: false,
     });
 
     const created = await stripe.prices.create({
         product: plan.stripeProductId!,
         unit_amount: unitAmount,
-        currency: 'eur',
+        currency: "eur",
         recurring: {
-            interval: price.billingInterval
+            interval: price.billingInterval,
         },
         active: price.isActive,
     });
@@ -109,8 +107,8 @@ export async function syncPlan(stripe: Stripe, plan: PlanEntity): Promise<PlanEn
 
     const prices = await PlanPriceRepository.find({
         where: {
-            planUuid: Equal(plan.uuid)
-        }
+            planUuid: Equal(plan.uuid),
+        },
     });
 
     for (const price of prices) {
@@ -128,8 +126,8 @@ export async function syncPlanByUuid(planUuid: string): Promise<string | null> {
     try {
         const plan = await PlanRepository.findOneOrFail({
             where: {
-                uuid: Equal(planUuid)
-            }
+                uuid: Equal(planUuid),
+            },
         });
 
         const stripe = await getStripeClient();
@@ -151,10 +149,10 @@ export async function archiveStripePrice(stripePriceId: string | null): Promise<
         const stripe = await getStripeClient();
 
         await stripe.prices.update(stripePriceId, {
-            active: false
+            active: false,
         });
     } catch (error) {
-        console.log('[Stripe] Failed to archive price', stripePriceId, error);
+        console.log("[Stripe] Failed to archive price", stripePriceId, error);
     }
 }
 
@@ -166,10 +164,10 @@ export async function archiveStripeProduct(stripeProductId: string | null): Prom
     try {
         const stripe = await getStripeClient();
         await stripe.products.update(stripeProductId, {
-            active: false
+            active: false,
         });
     } catch (error) {
-        console.log('[Stripe] Failed to archive product', stripeProductId, error);
+        console.log("[Stripe] Failed to archive product", stripeProductId, error);
     }
 }
 
@@ -236,7 +234,7 @@ export async function createCheckoutSession(
 
     return stripe.checkout.sessions.create({
         customer: customerId,
-        mode: 'subscription',
+        mode: "subscription",
         line_items: [{ price: planPrice.stripePriceId!, quantity: 1 }],
         subscription_data: {
             trial_period_days: planPrice.trialPeriod > 0 ? planPrice.trialPeriod : undefined,
@@ -280,8 +278,8 @@ async function resolvePlanPriceUuid(stripePriceId: string | undefined): Promise<
 
     const planPrice = await PlanPriceRepository.findOne({
         where: {
-            stripePriceId: Equal(stripePriceId)
-        }
+            stripePriceId: Equal(stripePriceId),
+        },
     });
 
     return planPrice?.uuid;
@@ -302,18 +300,18 @@ export async function upsertSubscriptionFromStripe(
 
     let subscription = await SubscriptionRepository.findOne({
         where: {
-            stripeSubscriptionId: Equal(stripeSubscription.id)
+            stripeSubscriptionId: Equal(stripeSubscription.id),
         },
     });
 
-    const resolvedOrganizationUuid = organizationUuid
-        ?? stripeSubscription.metadata?.organizationUuid
-        ?? subscription?.organizationUuid;
+    const resolvedOrganizationUuid =
+        organizationUuid ?? stripeSubscription.metadata?.organizationUuid ?? subscription?.organizationUuid;
 
-    const resolvedPlanPriceUuid = planPriceUuid
-        ?? stripeSubscription.metadata?.planPriceUuid
-        ?? subscription?.planPriceUuid
-        ?? await resolvePlanPriceUuid(stripeSubscription.items.data[0]?.price.id);
+    const resolvedPlanPriceUuid =
+        planPriceUuid ??
+        stripeSubscription.metadata?.planPriceUuid ??
+        subscription?.planPriceUuid ??
+        (await resolvePlanPriceUuid(stripeSubscription.items.data[0]?.price.id));
 
     if (!resolvedOrganizationUuid || !resolvedPlanPriceUuid) {
         return null;
@@ -330,17 +328,11 @@ export async function upsertSubscriptionFromStripe(
     subscription.organizationUuid = resolvedOrganizationUuid;
     subscription.planPriceUuid = resolvedPlanPriceUuid;
     subscription.status = status;
-    subscription.trialEndsAt = stripeSubscription.trial_end
-        ? new Date(stripeSubscription.trial_end * 1000)
-        : null;
+    subscription.trialEndsAt = stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : null;
 
-    subscription.currentPeriodStart = firstItem
-        ? new Date(firstItem.current_period_start * 1000)
-        : null;
+    subscription.currentPeriodStart = firstItem ? new Date(firstItem.current_period_start * 1000) : null;
 
-    subscription.currentPeriodEnd = firstItem
-        ? new Date(firstItem.current_period_end * 1000)
-        : null;
+    subscription.currentPeriodEnd = firstItem ? new Date(firstItem.current_period_end * 1000) : null;
 
     if (status === SubscriptionStatus.CANCELED && !subscription.canceledAt) {
         subscription.canceledAt = new Date();

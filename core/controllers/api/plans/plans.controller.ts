@@ -2,12 +2,11 @@ import { CheckIsSaasAdmin, CheckJwt, Controller, Error, Get } from "../../../dec
 import { Request, Response } from "express";
 import HttpCode from "../../../config/http-code";
 import { PlanRepository } from "../../../databases/repositories/plan.repository";
-import {Equal} from "typeorm";
+import { Equal } from "typeorm";
 import { attachPlanPriceDiscounts } from "../../../helpers/plan-price.helper";
 
 @Controller("plans")
 export default class PlansController {
-
     @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
@@ -19,12 +18,10 @@ export default class PlansController {
             },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send(plans);
+        return res.status(HttpCode.OK).send(plans);
     }
 
-    @Get('/public')
+    @Get("/public")
     @Error()
     async publicList(req: Request, res: Response) {
         const plans = await PlanRepository.find({
@@ -43,27 +40,27 @@ export default class PlansController {
                     quota: {
                         key: true,
                         period: true,
-                        defaultValue: true
-                    }
-                }
+                        defaultValue: true,
+                    },
+                },
             },
             where: {
-                isActive: Equal(true)
+                isActive: Equal(true),
             },
             relations: {
                 quotas: {
-                    quota: true
+                    quota: true,
                 },
                 prices: true,
             },
             order: {
-                title: 'ASC',
+                title: "ASC",
                 quotas: {
                     quota: {
-                        key: 'ASC'
-                    }
-                }
-            }
+                        key: "ASC",
+                    },
+                },
+            },
         });
 
         const plansWithDiscount = plans.map((plan) => ({
@@ -71,8 +68,6 @@ export default class PlansController {
             prices: attachPlanPriceDiscounts(plan.prices),
         }));
 
-        return res
-            .status(HttpCode.OK)
-            .send(plansWithDiscount);
+        return res.status(HttpCode.OK).send(plansWithDiscount);
     }
 }

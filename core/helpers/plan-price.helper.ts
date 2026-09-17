@@ -6,7 +6,9 @@ const MONTHS_PER_INTERVAL: Record<BillingInterval, number> = {
     [BillingInterval.YEAR]: 12,
 };
 
-export type PlanPriceWithDiscount = Omit<PlanPriceEntity, 'setCreatedAt' | 'setUpdatedAt' | 'setDeletedAt'> & { discount: number | null };
+export type PlanPriceWithDiscount = Omit<PlanPriceEntity, "setCreatedAt" | "setUpdatedAt" | "setDeletedAt"> & {
+    discount: number | null;
+};
 
 export const attachPlanPriceDiscounts = (prices: PlanPriceEntity[]): PlanPriceWithDiscount[] => {
     const monthly = prices.find((price) => price.billingInterval === BillingInterval.MONTH);

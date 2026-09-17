@@ -6,14 +6,17 @@
                     <div class="dashboard-org-hero bg-brand-dark text-white text-center pa-6 pa-md-8">
                         <div class="dashboard-org-badge">
                             <v-icon size="18" color="white">mdi-office-building-plus</v-icon>
-                            <span class="font-weight-medium text-caption text-white">Première étape de configuration</span>
+                            <span class="font-weight-medium text-caption text-white"
+                                >Première étape de configuration</span
+                            >
                         </div>
 
                         <h1 class="dashboard-org-title text-white">Vous n'avez encore aucune organisation</h1>
 
                         <p class="dashboard-org-text mx-auto text-white">
-                            Pour commencer à utiliser le portail, vous devez créer votre première organisation. Saisissez le nom, l'adresse
-                            et les coordonnées de votre structure pour ouvrir votre espace avec une base propre et exploitable.
+                            Pour commencer à utiliser le portail, vous devez créer votre première organisation.
+                            Saisissez le nom, l'adresse et les coordonnées de votre structure pour ouvrir votre espace
+                            avec une base propre et exploitable.
                         </p>
 
                         <div class="dashboard-org-cta d-flex justify-center">

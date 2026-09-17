@@ -322,11 +322,11 @@ defineProps<{
 }
 
 .cta-bg-primary {
-    background: linear-gradient(135deg, #118992 0%, #1BD7E4 100%);
+    background: linear-gradient(135deg, #118992 0%, #1bd7e4 100%);
 }
 
 .cta-bg-secondary {
-    background: linear-gradient(135deg, #108288 0%, #0C6469 100%);
+    background: linear-gradient(135deg, #108288 0%, #0c6469 100%);
 }
 
 .cta-bg-gradient {
@@ -400,4 +400,3 @@ defineProps<{
     }
 }
 </style>
-

@@ -9,7 +9,7 @@ import {
     ManyToOne,
     JoinColumn,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -17,26 +17,38 @@ import { PageEntity } from "./page.entity";
 
 @Entity()
 export class BlockEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column()
     pageUuid: string;
 
-    @ManyToOne(() => PageEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'pageUuid' })
+    @ManyToOne(() => PageEntity, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "pageUuid" })
     page: PageEntity;
 
     @Column({
-        type: 'enum',
-        enum: ['hero', 'one-columns', 'two-columns', 'three-columns', 'gallery', 'cta', 'testimonials', 'separator', 'super-hero', 'faq', 'multi-cards'],
+        type: "enum",
+        enum: [
+            "hero",
+            "one-columns",
+            "two-columns",
+            "three-columns",
+            "gallery",
+            "cta",
+            "testimonials",
+            "separator",
+            "super-hero",
+            "faq",
+            "multi-cards",
+        ],
     })
     type: string;
 
-    @Column({ type: 'int' })
+    @Column({ type: "int" })
     order: number;
 
-    @Column({ type: 'json' })
+    @Column({ type: "json" })
     data: Record<string, any>;
 
     @Column({ default: true })

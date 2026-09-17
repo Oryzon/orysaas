@@ -1,9 +1,7 @@
 <template>
     <v-row>
         <v-col md="12" class="d-flex justify-end mb-n2">
-            <portal-pages-add
-                @created="addToPages"
-            ></portal-pages-add>
+            <portal-pages-add @created="addToPages"></portal-pages-add>
         </v-col>
 
         <v-col md="12">
@@ -20,24 +18,18 @@
                                 items-per-page="25"
                             >
                                 <template v-slot:item.isPublished="{ value }">
-                                    <v-chip v-if="value" label append-icon="mdi-check" color="success">Page publiée</v-chip>
+                                    <v-chip v-if="value" label append-icon="mdi-check" color="success"
+                                        >Page publiée</v-chip
+                                    >
                                     <v-chip v-else label append-icon="mdi-close" color="error">Page non publiée</v-chip>
                                 </template>
 
                                 <template v-slot:item.actions="{ item }">
-                                    <v-btn
-                                        variant="text"
-                                        icon
-                                        color="info"
-                                        :to="`/portal/pages/${item.uuid}`"
-                                    >
+                                    <v-btn variant="text" icon color="info" :to="`/portal/pages/${item.uuid}`">
                                         <v-icon>mdi-pencil</v-icon>
                                     </v-btn>
 
-                                    <portal-pages-remove
-                                        :entity="item"
-                                        @removed="removeToPages"
-                                    ></portal-pages-remove>
+                                    <portal-pages-remove :entity="item" @removed="removeToPages"></portal-pages-remove>
                                 </template>
                             </v-data-table>
                         </v-col>
@@ -66,10 +58,10 @@ const isLoading = computed(() => {
 
 const headers = computed(() => {
     return [
-        { title: 'Titre', key: 'title' },
-        { title: 'Description', key: 'metaDescription' },
-        { title: "Page publiée ?", key: 'isPublished', minWidth: 150 },
-        { title: 'Actions', key: 'actions', align: 'end', minWidth: 150 }
+        { title: "Titre", key: "title" },
+        { title: "Description", key: "metaDescription" },
+        { title: "Page publiée ?", key: "isPublished", minWidth: 150 },
+        { title: "Actions", key: "actions", align: "end", minWidth: 150 },
     ];
 });
 
@@ -81,19 +73,17 @@ onMounted(async () => {
 });
 
 const handleSearch = async () => {
-    pages.value = await api.get<Array<Page>>('pages', {
-        loadingKey: 'pages:list',
-        params: {
-
-        }
+    pages.value = await api.get<Array<Page>>("pages", {
+        loadingKey: "pages:list",
+        params: {},
     });
 };
 
 const addToPages = (data: Page) => {
     pages.value.push(data);
-}
+};
 
 const removeToPages = (data: Page) => {
     pages.value = pages.value.filter((entity) => entity.uuid !== data.uuid);
-}
+};
 </script>

@@ -3,13 +3,7 @@
         <v-row class="mt-10 mb-10">
             <v-col md="3">
                 <NuxtLink to="/accueil" class="d-inline-flex align-center text-decoration-none">
-                    <v-img
-                        src="/logo.png"
-                        contain
-                        height="40"
-                        width="40"
-                        class="flex-shrink-0"
-                    />
+                    <v-img src="/logo.png" contain height="40" width="40" class="flex-shrink-0" />
 
                     <span class="ml-2 text-headline-small font-weight-black text-decoration-none text-white">
                         Ory<span class="text-primary font-italic">SaaS</span>
@@ -18,17 +12,14 @@
 
                 <br />
 
-                <h3 class="text-white text-title-medium font-weight-thin">La base moderne pour lancer ton Saas sans repartir de zéro.</h3>
+                <h3 class="text-white text-title-medium font-weight-thin">
+                    La base moderne pour lancer ton Saas sans repartir de zéro.
+                </h3>
             </v-col>
 
             <v-col md="9">
                 <v-row align="start" justify="end">
-                    <v-col
-                        v-for="item in items"
-                        :key="item.uuid"
-                        cols="6"
-                        md="2"
-                    >
+                    <v-col v-for="item in items" :key="item.uuid" cols="6" md="2">
                         <div class="text-white font-weight-black text-body-2 text-uppercase mb-4">
                             {{ item.label }}
                         </div>
@@ -47,7 +38,8 @@
                                 v-else
                                 :to="buildTo(child.url)"
                                 class="text-grey-lighten-2 text-decoration-none text-label-large"
-                            >{{ child.label }}</NuxtLink>
+                                >{{ child.label }}</NuxtLink
+                            >
                         </div>
                     </v-col>
                 </v-row>
@@ -63,15 +55,14 @@ defineProps<{
     items: MenuItemNode[];
 }>();
 
-const isExternal = (url: string | undefined) =>
-    !!url && (url.startsWith('http://') || url.startsWith('https://'));
+const isExternal = (url: string | undefined) => !!url && (url.startsWith("http://") || url.startsWith("https://"));
 
 const buildTo = (url: string | undefined) => {
     if (!url || isExternal(url)) {
         return undefined;
     }
 
-    return url.startsWith('/') ? url : `/${url}`;
+    return url.startsWith("/") ? url : `/${url}`;
 };
 </script>
 

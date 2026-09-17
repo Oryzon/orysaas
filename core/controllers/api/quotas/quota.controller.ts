@@ -1,25 +1,19 @@
 import { CheckJwt, Controller, Error, Get, Post, Put, Delete, CheckIsSaasAdmin } from "../../../decorators";
 import { Request, Response } from "express";
-import {QuotaEntity} from "../../../databases/entities/quota.entity";
-import {QuotaRepository} from "../../../databases/repositories/quota.repository";
+import { QuotaEntity } from "../../../databases/entities/quota.entity";
+import { QuotaRepository } from "../../../databases/repositories/quota.repository";
 import HttpCode from "../../../config/http-code";
 import Messages from "../../../config/messages";
-import {Equal} from "typeorm";
+import { Equal } from "typeorm";
 
-@Controller('quota')
+@Controller("quota")
 export default class QuotaController {
-
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
-        const {
-            key,
-            period,
-            unit,
-            defaultValue,
-        } = req.body;
+        const { key, period, unit, defaultValue } = req.body;
 
         const entity = new QuotaEntity();
 
@@ -32,28 +26,23 @@ export default class QuotaController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.QUOTA_CREATED,
-            entity
+            entity,
         });
     }
 
-    @Put('/:uuid')
+    @Put("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async update(req: Request, res: Response) {
         const uuid = req.params.uuid;
 
-        const {
-            key,
-            period,
-            unit,
-            defaultValue,
-        } = req.body;
+        const { key, period, unit, defaultValue } = req.body;
 
         let quota = await QuotaRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
         quota.key = key;
@@ -66,6 +55,6 @@ export default class QuotaController {
         return res.status(HttpCode.OK).send({
             message: Messages.QUOTA_UPDATED,
             entity: quota,
-        })
+        });
     }
 }

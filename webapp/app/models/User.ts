@@ -23,23 +23,23 @@ export enum UserOrigin {
 }
 
 const ORIGIN_COLOR: Record<string, string> = {
-    [UserOrigin.GOOGLE]:    'red-darken-2',
-    [UserOrigin.MICROSOFT]: 'blue-darken-2',
-    [UserOrigin.FACEBOOK]:  'indigo-darken-2',
-    [UserOrigin.LOCAL]:     'teal-darken-2',
+    [UserOrigin.GOOGLE]: "red-darken-2",
+    [UserOrigin.MICROSOFT]: "blue-darken-2",
+    [UserOrigin.FACEBOOK]: "indigo-darken-2",
+    [UserOrigin.LOCAL]: "teal-darken-2",
 };
 
 const ORIGIN_LABEL: Record<string, string> = {
-    [UserOrigin.GOOGLE]:    'Google',
-    [UserOrigin.MICROSOFT]: 'Microsoft',
-    [UserOrigin.FACEBOOK]:  'Facebook',
-    [UserOrigin.LOCAL]:     'Local',
+    [UserOrigin.GOOGLE]: "Google",
+    [UserOrigin.MICROSOFT]: "Microsoft",
+    [UserOrigin.FACEBOOK]: "Facebook",
+    [UserOrigin.LOCAL]: "Local",
 };
 
 export function getUserOriginColor(origin: unknown): string {
-    return ORIGIN_COLOR[String(origin ?? '').toLowerCase()] ?? 'secondary';
+    return ORIGIN_COLOR[String(origin ?? "").toLowerCase()] ?? "secondary";
 }
 
 export function getUserOriginLabel(origin: unknown): string {
-    return ORIGIN_LABEL[String(origin ?? '').toLowerCase()] ?? String(origin ?? '—');
+    return ORIGIN_LABEL[String(origin ?? "").toLowerCase()] ?? String(origin ?? "—");
 }

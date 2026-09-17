@@ -1,9 +1,9 @@
 export enum SubscriptionStatus {
-    TRIALING = 'trialing',
-    ACTIVE   = 'active',
-    PAST_DUE = 'past_due',
-    CANCELED = 'canceled',
-    UNPAID   = 'unpaid',
+    TRIALING = "trialing",
+    ACTIVE = "active",
+    PAST_DUE = "past_due",
+    CANCELED = "canceled",
+    UNPAID = "unpaid",
 }
 
 export const SubscriptionStatusLabel: Record<SubscriptionStatus, string> = {
@@ -12,4 +12,4 @@ export const SubscriptionStatusLabel: Record<SubscriptionStatus, string> = {
     [SubscriptionStatus.PAST_DUE]: "Paiement en retard",
     [SubscriptionStatus.CANCELED]: "Annulé",
     [SubscriptionStatus.UNPAID]: "Impayé",
-}
+};

@@ -1,6 +1,10 @@
 import type { Organization } from "~/models/Organization";
 import type { User } from "~/models/User";
-export { OrganizationMemberRole, OrganizationMemberRoleLabel, OrganizationMemberRoleColor } from "#shared/organization-roles";
+export {
+    OrganizationMemberRole,
+    OrganizationMemberRoleLabel,
+    OrganizationMemberRoleColor,
+} from "#shared/organization-roles";
 import type { OrganizationMemberRole } from "#shared/organization-roles";
 
 export interface OrganizationMember {

@@ -1,50 +1,31 @@
 <template>
     <NuxtLayout name="auth">
         <template #left>
-            <h2
-                class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase"
-            >
+            <h2 class="mt-n4 text-primary font-weight-black text-headline-small text-uppercase">
                 Heureux de vous revoir.
             </h2>
 
-            <h1 class="mt-n4 text-white font-weight-bold text-display-large">
-                Reprenez là où vous l'avez laissé.
-            </h1>
+            <h1 class="mt-n4 text-white font-weight-bold text-display-large">Reprenez là où vous l'avez laissé.</h1>
 
             <h3 class="mt-n2 text-blue-grey-lighten-3">
                 Votre dashboard, vos utilisateurs, vos métriques.<br />
                 Tout est resté en place.
             </h3>
 
-            <v-card
-                rounded="lg"
-                variant="outlined"
-                class="card-glass"
-                color="white"
-            >
-                <v-card-text
-                    class="text-headline-small font-weight-black px-6 pt-6 pb-4"
-                >
-                    « Le seul outil dont j'ai vraiment eu besoin pour lancer en
-                    prod. »
+            <v-card rounded="lg" variant="outlined" class="card-glass" color="white">
+                <v-card-text class="text-headline-small font-weight-black px-6 pt-6 pb-4">
+                    « Le seul outil dont j'ai vraiment eu besoin pour lancer en prod. »
                 </v-card-text>
 
                 <v-card-actions class="px-4 pb-4">
                     <v-list-item class="w-100">
                         <template v-slot:prepend>
-                            <v-avatar
-                                class="gradient-primary"
-                                text="VB"
-                            ></v-avatar>
+                            <v-avatar class="gradient-primary" text="VB"></v-avatar>
                         </template>
 
-                        <v-list-item-title class="font-weight-black"
-                            >Vincent BOULANGER</v-list-item-title
-                        >
+                        <v-list-item-title class="font-weight-black">Vincent BOULANGER</v-list-item-title>
 
-                        <v-list-item-subtitle
-                            >Président - OryScorp</v-list-item-subtitle
-                        >
+                        <v-list-item-subtitle>Président - OryScorp</v-list-item-subtitle>
                     </v-list-item>
                 </v-card-actions>
             </v-card>
@@ -65,9 +46,7 @@
 
             <h4>
                 Vous n'avez pas encore de compte ?
-                <v-btn color="primary" variant="text" to="register"
-                    >S'inscrire.</v-btn
-                >
+                <v-btn color="primary" variant="text" to="register">S'inscrire.</v-btn>
             </h4>
 
             <providers-banner />
@@ -115,8 +94,7 @@
                     </v-col>
 
                     <v-col md="6" class="mt-n3 text-right">
-                        <auth-forgot-password
-                        ></auth-forgot-password>
+                        <auth-forgot-password></auth-forgot-password>
                     </v-col>
 
                     <v-col md="12" class="mt-n8">
@@ -201,7 +179,7 @@ const handleLogin = async () => {
     await login({
         email: user.value.email,
         password: user.value.password,
-        stayConnected: stayConnected.value
+        stayConnected: stayConnected.value,
     });
 
     const redirect = route.query.redirect as string | undefined;

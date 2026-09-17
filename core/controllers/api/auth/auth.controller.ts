@@ -82,11 +82,9 @@ export default class AuthController {
             },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.USER_CREATED
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.USER_CREATED,
+        });
     }
 
     @Post("/login")
@@ -194,9 +192,17 @@ export default class AuthController {
 
         await OrganizationInviteRepository.acceptPendingInvites(user);
 
-        return res
-            .status(HttpCode.OK)
-            .send({ message: Messages.ACCOUNT_VERIFIED });
+        await new MailService().send({
+            to: user.email,
+            subject: "Bienvenue !",
+            template: "welcome",
+            variables: {
+                firstname: user.firstname,
+                loginUrl: `${process.env.HTTP_URL}/login`,
+            },
+        });
+
+        return res.status(HttpCode.OK).send({ message: Messages.ACCOUNT_VERIFIED });
     }
 
     @Get("/invite/check")
@@ -207,19 +213,15 @@ export default class AuthController {
         const invite = await OrganizationInviteRepository.findByToken(token);
 
         if (!invite || DateTime.now().toJSDate() > invite.expiresAt) {
-            return res
-                .status(HttpCode.NOT_FOUND)
-                .send({
-                    message: Messages.ORGANIZATION_INVITE_NOT_FOUND
-                });
+            return res.status(HttpCode.NOT_FOUND).send({
+                message: Messages.ORGANIZATION_INVITE_NOT_FOUND,
+            });
         }
 
         if (invite.acceptedAt) {
-            return res
-                .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({
-                    message: Messages.ORGANIZATION_INVITE_ALREADY_ACCEPTED
-                });
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({
+                message: Messages.ORGANIZATION_INVITE_ALREADY_ACCEPTED,
+            });
         }
 
         return res.status(HttpCode.OK).send({
@@ -311,11 +313,9 @@ export default class AuthController {
             });
         }
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.FORGOT_PASSWORD_SENT
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.FORGOT_PASSWORD_SENT,
+        });
     }
 
     @Post("/reset-password")

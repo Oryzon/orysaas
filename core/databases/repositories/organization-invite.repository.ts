@@ -29,7 +29,7 @@ export const OrganizationInviteRepository = dataSource.getRepository(Organizatio
                 acceptedAt: IsNull(),
                 expiresAt: MoreThan(DateTime.now().toJSDate()),
             },
-            order: { createdAt: 'DESC' },
+            order: { createdAt: "DESC" },
         });
     },
     async acceptPendingInvites(user: UserEntity) {
@@ -41,7 +41,8 @@ export const OrganizationInviteRepository = dataSource.getRepository(Organizatio
         });
 
         for (const invite of pendingInvites) {
-            if (DateTime.now().toJSDate() > invite.expiresAt) { // Check expiry
+            if (DateTime.now().toJSDate() > invite.expiresAt) {
+                // Check expiry
                 continue;
             }
 
@@ -66,5 +67,5 @@ export const OrganizationInviteRepository = dataSource.getRepository(Organizatio
 
             await OrganizationInviteRepository.save(invite);
         }
-    }
+    },
 });
