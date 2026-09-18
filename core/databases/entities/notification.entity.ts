@@ -1,4 +1,13 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    BeforeInsert,
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import { UserEntity } from "./user.entity";
 import { DateTime } from "luxon";
 import { NotificationTypes, NotificationAction } from "../../../shared/notification-types";
@@ -9,6 +18,7 @@ export class NotificationEntity {
     uuid: string;
 
     @Column()
+    @Index()
     userUuid: string;
 
     @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })

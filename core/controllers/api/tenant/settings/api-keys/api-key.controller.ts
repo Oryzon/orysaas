@@ -18,6 +18,7 @@ import { decrypt, encrypt } from "../../../../../helpers/crypto.helper";
 import { ApiKeyRepository } from "../../../../../databases/repositories/api-key.repository";
 import { OrganizationRepository } from "../../../../../databases/repositories/organization.repository";
 import { checkQuota } from "../../../../../helpers/quota.helper";
+import { withNamedLock } from "../../../../../helpers/db-lock.helper";
 import { Equal } from "typeorm";
 import { randomBytes } from "crypto";
 
@@ -63,12 +64,38 @@ export default class TenantSettingApiKeyController {
 
         let organization = await OrganizationRepository.getOrganizationBySlug(slugOrganization);
 
-        if (type === ApiKeyType.CONSUMER) {
-            const result = await checkQuota(organization.uuid, QuotaKey.API_KEYS);
+        const buildEntity = () => {
+            const entity = new ApiKeyEntity();
 
-            if (!result.allowed) {
-                throw result.message;
-            }
+            entity.label = label;
+            entity.type = type;
+            entity.value = encrypt(type === ApiKeyType.CONSUMER ? randomBytes(32).toString("hex") : value);
+            entity.expiresAt = expiresAt ?? null;
+            entity.organizationUuid = null;
+            entity.systemKey = systemKey ?? null;
+            entity.organization = organization;
+
+            return entity;
+        };
+
+        if (type === ApiKeyType.CONSUMER) {
+            const entity = await withNamedLock(`quota:${organization.uuid}:${QuotaKey.API_KEYS}`, async () => {
+                const result = await checkQuota(organization.uuid, QuotaKey.API_KEYS);
+
+                if (!result.allowed) {
+                    throw result.message;
+                }
+
+                const entity = buildEntity();
+                await ApiKeyRepository.insert(entity);
+
+                return entity;
+            });
+
+            return res.status(HttpCode.CREATED).send({
+                message: Messages.API_KEY_CREATED,
+                entity: { ...entity, value },
+            });
         }
 
         if (systemKey && type === ApiKeyType.INTEGRATION) {
@@ -87,15 +114,7 @@ export default class TenantSettingApiKeyController {
             }
         }
 
-        const entity = new ApiKeyEntity();
-
-        entity.label = label;
-        entity.type = type;
-        entity.value = encrypt(type === ApiKeyType.CONSUMER ? randomBytes(32).toString("hex") : value);
-        entity.expiresAt = expiresAt ?? null;
-        entity.organizationUuid = null;
-        entity.systemKey = systemKey ?? null;
-        entity.organization = organization;
+        const entity = buildEntity();
 
         await ApiKeyRepository.insert(entity);
 

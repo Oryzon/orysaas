@@ -30,7 +30,9 @@ export default class NotificationsController {
                     uuid: Equal(cursor),
                     userUuid: Equal(userUuid),
                 },
-                select: ["createdAt"],
+                select: {
+                    createdAt: true
+                },
             });
 
             if (cursorNotif) {

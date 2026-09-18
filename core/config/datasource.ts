@@ -1,6 +1,6 @@
+import "dotenv/config"; // so `typeorm-ts-node-commonjs` (run outside app.ts's bootstrap) still sees .env
 import path from "path";
 import { DataSource } from "typeorm";
-// import { AuditLogSubscriber } from "../databases/audit-log.subscriber";
 
 const entityExt = __filename.endsWith(".ts") ? ".ts" : ".js";
 
@@ -14,6 +14,6 @@ export const dataSource = new DataSource({
     synchronize: process.env.NODE_ENV !== "production",
     logging: process.env.DATASOURCE_LOGGING === "1",
     entities: [path.join(__dirname, `../databases/entities/**/*${entityExt}`)],
-    // subscribers: [AuditLogSubscriber],
+    migrations: [path.join(__dirname, `../databases/migrations/**/*${entityExt}`)],
     charset: "utf8mb4",
 });

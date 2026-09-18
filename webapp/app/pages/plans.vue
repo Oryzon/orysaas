@@ -57,7 +57,7 @@
                                     <v-row align="center" justify="center">
                                         <v-col md="12">
                                             <h2>{{ plan.title }}</h2>
-                                            <div v-html="plan.description"></div>
+                                            <div v-html="sanitizeHtml(plan.description)"></div>
                                         </v-col>
 
                                         <v-col md="12" class="mt-n4 mb-n2" v-if="priceFor(plan)">

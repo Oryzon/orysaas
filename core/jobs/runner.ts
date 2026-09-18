@@ -6,6 +6,7 @@ import { Equal } from "typeorm";
 import { schedule } from "node-cron";
 import { JobHistoryRepository } from "../databases/repositories/job-history.repository";
 import { JobHistoryStatus } from "../databases/entities/job-history.entity";
+import { dataSource } from "../config/datasource";
 
 interface RegisteredJobs {
     instance: any;
@@ -66,29 +67,56 @@ class RunnerClass {
     }
 
     public async execute(job: RegisteredJobs, input: Record<string, any> = {}) {
-        let alreadyRunning = await JobHistoryRepository.findOne({
-            where: {
-                jobUuid: Equal(job.setting.uuid),
-                status: Equal(JobHistoryStatus.RUNNING),
-            },
-        });
-
-        if (alreadyRunning) {
-            return;
-        }
-
-        let log = await JobHistoryRepository.start(job.setting);
-        const startedAt = Date.now();
+        const lockName = `job:${job.meta.name}`;
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
 
         try {
-            const result = await job.instance[job.meta.handlerName](log, input);
+            const [{ acquired }] = await queryRunner.query("SELECT GET_LOCK(?, 0) AS acquired", [lockName]);
 
-            log = await JobHistoryRepository.finish(log, result.input, result.output);
-        } catch (error) {
-            log = await JobHistoryRepository.fail(log, error.input, error.output);
+            if (Number(acquired) !== 1) {
+                return;
+            }
+
+            try {
+                let alreadyRunning = await JobHistoryRepository.findOne({
+                    where: {
+                        jobUuid: Equal(job.setting.uuid),
+                        status: Equal(JobHistoryStatus.RUNNING),
+                    },
+                });
+
+                if (alreadyRunning) {
+                    return;
+                }
+
+                let log = await JobHistoryRepository.start(job.setting);
+                const startedAt = Date.now();
+
+                try {
+                    const result = await job.instance[job.meta.handlerName](log, input);
+
+                    log = await JobHistoryRepository.finish(log, result.input, result.output);
+                } catch (error) {
+                    log = await JobHistoryRepository.fail(log, error.input, error.output);
+                } finally {
+                    log.duration = Date.now() - startedAt;
+                    await JobHistoryRepository.save(log);
+                }
+            } finally {
+                await queryRunner.query("SELECT RELEASE_LOCK(?)", [lockName]);
+            }
         } finally {
-            log.duration = Date.now() - startedAt;
-            await JobHistoryRepository.save(log);
+            await queryRunner.release();
+        }
+    }
+
+    stopAll() {
+        for (const job of this.jobs.values()) {
+            if (job.task) {
+                job.task.stop();
+                job.task = undefined;
+            }
         }
     }
 

@@ -40,4 +40,10 @@ export const RefreshTokenRepository = dataSource.getRepository(RefreshTokenEntit
 
         await this.update({ token: Equal(hash) }, { revokedAt: DateTime.now().toJSDate() });
     },
+    async revokeAllForUser(userUuid: string) {
+        await this.update(
+            { userUuid: Equal(userUuid), revokedAt: IsNull() },
+            { revokedAt: DateTime.now().toJSDate() },
+        );
+    },
 });

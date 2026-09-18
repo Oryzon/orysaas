@@ -49,6 +49,16 @@ async function routes(app: Application) {
         res.send(`${process.env.PROJECT_NAME} - API`);
     });
 
+    app.get("/health", async (req: Request, res: Response) => {
+        try {
+            await dataSource.query("SELECT 1");
+
+            return res.status(200).send({ status: "ok", db: "up" });
+        } catch (error) {
+            return res.status(503).send({ status: "error", db: "down" });
+        }
+    });
+
     const info: Array<{
         method: string;
         path: string;

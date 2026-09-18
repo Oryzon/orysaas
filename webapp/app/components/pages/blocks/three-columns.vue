@@ -11,7 +11,7 @@
                         </v-toolbar>
 
                         <v-card-text>
-                            <div class="text-body-1 quill-content ql-editor" v-html="data.leftColumn.content"></div>
+                            <div class="text-body-1 quill-content ql-editor" v-html="sanitizeHtml(data.leftColumn.content)"></div>
                         </v-card-text>
                     </v-card>
                 </v-col>
@@ -25,7 +25,7 @@
                         </v-toolbar>
 
                         <v-card-text>
-                            <div class="text-body-1 quill-content ql-editor" v-html="data.middleColumn.content"></div>
+                            <div class="text-body-1 quill-content ql-editor" v-html="sanitizeHtml(data.middleColumn.content)"></div>
                         </v-card-text>
                     </v-card>
                 </v-col>
@@ -39,7 +39,7 @@
                         </v-toolbar>
 
                         <v-card-text>
-                            <div class="text-body-1 quill-content ql-editor" v-html="data.rightColumn.content"></div>
+                            <div class="text-body-1 quill-content ql-editor" v-html="sanitizeHtml(data.rightColumn.content)"></div>
                         </v-card-text>
                     </v-card>
                 </v-col>

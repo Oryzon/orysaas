@@ -40,11 +40,11 @@
                     </v-col>
 
                     <v-card-text class="hidden-md-and-up ql-editor">
-                        <div v-html="image.caption"></div>
+                        <div v-html="sanitizeHtml(image.caption)"></div>
                     </v-card-text>
 
                     <v-col md="6" class="hidden-sm-and-down mt-2 ql-editor">
-                        <div v-html="image.caption"></div>
+                        <div v-html="sanitizeHtml(image.caption)"></div>
                     </v-col>
                 </v-row>
             </v-card>

@@ -1,4 +1,4 @@
-import { Controller, Error, CheckJwt, Get } from "../../../decorators";
+import { Controller, Error, CheckJwt, CheckIsSaasAdmin, Get } from "../../../decorators";
 import { Request, Response } from "express";
 import HttpCode from "../../../config/http-code";
 import { OrganizationRepository } from "../../../databases/repositories/organization.repository";
@@ -7,6 +7,7 @@ import { OrganizationRepository } from "../../../databases/repositories/organiza
 export default class OrganizationController {
     @Get("/")
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async getAll(req: Request, res: Response) {
         const organizations = await OrganizationRepository.find({

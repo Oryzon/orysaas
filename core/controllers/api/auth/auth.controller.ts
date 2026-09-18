@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get, Post } from "../../../decorators";
+import { CheckJwt, Controller, Error, Get, Post, RateLimit } from "../../../decorators";
 import { Request, Response } from "express";
 import { UserEntity, UserOrigin } from "../../../databases/entities/user.entity";
 import { UserRepository } from "../../../databases/repositories/user.repository";
@@ -44,6 +44,7 @@ type OAuthLoginResult =
 @Controller("auth")
 export default class AuthController {
     @Post("/register")
+    @RateLimit({ points: 5, duration: 300 })
     @Error()
     async register(req: Request, res: Response) {
         const { firstname, lastname, email, password } = req.body;
@@ -88,6 +89,7 @@ export default class AuthController {
     }
 
     @Post("/login")
+    @RateLimit({ points: 5, duration: 60 })
     @Error()
     async login(req: Request, res: Response) {
         const { email, password } = req.body;
@@ -289,6 +291,7 @@ export default class AuthController {
     }
 
     @Post("/forgot-password")
+    @RateLimit({ points: 3, duration: 300 })
     @Error()
     async forgotPassword(req: Request, res: Response) {
         const { email } = req.body;
@@ -356,6 +359,9 @@ export default class AuthController {
 
         await UserRepository.save(user);
         await TokenRepository.markAsUsed(tokenEntity);
+
+        // is password reset is needed, maybe last token is corrupted, so reset them
+        await RefreshTokenRepository.revokeAllForUser(user.uuid);
 
         return res.status(HttpCode.OK).send({
             message: Messages.RESET_PASSWORD_DONE,

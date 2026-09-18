@@ -152,6 +152,21 @@
                     </v-btn>
                 </v-card-actions>
             </v-card>
+
+            <v-card flat border rounded="lg" class="mt-4" border-color="error">
+                <div class="px-6 pt-6 pb-1">
+                    <div class="text-h6 font-weight-bold">Zone dangereuse</div>
+                    <div class="text-body-2 text-medium-emphasis mt-1">
+                        Supprimer votre compte est irréversible.
+                    </div>
+                </div>
+
+                <v-divider class="mt-4"></v-divider>
+
+                <v-card-text class="pa-6">
+                    <PortalProfilDeleteAccount />
+                </v-card-text>
+            </v-card>
         </v-col>
 
         <v-col cols="12" md="4">

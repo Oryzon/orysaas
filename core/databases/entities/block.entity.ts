@@ -6,6 +6,7 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    Index,
     ManyToOne,
     JoinColumn,
     PrimaryGeneratedColumn,
@@ -21,6 +22,7 @@ export class BlockEntity {
     uuid: string;
 
     @Column()
+    @Index()
     pageUuid: string;
 
     @ManyToOne(() => PageEntity, { onDelete: "CASCADE" })

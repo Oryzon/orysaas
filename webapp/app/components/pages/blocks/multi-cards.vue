@@ -20,7 +20,7 @@
                                         {{ card.title }}
                                     </h3>
 
-                                    <div v-if="card.text" class="card-content" v-html="card.text"></div>
+                                    <div v-if="card.text" class="card-content" v-html="sanitizeHtml(card.text)"></div>
                                 </v-col>
                             </v-row>
                         </v-card-text>

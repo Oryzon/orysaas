@@ -13,6 +13,7 @@
                 <v-card-text class="text-center py-10">
                     <v-progress-circular indeterminate color="primary" class="mb-4" />
                     <div class="text-body-1 font-weight-medium">Confirmation de votre paiement...</div>
+
                     <div class="text-body-2 text-medium-emphasis mt-1">
                         Ça ne devrait prendre que quelques secondes.
                     </div>
@@ -25,9 +26,11 @@
                 <v-card-text class="text-center py-10">
                     <v-icon size="40" color="warning" class="mb-2">mdi-clock-alert-outline</v-icon>
                     <div class="text-body-1 font-weight-medium">Ça prend plus de temps que prévu.</div>
+
                     <div class="text-body-2 text-medium-emphasis mt-1">
                         Votre paiement est en cours de traitement, actualisez dans quelques instants.
                     </div>
+
                     <v-btn color="primary" variant="tonal" class="mt-4" @click="fetchSubscription">Actualiser</v-btn>
                 </v-card-text>
             </v-card>
@@ -82,35 +85,43 @@
 
                     <v-divider class="mt-3" />
 
-                    <v-list v-if="invoices.length" density="compact" class="py-0">
-                        <v-list-item
-                            v-for="invoice in invoices"
-                            :key="invoice.id"
-                            :href="invoice.hostedInvoiceUrl ?? undefined"
-                            target="_blank"
-                            rel="noopener"
-                        >
-                            <template v-slot:prepend>
-                                <v-icon size="18" color="medium-emphasis">mdi-receipt-text-outline</v-icon>
-                            </template>
+                    <v-card-text v-if="invoices.length">
+                        <v-row>
+                            <v-col md="12">
+                                <v-list density="compact" class="py-0">
+                                    <v-list-item
+                                        v-for="invoice in invoices"
+                                        :key="invoice.id"
+                                        :href="invoice.hostedInvoiceUrl ?? undefined"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        <template v-slot:prepend>
+                                            <v-icon size="18" color="medium-emphasis">mdi-receipt-text-outline</v-icon>
+                                        </template>
 
-                            <v-list-item-title class="text-body-2">{{
-                                $date.frenchDate(invoice.date)
-                            }}</v-list-item-title>
-                            <v-list-item-subtitle v-if="invoice.number" class="text-caption">{{
-                                invoice.number
-                            }}</v-list-item-subtitle>
+                                        <v-list-item-title class="text-body-2">
+                                            {{ $date.frenchDate(invoice.date) }}
+                                        </v-list-item-title>
 
-                            <template v-slot:append>
-                                <div class="d-flex align-center ga-2">
-                                    <span class="text-body-2 font-weight-medium">{{ $price(invoice.amount) }}</span>
-                                    <v-chip :color="invoiceStatusColor(invoice.status)" size="x-small" label>{{
-                                        invoiceStatusLabel(invoice.status)
-                                    }}</v-chip>
-                                </div>
-                            </template>
-                        </v-list-item>
-                    </v-list>
+                                        <v-list-item-subtitle v-if="invoice.number" class="text-caption">
+                                            {{ invoice.number }}
+                                        </v-list-item-subtitle>
+
+                                        <template v-slot:append>
+                                            <div class="d-flex align-center ga-2">
+                                                <span class="text-body-2 font-weight-medium">{{ $price(invoice.amount) }}</span>
+
+                                                <v-chip :color="getColor(invoice.status as string)" size="x-small" label>
+                                                    {{ getLabel(invoice.status as string) }}
+                                                </v-chip>
+                                            </div>
+                                        </template>
+                                    </v-list-item>
+                                </v-list>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
 
                     <v-card-text v-else class="text-center text-caption text-medium-emphasis py-6">
                         Aucune facture pour le moment.
@@ -128,27 +139,32 @@
                     <v-divider class="mt-3" />
 
                     <v-card-text class="px-4 py-4">
-                        <div v-for="(item, index) in usage" :key="item.key" :class="{ 'mt-4': index > 0 }">
-                            <div class="d-flex align-center justify-space-between mb-1">
+                        <v-row v-for="(item, index) in usage" :key="item.key" :class="{ 'mt-4': index > 0 }">
+                            <v-col md="12" class="d-flex align-center justify-space-between mb-1">
                                 <span class="text-caption font-weight-medium">{{ QuotaKeyLabel[item.key] }}</span>
+
                                 <span class="text-caption text-medium-emphasis">
                                     {{ item.used }}{{ item.limit !== null ? ` / ${item.limit}` : "" }}
+
                                     {{ QuotaUnitLabel[item.unit] }}
+
                                     <template v-if="item.period"> {{ QuotaPeriodPerLabel[item.period] }}</template>
-                                    <v-chip v-if="item.limit === null" color="success" size="x-small" class="ml-2"
-                                        >Illimité</v-chip
-                                    >
+
+                                    <v-chip v-if="item.limit === null" color="success" size="x-small" class="ml-2">
+                                        Illimité
+                                    </v-chip>
                                 </span>
-                            </div>
+                            </v-col>
 
                             <v-progress-linear
+                                class="mt-n4"
                                 v-if="item.limit !== null"
                                 :model-value="usagePercent(item)"
                                 :color="usageColor(item)"
                                 height="6"
                                 rounded
                             />
-                        </div>
+                        </v-row>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -179,9 +195,9 @@
                     >
                         Annuel
 
-                        <v-chip v-if="hasYearlyDiscount" color="success" variant="flat" size="small" class="ml-2"
-                            >Remise</v-chip
-                        >
+                        <v-chip v-if="hasYearlyDiscount" color="success" variant="flat" size="small" class="ml-2">
+                            Remise
+                        </v-chip>
                     </v-btn>
                 </v-btn-toggle>
             </div>
@@ -191,16 +207,18 @@
                     <v-card rounded="lg" border flat>
                         <v-card-text>
                             <div class="text-h6 font-weight-bold">{{ plan.title }}</div>
-                            <div class="text-body-2 text-medium-emphasis" v-html="plan.description"></div>
+                            <div class="text-body-2 text-medium-emphasis" v-html="sanitizeHtml(plan.description)"></div>
 
                             <div class="mt-4" v-if="priceFor(plan)">
                                 <span class="text-h4 font-weight-black">{{ $price(priceFor(plan)!.sellPrice) }}</span>
+
                                 <span class="text-body-2">
-                                    / {{ selectedInterval === BillingInterval.MONTH ? "mois" : "an" }}</span
-                                >
-                                <v-chip v-if="priceFor(plan)?.discount" color="success" size="small" class="ml-2"
-                                    >-{{ priceFor(plan)!.discount }}%</v-chip
-                                >
+                                    / {{ selectedInterval === BillingInterval.MONTH ? "mois" : "an" }}
+                                </span>
+
+                                <v-chip v-if="priceFor(plan)?.discount" color="success" size="small" class="ml-2">
+                                    -{{ priceFor(plan)!.discount }}%
+                                </v-chip>
                             </div>
 
                             <v-btn
@@ -228,7 +246,7 @@ import type { Plan } from "~/models/Plan";
 import type { PlanPrice } from "~/models/PlanPrice";
 import type { Subscription } from "~/models/Subscription";
 import type { QuotaUsage } from "~/models/QuotaUsage";
-import type { Invoice } from "~/models/Invoice";
+import { type Invoice, getLabel, getColor } from "~/models/Invoice";
 import { BillingInterval } from "#shared/billing-interval";
 import { SubscriptionStatusLabel } from "#shared/subscription-status";
 import { OrganizationMemberRole } from "#shared/organization-roles";
@@ -294,25 +312,6 @@ const usageColor = (item: QuotaUsage): string => {
 
     return "primary";
 };
-
-const INVOICE_STATUS_COLOR: Record<string, string> = {
-    paid: "success",
-    open: "warning",
-    uncollectible: "error",
-    void: "secondary",
-    draft: "secondary",
-};
-
-const INVOICE_STATUS_LABEL: Record<string, string> = {
-    paid: "Payée",
-    open: "En attente",
-    uncollectible: "Impayée",
-    void: "Annulée",
-    draft: "Brouillon",
-};
-
-const invoiceStatusColor = (status: Invoice["status"]): string => INVOICE_STATUS_COLOR[status ?? ""] ?? "secondary";
-const invoiceStatusLabel = (status: Invoice["status"]): string => INVOICE_STATUS_LABEL[status ?? ""] ?? status ?? "";
 
 const hasYearlyDiscount = computed(() => {
     return plans.value

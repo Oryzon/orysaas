@@ -44,6 +44,11 @@ export default class TenantMemberController {
                 .send({ message: Messages.ORGANIZATION_MEMBER_OWNER_CANT_BE_EDITED });
         }
 
+        // avoid an admin create himself the owner role
+        if (role !== OrganizationMemberRole.ADMIN && role !== OrganizationMemberRole.MEMBER) {
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({ message: Messages.ORGANIZATION_MEMBER_ROLE_INVALID });
+        }
+
         target.role = role;
         await OrganizationMemberRepository.save(target);
 

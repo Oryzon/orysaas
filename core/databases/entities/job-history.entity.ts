@@ -6,6 +6,7 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    Index,
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -26,6 +27,7 @@ export class JobHistoryEntity {
     uuid: string;
 
     @Column()
+    @Index()
     jobUuid: string;
 
     @ManyToOne(() => JobSettingEntity)

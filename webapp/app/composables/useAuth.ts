@@ -146,15 +146,20 @@ export const useAuth = () => {
     }
 
     async function logout(toast: boolean = true) {
-        const res = await api.post<TokenPair>(
-            "/auth/logout",
-            { refreshToken: rToken.value },
-            {
-                toast: toast,
-                auth: true,
-                loadingKey: "auth:logout",
-            },
-        );
+        try {
+            await api.post<TokenPair>(
+                "/auth/logout",
+                { refreshToken: rToken.value },
+                {
+                    toast: toast,
+                    auth: true,
+                    loadingKey: "auth:logout",
+                },
+            );
+        } catch (error) {
+            // Local cleanup
+            console.error("Failed to revoke session server-side", error);
+        }
 
         token.value = null;
         rToken.value = null;

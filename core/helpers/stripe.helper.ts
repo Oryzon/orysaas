@@ -10,6 +10,8 @@ import { ApiKeyRepository } from "../databases/repositories/api-key.repository";
 import { OrganizationRepository } from "../databases/repositories/organization.repository";
 import { OrganizationMemberRepository } from "../databases/repositories/organization-member.repository";
 import { SubscriptionRepository } from "../databases/repositories/subscription.repository";
+import { InvoiceEntity } from "../databases/entities/invoice.entity";
+import { InvoiceRepository } from "../databases/repositories/invoice.repository";
 import { OrganizationMemberRole } from "../../shared/organization-roles";
 import { SubscriptionStatus } from "../../shared/subscription-status";
 
@@ -168,6 +170,22 @@ export async function archiveStripeProduct(stripeProductId: string | null): Prom
         });
     } catch (error) {
         console.log("[Stripe] Failed to archive product", stripeProductId, error);
+    }
+}
+
+// Called when an organization is deleted. Best-effort like the archive helpers above
+export async function cancelActiveSubscription(organizationUuid: string): Promise<void> {
+    const subscription = await SubscriptionRepository.findActiveByOrganization(organizationUuid);
+
+    if (!subscription) {
+        return;
+    }
+
+    try {
+        const stripe = await getStripeClient();
+        await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+    } catch (error) {
+        console.log("[Stripe] Failed to cancel subscription", subscription.stripeSubscriptionId, error);
     }
 }
 
@@ -341,4 +359,32 @@ export async function upsertSubscriptionFromStripe(
     await SubscriptionRepository.save(subscription);
 
     return subscription;
+}
+
+// Upserts by stripeInvoiceId : safe to call repeatedly with the same event
+export async function upsertInvoiceFromStripe(
+    stripeInvoice: Stripe.Invoice,
+    organizationUuid: string,
+): Promise<InvoiceEntity> {
+    let invoice = await InvoiceRepository.findOne({
+        where: { stripeInvoiceId: Equal(stripeInvoice.id!) },
+    });
+
+    if (!invoice) {
+        invoice = new InvoiceEntity();
+        invoice.stripeInvoiceId = stripeInvoice.id!;
+    }
+
+    invoice.organizationUuid = organizationUuid;
+    invoice.number = stripeInvoice.number;
+    invoice.date = new Date(stripeInvoice.created * 1000);
+    invoice.amount = (stripeInvoice.amount_paid ?? 0) / 100;
+    invoice.currency = stripeInvoice.currency;
+    invoice.status = stripeInvoice.status ?? "draft";
+    invoice.hostedInvoiceUrl = stripeInvoice.hosted_invoice_url;
+    invoice.invoicePdf = stripeInvoice.invoice_pdf;
+
+    await InvoiceRepository.save(invoice);
+
+    return invoice;
 }

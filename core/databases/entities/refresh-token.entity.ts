@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class RefreshTokenEntity {
@@ -6,6 +6,7 @@ export class RefreshTokenEntity {
     uuid: string;
 
     @Column()
+    @Index()
     userUuid: string;
 
     @Column({ nullable: true })
@@ -15,6 +16,7 @@ export class RefreshTokenEntity {
     userAgent: string;
 
     @Column()
+    @Index({ unique: true })
     token: string;
 
     @Column()

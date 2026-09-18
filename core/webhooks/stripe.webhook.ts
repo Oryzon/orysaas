@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import Stripe from "stripe";
 import { Equal } from "typeorm";
 import HttpCode from "../config/http-code";
-import { getStripeClient, upsertSubscriptionFromStripe } from "../helpers/stripe.helper";
+import { getStripeClient, upsertSubscriptionFromStripe, upsertInvoiceFromStripe } from "../helpers/stripe.helper";
 import { OrganizationRepository } from "../databases/repositories/organization.repository";
+import { StripeWebhookEventRepository } from "../databases/repositories/stripe-webhook-event.repository";
 import { PlanPriceRepository } from "../databases/repositories/plan-price.repository";
 import { notifyOrganizationAdmins, emailOrganizationAdmins } from "../helpers/organization-notify.helper";
 import Messages from "../config/messages";
@@ -50,6 +51,14 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         return res.status(HttpCode.BAD_REQUEST).send({
             message: Messages.MISSING_SIGNATURE,
         });
+    }
+
+    const isNewEvent = await StripeWebhookEventRepository.markProcessed(event.id, event.type);
+
+    if (!isNewEvent) {
+        console.log("[Stripe webhook] Event already processed, skipping", event.id, event.type);
+
+        return res.status(HttpCode.OK).send({ received: true });
     }
 
     try {
@@ -151,6 +160,8 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                     const subscription = await upsertSubscriptionFromStripe(stripeSubscription);
 
                     if (subscription) {
+                        await upsertInvoiceFromStripe(invoice, subscription.organizationUuid);
+
                         const organization = await OrganizationRepository.findOne({
                             where: { uuid: Equal(subscription.organizationUuid) },
                         });
@@ -190,6 +201,7 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                     const subscription = await upsertSubscriptionFromStripe(stripeSubscription);
 
                     if (subscription) {
+                        await upsertInvoiceFromStripe(invoice, subscription.organizationUuid);
                         await notifyOrganizationAdmins(subscription.organizationUuid, "PAYMENT_FAILED");
 
                         const organization = await OrganizationRepository.findOne({
@@ -212,6 +224,9 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                 }
                 break;
             }
+
+            default:
+                console.log("[Stripe webhook] Unhandled event type", event.type);
         }
     } catch (error) {
         console.log(

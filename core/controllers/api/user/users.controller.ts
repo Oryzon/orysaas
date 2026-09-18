@@ -1,4 +1,4 @@
-import { CheckJwt, Controller, Error, Get } from "../../../decorators";
+import { CheckJwt, CheckIsSaasAdmin, Controller, Error, Get } from "../../../decorators";
 import { Request, Response } from "express";
 import { UserRepository } from "../../../databases/repositories/user.repository";
 import HttpCode from "../../../config/http-code";
@@ -7,6 +7,7 @@ import HttpCode from "../../../config/http-code";
 export default class UsersController {
     @Get("/")
     @CheckJwt()
+    @CheckIsSaasAdmin()
     @Error()
     async me(req: Request, res: Response) {
         const users = await UserRepository.find();

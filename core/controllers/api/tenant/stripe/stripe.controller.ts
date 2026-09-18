@@ -14,8 +14,10 @@ import Messages from "../../../../config/messages";
 import { OrganizationMemberRole } from "../../../../../shared/organization-roles";
 import { OrganizationEntity } from "../../../../databases/entities/organization.entity";
 import { SubscriptionRepository } from "../../../../databases/repositories/subscription.repository";
+import { InvoiceRepository } from "../../../../databases/repositories/invoice.repository";
 import { PlanPriceRepository } from "../../../../databases/repositories/plan-price.repository";
 import { createBillingPortalSession, createCheckoutSession, getStripeClient } from "../../../../helpers/stripe.helper";
+import { withNamedLock } from "../../../../helpers/db-lock.helper";
 
 @Controller("/tenant/:slugOrganization/stripe")
 export default class TenantStripeController {
@@ -38,27 +40,18 @@ export default class TenantStripeController {
     async invoices(req: Request, res: Response) {
         const organization = res.locals.organization as OrganizationEntity;
 
-        if (!organization.stripeCustomerId) {
-            return res.status(HttpCode.OK).send([]);
-        }
-
-        const stripe = await getStripeClient();
-
-        const invoices = await stripe.invoices.list({
-            customer: organization.stripeCustomerId,
-            limit: 12,
-        });
+        const invoiceRows = await InvoiceRepository.findRecentByOrganization(organization.uuid, 12);
 
         return res.status(HttpCode.OK).send(
-            invoices.data.map((invoice) => ({
-                id: invoice.id,
+            invoiceRows.map((invoice) => ({
+                id: invoice.stripeInvoiceId,
                 number: invoice.number,
-                date: invoice.created,
-                amount: (invoice.amount_paid ?? 0) / 100,
+                date: Math.floor(invoice.date.getTime() / 1000),
+                amount: invoice.amount,
                 currency: invoice.currency,
                 status: invoice.status,
-                hostedInvoiceUrl: invoice.hosted_invoice_url,
-                invoicePdf: invoice.invoice_pdf,
+                hostedInvoiceUrl: invoice.hostedInvoiceUrl,
+                invoicePdf: invoice.invoicePdf,
             })),
         );
     }
@@ -91,19 +84,28 @@ export default class TenantStripeController {
             });
         }
 
-        const existingSubscription = await SubscriptionRepository.findActiveByOrganization(organization.uuid);
+        // avoid concurrent payment by user (double click)
+        const result = await withNamedLock(`stripe-checkout:${organization.uuid}`, async () => {
+            const existingSubscription = await SubscriptionRepository.findActiveByOrganization(organization.uuid);
 
-        if (existingSubscription) {
+            if (existingSubscription) {
+                return { conflict: true as const };
+            }
+
+            const stripe = await getStripeClient();
+            const session = await createCheckoutSession(stripe, organization, planPrice, successUrl, cancelUrl);
+
+            return { conflict: false as const, url: session.url };
+        });
+
+        if (result.conflict) {
             return res.status(HttpCode.CONFLICT).send({
                 message: Messages.SUBSCRIPTION_ALREADY_ACTIVE,
             });
         }
 
-        const stripe = await getStripeClient();
-        const session = await createCheckoutSession(stripe, organization, planPrice, successUrl, cancelUrl);
-
         return res.status(HttpCode.OK).send({
-            url: session.url,
+            url: result.url,
         });
     }
 

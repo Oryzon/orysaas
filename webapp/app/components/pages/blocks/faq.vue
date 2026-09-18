@@ -19,7 +19,7 @@
                                 <v-icon :icon="openIndex === index ? 'mdi-chevron-up' : 'mdi-chevron-down'" size="20" />
                             </button>
 
-                            <div v-show="openIndex === index" class="faq-answer" v-html="item.answer"></div>
+                            <div v-show="openIndex === index" class="faq-answer" v-html="sanitizeHtml(item.answer)"></div>
                         </div>
                     </div>
                 </v-col>

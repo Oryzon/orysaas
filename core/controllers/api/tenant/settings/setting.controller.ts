@@ -8,6 +8,7 @@ import {
     CheckJwt,
     CheckOrganizationMember,
     CheckOrganizationRole,
+    RateLimit,
 } from "../../../../decorators";
 import { Request, Response } from "express";
 import { OrganizationRepository } from "../../../../databases/repositories/organization.repository";
@@ -26,6 +27,7 @@ import { TokenType } from "../../../../databases/entities/token.entity";
 import { MailService } from "../../../../services/mail.service";
 import { Equal, Not } from "typeorm";
 import { OrganizationMemberRepository } from "../../../../databases/repositories/organization-member.repository";
+import { cancelActiveSubscription } from "../../../../helpers/stripe.helper";
 
 @Controller("/tenant/:slugOrganization/setting")
 export default class TenantSettingController {
@@ -114,6 +116,7 @@ export default class TenantSettingController {
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.OWNER)
+    @RateLimit({ points: 3, duration: 300 })
     @Error()
     async request(req: Request, res: Response) {
         const organization = res.locals.organization as OrganizationEntity;
@@ -146,6 +149,7 @@ export default class TenantSettingController {
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.OWNER)
+    @RateLimit({ points: 5, duration: 900 })
     @Error()
     async confirm(req: Request, res: Response) {
         const { code } = req.body;
@@ -175,6 +179,7 @@ export default class TenantSettingController {
 
         await TokenRepository.markAsUsed(tokenEntity);
 
+        await cancelActiveSubscription(organization.uuid);
         await OrganizationRepository.softRemoveWithRelations(organization);
 
         const nextOrg = otherMemberships.find((m) => !m.organization.deletedAt) ?? null;

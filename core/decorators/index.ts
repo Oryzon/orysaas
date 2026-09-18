@@ -7,3 +7,4 @@ export * from "./check-organization-member";
 export * from "./check-organization-role";
 export * from "./check-is-saas-admin";
 export * from "./check-quota";
+export * from "./rate-limit";

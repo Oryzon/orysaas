@@ -36,4 +36,19 @@ export const SubscriptionRepository = dataSource.getRepository(SubscriptionEntit
             },
         });
     },
+
+    async countByPlan(): Promise<{ title: string; count: number }[]> {
+        const rows: { title: string; count: string }[] = await this.createQueryBuilder("subscription")
+            .innerJoin("subscription.planPrice", "planPrice")
+            .innerJoin("planPrice.plan", "plan")
+            .select("plan.title", "title")
+            .addSelect("COUNT(*)", "count")
+            .where("subscription.status IN (:...statuses)", {
+                statuses: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING, SubscriptionStatus.PAST_DUE],
+            })
+            .groupBy("plan.title")
+            .getRawMany();
+
+        return rows.map((row) => ({ title: row.title, count: parseInt(row.count, 10) }));
+    },
 });
