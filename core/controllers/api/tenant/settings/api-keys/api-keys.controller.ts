@@ -1,14 +1,21 @@
-import {CheckJwt, CheckOrganizationMember, CheckOrganizationRole, Controller, Error, Get} from "../../../../../decorators";
-import {OrganizationMemberRole} from "../../../../../../shared/organization-roles";
-import {Request, Response} from "express";
-import {OrganizationRepository} from "../../../../../databases/repositories/organization.repository";
-import {ApiKeyRepository} from "../../../../../databases/repositories/api-key.repository";
-import {Equal} from "typeorm";
+import {
+    CheckJwt,
+    CheckOrganizationMember,
+    CheckOrganizationRole,
+    Controller,
+    Error,
+    Get,
+} from "../../../../../decorators";
+import { OrganizationMemberRole } from "../../../../../../shared/organization-roles";
+import { Request, Response } from "express";
+import { OrganizationRepository } from "../../../../../databases/repositories/organization.repository";
+import { ApiKeyRepository } from "../../../../../databases/repositories/api-key.repository";
+import { Equal } from "typeorm";
 import HttpCode from "../../../../../config/http-code";
 
-@Controller('/tenant/:slugOrganization/setting/api-keys')
+@Controller("/tenant/:slugOrganization/setting/api-keys")
 export default class TenantSettingApiKeysController {
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -19,8 +26,8 @@ export default class TenantSettingApiKeysController {
 
         let apiKeys = await ApiKeyRepository.find({
             where: {
-                organizationUuid: Equal(organization.uuid)
-            }
+                organizationUuid: Equal(organization.uuid),
+            },
         });
 
         return res.status(HttpCode.OK).send(apiKeys);

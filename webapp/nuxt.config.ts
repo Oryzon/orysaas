@@ -1,18 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from "node:url";
 
 export default defineNuxtConfig({
     alias: {
-        '#shared': fileURLToPath(new URL('../shared', import.meta.url)),
+        "#shared": fileURLToPath(new URL("../shared", import.meta.url)),
     },
-    compatibilityDate: '2025-07-15',
+    compatibilityDate: "2025-07-15",
     devtools: {
         enabled: true,
     },
     modules: ["@nuxtjs/seo", "@pinia/nuxt", "@vueuse/nuxt"],
     site: {
-        name: 'OrySaas',
-        url: process.env.SITE_URL || 'http://localhost:3000',
+        name: "OrySaas",
+        url: process.env.SITE_URL || "http://localhost:3000",
     },
     css: [
         "vuetify/styles",
@@ -31,13 +31,7 @@ export default defineNuxtConfig({
             noExternal: ["vuetify"],
         },
         optimizeDeps: {
-            include: [
-                "@vue/devtools-core",
-                "@vue/devtools-kit",
-                "vuetify",
-                "@mdi/js",
-                "luxon",
-            ],
+            include: ["@vue/devtools-core", "@vue/devtools-kit", "vuetify", "@mdi/js", "luxon"],
         },
     },
     runtimeConfig: {

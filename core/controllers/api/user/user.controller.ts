@@ -15,15 +15,12 @@ export default class UserController {
     @Error()
     async updateMe(req: Request, res: Response) {
         const uuid = getUserUuid();
-        const {
-            firstname,
-            lastname
-        } = req.body;
+        const { firstname, lastname } = req.body;
 
         const user = await UserRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
         user.firstname = firstname;
@@ -35,7 +32,7 @@ export default class UserController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.USER_PROFILE_UPDATED,
-            entity: user
+            entity: user,
         });
     }
 
@@ -45,10 +42,7 @@ export default class UserController {
     async updatePassword(req: Request, res: Response) {
         const uuid = getUserUuid();
 
-        const {
-            currentPassword,
-            newPassword
-        } = req.body;
+        const { currentPassword, newPassword } = req.body;
 
         const user = await UserRepository.findOneOrFail({ where: { uuid: Equal(uuid) } });
 
@@ -65,11 +59,9 @@ export default class UserController {
 
         await UserRepository.save(user);
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.USER_PASSWORD_UPDATED
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.USER_PASSWORD_UPDATED,
+        });
     }
 
     @Get("/me")

@@ -10,7 +10,8 @@
             <v-card flat>
                 <v-toolbar color="blue">
                     <v-toolbar-title>
-                        Modifier le rôle de <strong>{{ props.entity.member.lastname }} {{ props.entity.member.firstname }}</strong>
+                        Modifier le rôle de
+                        <strong>{{ props.entity.member.lastname }} {{ props.entity.member.firstname }}</strong>
                     </v-toolbar-title>
 
                     <v-toolbar-items>
@@ -58,13 +59,17 @@
 </template>
 
 <script setup lang="ts">
-import { type OrganizationMember, OrganizationMemberRole, OrganizationMemberRoleLabel } from "~/models/OrganizationMember";
+import {
+    type OrganizationMember,
+    OrganizationMemberRole,
+    OrganizationMemberRoleLabel,
+} from "~/models/OrganizationMember";
 
 const props = defineProps<{
     entity: OrganizationMember;
 }>();
 
-const emit = defineEmits(['updated']);
+const emit = defineEmits(["updated"]);
 
 const api = useApi();
 const rules = useValidationRules();
@@ -94,7 +99,7 @@ const handleUpdate = async () => {
         return;
     }
 
-    const res = await api.put<{ message: string, entity: OrganizationMember }>(
+    const res = await api.put<{ message: string; entity: OrganizationMember }>(
         `/tenant/${slugOrganization}/member/${props.entity.uuid}`,
         { role: selectedRole.value },
         {

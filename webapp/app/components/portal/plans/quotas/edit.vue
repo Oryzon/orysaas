@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="500" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="text"
-                color="info"
-                icon
-            >
+            <v-btn v-bind="activatorProps" variant="text" color="info" icon>
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </template>
@@ -34,7 +29,7 @@
                                     :items="quotaItems"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     v-model="local.quotaUuid"
                                 ></v-select>
                             </v-col>
@@ -57,12 +52,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Modifier
                     </v-btn>
                 </v-card-actions>
@@ -77,7 +67,7 @@ import type { QuotaPlan } from "~/models/QuotaPlan";
 import { QuotaKeyLabel, QuotaPeriodLabel } from "#shared/quota";
 
 const props = defineProps<{
-    entity: QuotaPlan
+    entity: QuotaPlan;
 }>();
 const emit = defineEmits(["updated"]);
 
@@ -89,13 +79,13 @@ const isFormValid = ref(false);
 const quotas = ref<Quota[]>([]);
 const local = ref<Partial<QuotaPlan>>({});
 
-const isLoading = computed(() => api.isLoading('plan-quota:edit') || api.isLoading('quotas:list'));
+const isLoading = computed(() => api.isLoading("plan-quota:edit") || api.isLoading("quotas:list"));
 
 const quotaItems = computed(() =>
     quotas.value.map((q) => ({
         value: q.uuid,
-        title: `${QuotaKeyLabel[q.key]}${q.period ? ' — ' + QuotaPeriodLabel[q.period] : ''}`,
-    }))
+        title: `${QuotaKeyLabel[q.key]}${q.period ? " — " + QuotaPeriodLabel[q.period] : ""}`,
+    })),
 );
 
 watch(dialog, async (open) => {
@@ -103,7 +93,7 @@ watch(dialog, async (open) => {
         return;
     }
 
-    quotas.value = await api.get<Quota[]>('/quotas', { loadingKey: 'quotas:list', toast: false });
+    quotas.value = await api.get<Quota[]>("/quotas", { loadingKey: "quotas:list", toast: false });
     local.value = { ...props.entity };
 });
 
@@ -119,14 +109,16 @@ const handleCreate = async () => {
         return;
     }
 
-    const res = await api.put<{ entity: QuotaPlan }>(`/plan/${local.value.planUuid}/quota/${local.value.uuid}`,
+    const res = await api.put<{ entity: QuotaPlan }>(
+        `/plan/${local.value.planUuid}/quota/${local.value.uuid}`,
         local.value,
         {
-            loadingKey: 'plan-quota:edit',
+            loadingKey: "plan-quota:edit",
             toast: true,
-    });
+        },
+    );
 
-    emit('updated', res.entity);
+    emit("updated", res.entity);
     handleClose();
 };
 </script>

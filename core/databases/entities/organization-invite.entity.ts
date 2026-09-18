@@ -1,11 +1,16 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, Index, JoinColumn, ManyToOne,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -17,19 +22,19 @@ export class OrganizationInviteEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
-    @Column({ type: 'uuid' })
+    @Column({ type: "uuid" })
     @Index()
     organizationUuid: string;
 
-    @ManyToOne(() => OrganizationEntity, (o) => o.invites, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'organizationUuid' })
+    @ManyToOne(() => OrganizationEntity, (o) => o.invites, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "organizationUuid" })
     organization: OrganizationEntity;
 
     @Column()
     @Index()
     email: string;
 
-    @Column({ type: 'enum', enum: OrganizationMemberRole })
+    @Column({ type: "enum", enum: OrganizationMemberRole })
     role: OrganizationMemberRole;
 
     @Column({ unique: true })
@@ -48,18 +53,18 @@ export class OrganizationInviteEntity {
     @Column()
     createdBy: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     updatedBy: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     @DeleteDateColumn()
     deletedAt: Date;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     deletedBy: string;
 
     @BeforeInsert()

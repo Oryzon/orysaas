@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { NOTIFICATION_TYPES, type NotificationAction } from "#shared/notification-types";
-import type { Notification } from '~/models/Notification';
+import type { Notification } from "~/models/Notification";
 
 const { markAsRead } = useNotifications();
 const { refreshOrganization } = useAuth();
@@ -55,7 +55,7 @@ const api = useApi();
 const router = useRouter();
 
 const props = defineProps<{
-    notification: Notification
+    notification: Notification;
 }>();
 
 const notif = computed(() => NOTIFICATION_TYPES[props.notification.type]);
@@ -72,20 +72,16 @@ const handleAction = async (endpoint: string) => {
         return;
     }
 
-    const res = await api.post<{ message: string }>(
-        action.endpoint,
-        action.body ?? {},
-        {
-            loadingKey: `notification:action:${props.notification.uuid}`,
-            toast: true,
-        },
-    );
+    const res = await api.post<{ message: string }>(action.endpoint, action.body ?? {}, {
+        loadingKey: `notification:action:${props.notification.uuid}`,
+        toast: true,
+    });
 
     if (res) {
         await markAsRead(props.notification.uuid);
 
         if (action.refreshOrganization) {
-            const slug = action.redirect?.split('/portal/')?.[1]?.split('/')?.[0];
+            const slug = action.redirect?.split("/portal/")?.[1]?.split("/")?.[0];
             await refreshOrganization(slug);
         }
 

@@ -1,19 +1,19 @@
 // plugins/date.ts
-import { defineNuxtPlugin, useRuntimeConfig } from '#app'
-import { DateTime, Settings } from 'luxon'
+import { defineNuxtPlugin, useRuntimeConfig } from "#app";
+import { DateTime, Settings } from "luxon";
 
-type Input = string | number | Date | null | undefined
+type Input = string | number | Date | null | undefined;
 
 export default defineNuxtPlugin(() => {
     const cfg = useRuntimeConfig();
-    const defaultZone: string = <string>cfg.public?.defaultTimezone || 'Europe/Paris';
-    const defaultLocale: string = <string>cfg.public?.defaultLocale || 'fr';
+    const defaultZone: string = <string>cfg.public?.defaultTimezone || "Europe/Paris";
+    const defaultLocale: string = <string>cfg.public?.defaultLocale || "fr";
 
     Settings.defaultZone = defaultZone;
     Settings.defaultLocale = defaultLocale;
 
     function toDateTime(input: Input): DateTime | null {
-        if (input === null || input === undefined || input === '') {
+        if (input === null || input === undefined || input === "") {
             return null;
         }
 
@@ -23,15 +23,13 @@ export default defineNuxtPlugin(() => {
         }
 
         // Numbers: assume ms or sec epoch
-        if (typeof input === 'number') {
+        if (typeof input === "number") {
             const asSec = `${input}`.length === 10;
-            return asSec
-                ? DateTime.fromSeconds(input)
-                : DateTime.fromMillis(input);
+            return asSec ? DateTime.fromSeconds(input) : DateTime.fromMillis(input);
         }
 
         // Strings: try ISO first
-        if (typeof input === 'string') {
+        if (typeof input === "string") {
             // epoch seconds/millis in string form
             if (/^\d{10}$/.test(input)) {
                 return DateTime.fromSeconds(Number(input));
@@ -42,7 +40,7 @@ export default defineNuxtPlugin(() => {
             }
 
             // ISO or RFC-like
-            const isoTry = DateTime.fromISO(input)
+            const isoTry = DateTime.fromISO(input);
             if (isoTry.isValid) {
                 return isoTry;
             }
@@ -55,19 +53,19 @@ export default defineNuxtPlugin(() => {
             }
         }
 
-        return null
+        return null;
     }
 
     function french(value: Input, opts?: { withTime?: boolean }) {
         const dt = toDateTime(value);
 
         if (!dt) {
-            return '';
+            return "";
         }
 
         const withTime = opts?.withTime ?? true;
 
-        return dt.toFormat(withTime ? 'dd/MM/yyyy à HH:mm' : 'dd/MM/yyyy');
+        return dt.toFormat(withTime ? "dd/MM/yyyy à HH:mm" : "dd/MM/yyyy");
     }
 
     function frenchDate(value: Input) {
@@ -78,17 +76,17 @@ export default defineNuxtPlugin(() => {
         const dt = toDateTime(value);
 
         if (!dt) {
-            return '';
+            return "";
         }
 
-        return dt.toRelative({ base: DateTime.now() }) || '';
+        return dt.toRelative({ base: DateTime.now() }) || "";
     }
 
     function iso(value: Input) {
         const dt = toDateTime(value);
 
         if (!dt) {
-            return '';
+            return "";
         }
 
         return dt.toUTC().toISO();
@@ -98,7 +96,7 @@ export default defineNuxtPlugin(() => {
         const dt = toDateTime(value);
 
         if (!dt) {
-            return '';
+            return "";
         }
 
         return dt.toFormat(fmt);
@@ -112,8 +110,8 @@ export default defineNuxtPlugin(() => {
                 relative,
                 iso,
                 format,
-                DateTime
-            }
-        }
-    }
-})
+                DateTime,
+            },
+        },
+    };
+});

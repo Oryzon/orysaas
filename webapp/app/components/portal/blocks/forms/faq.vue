@@ -13,47 +13,30 @@
         <v-col md="12" class="mt-n6">
             <div class="d-flex align-center justify-space-between mb-4">
                 <div>
-                    <p class="text-body-2 text-medium-emphasis mb-0">{{ localData.items.length }} question{{ localData.items.length !== 1 ? 's' : '' }}</p>
+                    <p class="text-body-2 text-medium-emphasis mb-0">
+                        {{ localData.items.length }} question{{ localData.items.length !== 1 ? "s" : "" }}
+                    </p>
                 </div>
 
-                <v-btn
-                    color="primary"
-                    prepend-icon="mdi-plus"
-                    variant="tonal"
-                    @click="addItem"
-                >
-                    Ajouter
-                </v-btn>
+                <v-btn color="primary" prepend-icon="mdi-plus" variant="tonal" @click="addItem"> Ajouter </v-btn>
             </div>
 
-            <v-alert
-                v-if="localData.items.length === 0"
-                type="info"
-                variant="tonal"
-            >
+            <v-alert v-if="localData.items.length === 0" type="info" variant="tonal">
                 Aucune question. Cliquez sur "Ajouter" pour commencer.
             </v-alert>
 
             <v-row v-else>
-                <v-col
-                    md="12"
-                    v-for="(item, index) in localData.items"
-                    :key="index"
-                >
+                <v-col md="12" v-for="(item, index) in localData.items" :key="index">
                     <v-card>
                         <v-toolbar>
                             <v-toolbar-title>
                                 <v-chip color="primary" label>#{{ index + 1 }}</v-chip>
                                 &nbsp;
-                                {{ item.question || 'Nouvelle question' }}
+                                {{ item.question || "Nouvelle question" }}
                             </v-toolbar-title>
 
                             <v-toolbar-items>
-                                <v-btn
-                                    icon
-                                    color="error"
-                                    @click.stop="removeItem(index)"
-                                >
+                                <v-btn icon color="error" @click.stop="removeItem(index)">
                                     <v-icon>mdi-delete</v-icon>
                                 </v-btn>
                             </v-toolbar-items>
@@ -70,7 +53,7 @@
                                     ></v-text-field>
                                 </v-col>
 
-                                <v-col md="12" style="height: 180px;" class="mb-16 mt-n10">
+                                <v-col md="12" style="height: 180px" class="mb-16 mt-n10">
                                     <client-only>
                                         <quill-editor
                                             v-model:content="item.answer"
@@ -90,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FaqData } from '~/models/Block';
+import type { FaqData } from "~/models/Block";
 
 interface Props {
     modelValue: FaqData;
@@ -98,7 +81,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: FaqData];
+    "update:modelValue": [value: FaqData];
 }>();
 
 const localData = ref<FaqData>({
@@ -106,7 +89,7 @@ const localData = ref<FaqData>({
 });
 
 const addItem = () => {
-    localData.value.items.push({ question: '', answer: '' });
+    localData.value.items.push({ question: "", answer: "" });
     emitUpdate();
 };
 
@@ -116,12 +99,16 @@ const removeItem = (index: number) => {
 };
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localData.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localData.value)));
 };
 
-watch(() => props.modelValue, (newVal) => {
-    localData.value = { ...JSON.parse(JSON.stringify(newVal)) };
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localData.value = { ...JSON.parse(JSON.stringify(newVal)) };
+    },
+    { deep: true },
+);
 </script>
 
 <style scoped>

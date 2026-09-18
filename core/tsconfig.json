@@ -1,16 +1,19 @@
 {
-  "compilerOptions": {
-    "target": "es2016",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strictPropertyInitialization": false,
-    "skipLibCheck": true,
-    "outDir": "./build",
-    "rootDir": "..",
-    "resolveJsonModule": true,
-    "sourceMap": true
-  }
+    "compilerOptions": {
+        "target": "es2016",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strictPropertyInitialization": false,
+        "skipLibCheck": true,
+        "outDir": "./build",
+        "rootDir": "..",
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true
+    },
+    "exclude": ["test", "vitest.config.ts", "build"]
 }

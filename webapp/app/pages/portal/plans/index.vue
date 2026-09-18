@@ -1,11 +1,12 @@
 <template>
     <v-row>
         <v-col md="12" class="d-flex justify-end mb-n2">
-            <portal-quotas-list
-            ></portal-quotas-list>
+            <portal-quotas-list></portal-quotas-list>
 
             <v-btn color="secondary" variant="flat" @click="handleSearch" prepend-icon="mdi-refresh">Rafraîchir</v-btn>
-            <v-btn color="primary" variant="flat" to="/portal/plans/create" prepend-icon="mdi-plus" class="ms-2">Créer</v-btn>
+            <v-btn color="primary" variant="flat" to="/portal/plans/create" prepend-icon="mdi-plus" class="ms-2"
+                >Créer</v-btn
+            >
         </v-col>
     </v-row>
 
@@ -64,7 +65,8 @@
                                         prepend-icon="mdi-cash-plus"
                                         class="mr-1"
                                     >
-                                        {{ BillingIntervalLabel[price.billingInterval] }} — {{ $price(price.sellPrice) }}
+                                        {{ BillingIntervalLabel[price.billingInterval] }} —
+                                        {{ $price(price.sellPrice) }}
                                     </v-chip>
                                 </template>
 
@@ -73,10 +75,7 @@
                                         <v-icon>mdi-pencil</v-icon>
                                     </v-btn>
 
-                                    <portal-plans-remove
-                                        :entity="item"
-                                        @removed="removeToPlans"
-                                    ></portal-plans-remove>
+                                    <portal-plans-remove :entity="item" @removed="removeToPlans"></portal-plans-remove>
                                 </template>
                             </v-data-table>
                         </v-col>

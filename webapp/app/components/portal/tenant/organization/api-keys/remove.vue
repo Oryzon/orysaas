@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                icon
-                variant="text"
-                color="error"
-                v-bind="activatorProps"
-            >
+            <v-btn icon variant="text" color="error" v-bind="activatorProps">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </template>
@@ -28,7 +23,10 @@
                         <v-col md="12">
                             <v-alert type="info">Cette opération est une opération définitive.</v-alert>
 
-                            <p>Vous êtes sur le point de supprimer la clé d'API  <strong>{{ entity?.label }}</strong>.</p>
+                            <p>
+                                Vous êtes sur le point de supprimer la clé d'API <strong>{{ entity?.label }}</strong
+                                >.
+                            </p>
                             <p>Cette clé a été ajouté le {{ $date.french(props.entity?.createdAt) }}.</p>
                             <p>Êtes-vous sur de vouloir continuer cette opération ?</p>
                         </v-col>
@@ -58,7 +56,7 @@ const props = defineProps<{
     entity: ApiKey;
 }>();
 
-const emit = defineEmits(['removed']);
+const emit = defineEmits(["removed"]);
 
 const api = useApi();
 
@@ -73,7 +71,7 @@ const handleClose = () => {
 };
 
 const handleRemove = async () => {
-    const res = await api.remove<{ message: string, entity: ApiKey}>(
+    const res = await api.remove<{ message: string; entity: ApiKey }>(
         `/tenant/${slugOrganization}/setting/api-key/${props?.entity?.uuid}`,
         {
             loadingKey: "api-key:remove",

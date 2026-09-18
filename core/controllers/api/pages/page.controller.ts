@@ -8,9 +8,9 @@ import { Equal } from "typeorm";
 import { BlockRepository } from "../../../databases/repositories/block.repository";
 import { BlockEntity } from "../../../databases/entities/block.entity";
 
-@Controller('page')
+@Controller("page")
 export default class PageController {
-    @Get('/slug/:slug')
+    @Get("/slug/:slug")
     @Error()
     async detailWithSlug(req: Request, res: Response) {
         let slug = req.params.slug;
@@ -20,19 +20,19 @@ export default class PageController {
                 slug: Equal(slug),
             },
             relations: {
-                blocks: true
+                blocks: true,
             },
             order: {
                 blocks: {
-                    order: 'ASC'
-                }
-            }
+                    order: "ASC",
+                },
+            },
         });
 
         return res.status(HttpCode.OK).send(page);
     }
 
-    @Get('/:uuid')
+    @Get("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -41,34 +41,27 @@ export default class PageController {
 
         let page = await PageRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
+                uuid: Equal(uuid),
             },
             relations: {
-                blocks: true
+                blocks: true,
             },
             order: {
                 blocks: {
-                    order: 'ASC'
-                }
-            }
+                    order: "ASC",
+                },
+            },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send(page);
+        return res.status(HttpCode.OK).send(page);
     }
 
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
-        let {
-            title,
-            slug,
-            metaTitle,
-            metaDescription,
-        } = req.body;
+        let { title, slug, metaTitle, metaDescription } = req.body;
 
         let page = new PageEntity();
 
@@ -86,7 +79,7 @@ export default class PageController {
         });
     }
 
-    @Put('/:uuid')
+    @Put("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -95,26 +88,19 @@ export default class PageController {
 
         let page = await PageRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
+                uuid: Equal(uuid),
             },
             relations: {
                 blocks: true,
             },
             order: {
                 blocks: {
-                    order: 'ASC'
-                }
-            }
+                    order: "ASC",
+                },
+            },
         });
 
-        let {
-            title,
-            slug,
-            metaTitle,
-            metaDescription,
-            isPublished,
-            blocks
-        } = req.body;
+        let { title, slug, metaTitle, metaDescription, isPublished, blocks } = req.body;
 
         page.title = title;
         page.slug = slug;
@@ -125,13 +111,9 @@ export default class PageController {
         await PageRepository.save(page);
 
         if (blocks && Array.isArray(blocks)) {
-            const newBlockUuids = blocks
-                .filter(b => b.uuid)
-                .map(b => b.uuid);
+            const newBlockUuids = blocks.filter((b) => b.uuid).map((b) => b.uuid);
 
-            const blocksToDelete = page.blocks.filter(
-                existingBlock => !newBlockUuids.includes(existingBlock.uuid)
-            );
+            const blocksToDelete = page.blocks.filter((existingBlock) => !newBlockUuids.includes(existingBlock.uuid));
 
             if (blocksToDelete.length > 0) {
                 await BlockRepository.softRemove(blocksToDelete);
@@ -143,8 +125,8 @@ export default class PageController {
                 if (blockData.uuid) {
                     block = await BlockRepository.findOne({
                         where: {
-                            uuid: Equal(blockData.uuid)
-                        }
+                            uuid: Equal(blockData.uuid),
+                        },
                     });
                 }
 
@@ -160,25 +142,25 @@ export default class PageController {
 
         const updatedPage = await PageRepository.findOne({
             where: {
-                uuid: Equal(uuid)
+                uuid: Equal(uuid),
             },
             relations: {
                 blocks: true,
             },
             order: {
                 blocks: {
-                    order: 'ASC'
-                }
-            }
+                    order: "ASC",
+                },
+            },
         });
 
         return res.status(HttpCode.OK).send({
             message: Messages.PAGE_UPDATED,
-            entity: updatedPage
+            entity: updatedPage,
         });
     }
 
-    @Delete('/:uuid')
+    @Delete("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -187,8 +169,8 @@ export default class PageController {
 
         let item = await PageRepository.findOneOrFail({
             where: {
-                uuid: Equal(uuid)
-            }
+                uuid: Equal(uuid),
+            },
         });
 
         item.setDeletedAt();
@@ -196,7 +178,7 @@ export default class PageController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.PAGE_REMOVED,
-            entity: item
+            entity: item,
         });
     }
 

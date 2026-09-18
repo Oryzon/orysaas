@@ -6,7 +6,7 @@ export interface MenuItem {
     position: number;
     url: string;
     target: string;
-    isVisible: boolean,
+    isVisible: boolean;
     createdAt: Date;
     createdBy: string;
     updatedAt: Date;
@@ -28,9 +28,9 @@ export interface MenuItemSelectOption {
 }
 
 export const targets = [
-    { title: 'Nouvel onglet', value: '_blank' },
-    { title: 'Même onglet', value: '_self' },
-]
+    { title: "Nouvel onglet", value: "_blank" },
+    { title: "Même onglet", value: "_self" },
+];
 
 export function buildMenuTree(items: MenuItem[]): MenuItemNode[] {
     const map = new Map<string, MenuItemNode>();
@@ -92,17 +92,11 @@ export function buildMenuTree(items: MenuItem[]): MenuItemNode[] {
     return roots;
 }
 
-export function flattenMenuTreeForSelect(
-    nodes: MenuItemNode[],
-    depth = 0,
-): MenuItemSelectOption[] {
+export function flattenMenuTreeForSelect(nodes: MenuItemNode[], depth = 0): MenuItemSelectOption[] {
     const result: MenuItemSelectOption[] = [];
 
     for (const node of nodes) {
-        const prefix =
-            depth === 0
-                ? ''
-                : `${'-'.repeat(depth)}> `;
+        const prefix = depth === 0 ? "" : `${"-".repeat(depth)}> `;
 
         result.push({
             value: node.uuid,

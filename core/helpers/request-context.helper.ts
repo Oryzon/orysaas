@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
 interface ContextData {
-    uuid?: string,
+    uuid?: string;
 }
 
 export const requestContext = new AsyncLocalStorage<ContextData>();

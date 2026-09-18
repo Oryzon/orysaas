@@ -26,15 +26,20 @@
                                                 </v-avatar>
                                             </template>
 
-                                            <v-list-item-title>{{ item.lastname.toUpperCase() }} {{ item.firstname }}</v-list-item-title>
+                                            <v-list-item-title
+                                                >{{ item.lastname.toUpperCase() }}
+                                                {{ item.firstname }}</v-list-item-title
+                                            >
                                             <v-list-item-subtitle>{{ item.email }}</v-list-item-subtitle>
-                                            <v-list-item-subtitle v-if="item.company">{{ item.company }}</v-list-item-subtitle>
+                                            <v-list-item-subtitle v-if="item.company">{{
+                                                item.company
+                                            }}</v-list-item-subtitle>
                                         </v-list-item>
                                     </v-list>
                                 </template>
 
                                 <template v-slot:item.message="{ value }">
-                                    {{ value?.length > 200 ? value.slice(0, 200) + '…' : value }}
+                                    {{ value?.length > 200 ? value.slice(0, 200) + "…" : value }}
                                 </template>
 
                                 <template v-slot:item.createdAt="{ value }">
@@ -42,13 +47,9 @@
                                 </template>
 
                                 <template v-slot:item.actions="{ item }">
-                                    <portal-contacts-reply
-                                        :entity="item"
-                                    ></portal-contacts-reply>
+                                    <portal-contacts-reply :entity="item"></portal-contacts-reply>
 
-                                    <portal-contacts-view
-                                        :entity="item"
-                                    ></portal-contacts-view>
+                                    <portal-contacts-view :entity="item"></portal-contacts-view>
 
                                     <portal-contacts-archive
                                         :entity="item"
@@ -82,11 +83,11 @@ const isLoading = computed(() => {
 
 const headers = computed(() => {
     return [
-        { title: 'Personne', key: 'people' },
-        { title: 'Sujet', key: 'subject' },
-        { title: "Prévisualisation", key: 'message', maxWidth: 350 },
-        { title: 'Date', key: 'createdAt', },
-        { title: 'Actions', key: 'actions', align: 'end', minWidth: 150 }
+        { title: "Personne", key: "people" },
+        { title: "Sujet", key: "subject" },
+        { title: "Prévisualisation", key: "message", maxWidth: 350 },
+        { title: "Date", key: "createdAt" },
+        { title: "Actions", key: "actions", align: "end", minWidth: 150 },
     ];
 });
 
@@ -97,11 +98,9 @@ onMounted(async () => {
 });
 
 const handleSearch = async () => {
-    contacts.value = await api.get<Array<Contact>>('contacts', {
-        loadingKey: 'contacts:list',
-        params: {
-
-        }
+    contacts.value = await api.get<Array<Contact>>("contacts", {
+        loadingKey: "contacts:list",
+        params: {},
     });
 };
 

@@ -1,11 +1,16 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, Index, JoinColumn, ManyToOne,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -13,12 +18,11 @@ import { OrganizationEntity } from "./organization.entity";
 import { ApiKeySystem } from "../../../shared/api-key-systems";
 
 export enum ApiKeyType {
-    INTEGRATION = 'INTEGRATION',
-    CONSUMER    = 'CONSUMER',
+    INTEGRATION = "INTEGRATION",
+    CONSUMER = "CONSUMER",
 }
 
 @Entity()
-@Index(['systemKey', 'organizationUuid', 'deletedAt'], { unique: true })
 export class ApiKeyEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
@@ -26,7 +30,7 @@ export class ApiKeyEntity {
     @Column()
     label: string;
 
-    @Column({ type: 'enum', enum: ApiKeyType })
+    @Column({ type: "enum", enum: ApiKeyType })
     type: ApiKeyType;
 
     @Column({ nullable: true })
@@ -39,8 +43,8 @@ export class ApiKeyEntity {
     @Index()
     organizationUuid: string | null;
 
-    @ManyToOne(() => OrganizationEntity, { onDelete: 'CASCADE', nullable: true })
-    @JoinColumn({ name: 'organizationUuid' })
+    @ManyToOne(() => OrganizationEntity, { onDelete: "CASCADE", nullable: true })
+    @JoinColumn({ name: "organizationUuid" })
     organization: OrganizationEntity | null;
 
     @Column({ nullable: true })

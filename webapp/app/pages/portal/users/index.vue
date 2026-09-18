@@ -16,11 +16,13 @@
                                 <v-list-item>
                                     <template v-slot:prepend>
                                         <v-avatar size="48" rounded="lg" class="gradient-primary flex-shrink-0">
-                                            {{ getInitials(item.firstname + ' ' + item.lastname) }}
+                                            {{ getInitials(item.firstname + " " + item.lastname) }}
                                         </v-avatar>
                                     </template>
 
-                                    <v-list-item-title>{{ item.lastname?.toUpperCase() }} {{ item.firstname }}</v-list-item-title>
+                                    <v-list-item-title
+                                        >{{ item.lastname?.toUpperCase() }} {{ item.firstname }}</v-list-item-title
+                                    >
                                     <v-list-item-subtitle>
                                         {{ item.email }}
                                     </v-list-item-subtitle>
@@ -29,11 +31,7 @@
                         </template>
 
                         <template v-slot:item.origin="{ value }">
-                            <v-chip
-                                label
-                                :color="getUserOriginColor(value)"
-                                variant="tonal"
-                            >
+                            <v-chip label :color="getUserOriginColor(value)" variant="tonal">
                                 {{ getUserOriginLabel(value) }}
                             </v-chip>
                         </template>
@@ -50,23 +48,13 @@
                         </template>
 
                         <template v-slot:item.lastLogin="{ value }">
-                            <v-chip
-                                label
-                                color="info"
-                                variant="tonal"
-                                prepend-icon="mdi-calendar-clock-outline"
-                            >
+                            <v-chip label color="info" variant="tonal" prepend-icon="mdi-calendar-clock-outline">
                                 {{ value ? $date.french(value) : "Jamais" }}
                             </v-chip>
                         </template>
 
                         <template v-slot:item.actions="{ item }">
-                            <v-btn
-                                :to="`/portal/users/${item.uuid}`"
-                                variant="text"
-                                icon
-                                color="info"
-                            >
+                            <v-btn :to="`/portal/users/${item.uuid}`" variant="text" icon color="info">
                                 <v-icon>mdi-eye</v-icon>
                             </v-btn>
                         </template>

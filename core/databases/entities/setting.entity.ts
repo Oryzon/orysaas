@@ -1,11 +1,13 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
     PrimaryColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -29,7 +31,7 @@ export class SettingEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column( { nullable: true })
+    @Column({ nullable: true })
     updatedBy: string;
 
     @Column({ nullable: true })
@@ -54,6 +56,6 @@ export class SettingEntity {
     @BeforeSoftRemove()
     setDeletedAt() {
         this.deletedAt = DateTime.now().toJSDate();
-        this.deletedBy = getUserUuid()
+        this.deletedBy = getUserUuid();
     }
 }

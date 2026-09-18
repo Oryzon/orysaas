@@ -8,7 +8,7 @@ export function useValidationRules() {
             return msg;
         }
 
-        if (typeof value === 'string' && value.trim() === '') {
+        if (typeof value === "string" && value.trim() === "") {
             return msg;
         }
 
@@ -17,7 +17,7 @@ export function useValidationRules() {
         }
 
         return true;
-    }
+    };
 
     const minLength = (min: number, msg?: string) => (value: any) => {
         if (!msg) {
@@ -29,7 +29,7 @@ export function useValidationRules() {
         }
 
         return value.length >= min || msg;
-    }
+    };
 
     const maxLength = (max: number, msg?: string) => (value: any) => {
         if (!msg) {
@@ -41,7 +41,7 @@ export function useValidationRules() {
         }
 
         return value.length <= max || msg;
-    }
+    };
 
     const isEmail = (msg?: string) => (value: any) => {
         if (!msg) {
@@ -55,7 +55,7 @@ export function useValidationRules() {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         return regex.test(value) || msg;
-    }
+    };
 
     const isPhoneNumber = (msg?: string) => (value: any) => {
         if (!msg) {
@@ -69,7 +69,7 @@ export function useValidationRules() {
         const regex = /^\+?[\d\s\-().]{7,20}$/;
 
         return regex.test(value) || msg;
-    }
+    };
 
     const isSameAs = (getter: () => any, msg?: string) => (value: any) => {
         if (!msg) {
@@ -77,19 +77,19 @@ export function useValidationRules() {
         }
 
         return value === getter() || msg;
-    }
+    };
 
     const isNumber = (msg?: string) => (value: any) => {
         if (!msg) {
             msg = "Ce champ doit être un nombre.";
         }
 
-        if (value === null || value === undefined || value === '') {
+        if (value === null || value === undefined || value === "") {
             return true;
         }
 
         return !isNaN(Number(value)) || msg;
-    }
+    };
 
     return {
         required,
@@ -98,6 +98,6 @@ export function useValidationRules() {
         isEmail,
         isPhoneNumber,
         isSameAs,
-        isNumber
-    }
+        isNumber,
+    };
 }

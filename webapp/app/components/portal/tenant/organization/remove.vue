@@ -1,14 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading || step === 'confirm'">
         <template #activator="{ props: activatorProps }">
-            <v-btn
-                v-if="canDelete"
-                color="error"
-                variant="tonal"
-                rounded="lg"
-                min-width="140"
-                v-bind="activatorProps"
-            >
+            <v-btn v-if="canDelete" color="error" variant="tonal" rounded="lg" min-width="140" v-bind="activatorProps">
                 Supprimer
             </v-btn>
         </template>
@@ -28,19 +21,15 @@
 
             <template v-if="step === 'warn'">
                 <v-card-text class="pa-6">
-                    <v-alert
-                        type="warning"
-                        variant="tonal"
-                        rounded="lg"
-                        icon="mdi-alert-outline"
-                        class="mb-4"
-                    >
+                    <v-alert type="warning" variant="tonal" rounded="lg" icon="mdi-alert-outline" class="mb-4">
                         Cette action est <strong>irréversible</strong>.<br />
-                        L'organisation et toutes ses données (membres, invitations, etc.) seront supprimées définitivement.
+                        L'organisation et toutes ses données (membres, invitations, etc.) seront supprimées
+                        définitivement.
                     </v-alert>
 
                     <p class="text-body-2 text-medium-emphasis mb-0">
-                        Un code de confirmation à 6 chiffres sera envoyé à votre adresse e-mail. Vous aurez <strong>15 minutes</strong> pour l'utiliser.
+                        Un code de confirmation à 6 chiffres sera envoyé à votre adresse e-mail. Vous aurez
+                        <strong>15 minutes</strong> pour l'utiliser.
                     </p>
                 </v-card-text>
 
@@ -62,14 +51,9 @@
 
             <template v-else-if="step === 'confirm'">
                 <v-card-text class="pa-6">
-                    <v-alert
-                        type="info"
-                        variant="tonal"
-                        rounded="lg"
-                        icon="mdi-email-check-outline"
-                        class="mb-4"
-                    >
-                        Un code à 6 chiffres a été envoyé à <strong>{{ user?.email }}</strong>. Il est valable <strong>15 minutes</strong>.
+                    <v-alert type="info" variant="tonal" rounded="lg" icon="mdi-email-check-outline" class="mb-4">
+                        Un code à 6 chiffres a été envoyé à <strong>{{ user?.email }}</strong
+                        >. Il est valable <strong>15 minutes</strong>.
                     </v-alert>
 
                     <v-text-field
@@ -79,7 +63,7 @@
                         inputmode="numeric"
                         maxlength="6"
                         hide-details="auto"
-                        :rules="[ rules.required() ]"
+                        :rules="[rules.required()]"
                         :loading="isLoading"
                         :disabled="isLoading"
                         class="code-input"
@@ -108,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { OrganizationMemberRole } from '#shared/organization-roles';
+import { OrganizationMemberRole } from "#shared/organization-roles";
 
 const api = useApi();
 const router = useRouter();
@@ -120,26 +104,26 @@ const slugOrganization = route.params.slugOrganization as string;
 const canDelete = useOrganizationCan(OrganizationMemberRole.OWNER);
 
 const dialog = ref(false);
-const step = ref<'warn' | 'confirm'>('warn');
-const code = ref('');
+const step = ref<"warn" | "confirm">("warn");
+const code = ref("");
 
-const isLoading = computed(() => api.isLoading('org:delete-request') || api.isLoading('org:delete-confirm'));
+const isLoading = computed(() => api.isLoading("org:delete-request") || api.isLoading("org:delete-confirm"));
 
 watch(dialog, (opened) => {
     if (!opened) {
-        step.value = 'warn';
-        code.value = '';
+        step.value = "warn";
+        code.value = "";
     }
 });
 
 const sendCode = async () => {
     const res = await api.remove(`/tenant/${slugOrganization}/setting/request`, {
-        loadingKey: 'org:delete-request',
+        loadingKey: "org:delete-request",
         toast: true,
     });
 
     if (res) {
-        step.value = 'confirm';
+        step.value = "confirm";
     }
 };
 
@@ -149,7 +133,7 @@ const confirm = async () => {
     }
 
     const res = await api.remove<{ nextOrgSlug: string | null }>(`/tenant/${slugOrganization}/setting/confirm`, {
-        loadingKey: 'org:delete-confirm',
+        loadingKey: "org:delete-confirm",
         toast: true,
         body: { code: code.value },
     });
@@ -169,7 +153,7 @@ const confirm = async () => {
             };
         }
 
-        await router.push('/portal/dashboard');
+        await router.push("/portal/dashboard");
     }
 };
 </script>

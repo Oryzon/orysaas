@@ -24,16 +24,12 @@ export default class OrganizationController {
         });
 
         if (!organization) {
-            return res
-                .status(HttpCode.NOT_FOUND)
-                .send({
-                    message: Messages.ORGANIZATION_NOT_FOUND
-                });
+            return res.status(HttpCode.NOT_FOUND).send({
+                message: Messages.ORGANIZATION_NOT_FOUND,
+            });
         }
 
-        return res
-            .status(HttpCode.OK)
-            .send(organization);
+        return res.status(HttpCode.OK).send(organization);
     }
 
     @Get("/:slug/invites")
@@ -45,14 +41,12 @@ export default class OrganizationController {
 
         const organization = await OrganizationRepository.findOneOrFail({
             where: {
-                slug: Equal(slug)
+                slug: Equal(slug),
             },
         });
 
         const invites = await OrganizationInviteRepository.findPendingByOrganization(organization.uuid);
 
-        return res
-            .status(HttpCode.OK)
-            .send(invites);
+        return res.status(HttpCode.OK).send(invites);
     }
 }

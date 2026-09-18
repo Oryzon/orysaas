@@ -1,13 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="1200" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                class="mr-2"
-                v-bind="activatorProps"
-                variant="flat"
-                color="success"
-                prepend-icon="mdi-list-box"
-            >
+            <v-btn class="mr-2" v-bind="activatorProps" variant="flat" color="success" prepend-icon="mdi-list-box">
                 Gestion des quotas
             </v-btn>
         </template>
@@ -58,10 +52,7 @@
                                 </template>
 
                                 <template v-slot:item.actions="{ item }">
-                                    <portal-quotas-edit
-                                        :entity="item"
-                                        @updated="updateToQuotas"
-                                    ></portal-quotas-edit>
+                                    <portal-quotas-edit :entity="item" @updated="updateToQuotas"></portal-quotas-edit>
                                 </template>
                             </v-data-table>
                         </v-col>
@@ -71,9 +62,7 @@
                 <v-card-actions class="bg-surface-light">
                     <v-spacer></v-spacer>
 
-                    <portal-quotas-add
-                        @created="addToQuotas"
-                    ></portal-quotas-add>
+                    <portal-quotas-add @created="addToQuotas"></portal-quotas-add>
                 </v-card-actions>
             </v-card>
         </template>
@@ -82,14 +71,14 @@
 
 <script lang="ts" setup>
 import type { Quota } from "~/models/Quota";
-import {QuotaKey, QuotaKeyLabel, QuotaPeriod, QuotaPeriodLabel, QuotaUnit, QuotaUnitLabel} from "#shared/quota";
+import { QuotaKey, QuotaKeyLabel, QuotaPeriod, QuotaPeriodLabel, QuotaUnit, QuotaUnitLabel } from "#shared/quota";
 
 const api = useApi();
 const dialog = ref(false);
 
 const quotas = ref<Array<Quota>>([]);
 
-const isLoading = computed(() => api.isLoading('quotas:list'));
+const isLoading = computed(() => api.isLoading("quotas:list"));
 
 const headers = computed(() => {
     return [
@@ -104,7 +93,7 @@ const headers = computed(() => {
 watch(dialog, async (newVal) => {
     if (newVal) {
         quotas.value = await api.get<Array<Quota>>(`/quotas/`, {
-            loadingKey: 'quotas:list',
+            loadingKey: "quotas:list",
             toast: false,
         });
     }
@@ -116,7 +105,7 @@ const handleClose = () => {
 
 const addToQuotas = (data: Quota) => {
     quotas.value.push(data);
-}
+};
 
 const updateToQuotas = (data: Quota) => {
     quotas.value = quotas.value.map((quota) => {
@@ -126,5 +115,5 @@ const updateToQuotas = (data: Quota) => {
 
         return quota;
     });
-}
+};
 </script>

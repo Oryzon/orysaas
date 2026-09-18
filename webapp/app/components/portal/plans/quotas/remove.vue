@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                icon
-                variant="text"
-                color="error"
-                v-bind="activatorProps"
-            >
+            <v-btn icon variant="text" color="error" v-bind="activatorProps">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </template>
@@ -28,7 +23,11 @@
                         <v-col md="12">
                             <v-alert type="info">Cette opération est une opération définitive.</v-alert>
 
-                            <p>Vous êtes sur le point de supprimer le quota  <strong>{{ QuotaKeyLabel[entity?.quota?.key as QuotaKey] }}</strong>.</p>
+                            <p>
+                                Vous êtes sur le point de supprimer le quota
+                                <strong>{{ QuotaKeyLabel[entity?.quota?.key as QuotaKey] }}</strong
+                                >.
+                            </p>
                             <p>Ce quota a été ajouté le {{ $date.french(props.entity?.createdAt) }}.</p>
                             <p>Êtes-vous sur de vouloir continuer cette opération ?</p>
                         </v-col>
@@ -52,14 +51,14 @@
 </template>
 
 <script setup lang="ts">
-import type {QuotaPlan} from "~/models/QuotaPlan";
-import {QuotaKey, QuotaKeyLabel} from "#shared/quota";
+import type { QuotaPlan } from "~/models/QuotaPlan";
+import { QuotaKey, QuotaKeyLabel } from "#shared/quota";
 
 const props = defineProps<{
     entity: QuotaPlan;
 }>();
 
-const emit = defineEmits(['removed']);
+const emit = defineEmits(["removed"]);
 
 const api = useApi();
 
@@ -71,7 +70,7 @@ const handleClose = () => {
 };
 
 const handleRemove = async () => {
-    const res = await api.remove<{ message: string, entity: QuotaPlan}>(
+    const res = await api.remove<{ message: string; entity: QuotaPlan }>(
         `/plan/${props.entity.planUuid}/quota/${props.entity.uuid}`,
         {
             loadingKey: "quota-plan:remove",

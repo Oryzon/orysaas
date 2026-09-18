@@ -1,4 +1,4 @@
-import type { Notification } from '~/models/Notification';
+import type { Notification } from "~/models/Notification";
 
 let _eventSource: EventSource | null = null;
 let _retryCount = 0;
@@ -6,7 +6,7 @@ let _retryResetTimer: ReturnType<typeof setTimeout> | null = null;
 
 function isTokenExpired(token: string): boolean {
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]!));
+        const payload = JSON.parse(atob(token.split(".")[1]!));
         return payload.exp * 1000 < Date.now();
     } catch {
         return true;
@@ -18,10 +18,10 @@ export const useNotifications = () => {
     const runtime = useRuntimeConfig();
     const { refresh: refreshToken } = useAuth();
 
-    const notifications = useState<Notification[]>('notifications:list', () => []);
-    const nextCursor = useState<string | null>('notifications:cursor', () => null);
-    const isLoadingMore = useState<boolean>('notifications:loading-more', () => false);
-    const unreadCount = useState<number>('notifications:unread-count', () => 0);
+    const notifications = useState<Notification[]>("notifications:list", () => []);
+    const nextCursor = useState<string | null>("notifications:cursor", () => null);
+    const isLoadingMore = useState<boolean>("notifications:loading-more", () => false);
+    const unreadCount = useState<number>("notifications:unread-count", () => 0);
 
     async function connect() {
         if (!import.meta.client) {
@@ -32,7 +32,7 @@ export const useNotifications = () => {
             return;
         }
 
-        const tokenCookie = useCookie('token');
+        const tokenCookie = useCookie("token");
         let token = tokenCookie.value;
 
         if (!token) {
@@ -51,15 +51,15 @@ export const useNotifications = () => {
 
         _eventSource?.close();
 
-        const base = runtime.public.apiBase.toString().replace(/\/$/, '');
+        const base = runtime.public.apiBase.toString().replace(/\/$/, "");
         _eventSource = new EventSource(`${base}/notifications/stream?token=${token}`);
 
-        _eventSource.addEventListener('connected', () => {
+        _eventSource.addEventListener("connected", () => {
             _retryCount = 0;
             fetchRecent();
         });
 
-        _eventSource.addEventListener('notification', (e: MessageEvent) => {
+        _eventSource.addEventListener("notification", (e: MessageEvent) => {
             const notif = JSON.parse(e.data) as Notification;
             notifications.value.unshift(notif);
             unreadCount.value++;
@@ -72,7 +72,9 @@ export const useNotifications = () => {
                 clearTimeout(_retryResetTimer);
             }
 
-            _retryResetTimer = setTimeout(() => { _retryCount = 0; }, 30_000);
+            _retryResetTimer = setTimeout(() => {
+                _retryCount = 0;
+            }, 30_000);
 
             if (_retryCount >= 3) {
                 _retryCount = 0;
@@ -102,7 +104,10 @@ export const useNotifications = () => {
     }
 
     async function fetchRecent() {
-        const data = await api.get<{ items: Notification[], nextCursor: string | null, totalUnread: number }>('/notifications', { toast: false });
+        const data = await api.get<{ items: Notification[]; nextCursor: string | null; totalUnread: number }>(
+            "/notifications",
+            { toast: false },
+        );
         notifications.value = data.items;
         nextCursor.value = data.nextCursor;
         unreadCount.value = data.totalUnread;
@@ -116,9 +121,9 @@ export const useNotifications = () => {
         isLoadingMore.value = true;
 
         try {
-            const data = await api.get<{ items: Notification[], nextCursor: string | null }>('/notifications', {
+            const data = await api.get<{ items: Notification[]; nextCursor: string | null }>("/notifications", {
                 toast: false,
-                params: { cursor: nextCursor.value }
+                params: { cursor: nextCursor.value },
             });
 
             notifications.value = [...notifications.value, ...data.items];
@@ -130,10 +135,10 @@ export const useNotifications = () => {
 
     async function markAsRead(uuid: string) {
         await api.get(`/notification/${uuid}/read`, {
-            toast: false
+            toast: false,
         });
 
-        const notif = notifications.value.find(n => n.uuid === uuid);
+        const notif = notifications.value.find((n) => n.uuid === uuid);
 
         if (notif && !notif.readAt) {
             notif.readAt = new Date().toISOString();
@@ -142,11 +147,11 @@ export const useNotifications = () => {
     }
 
     async function markAllAsRead() {
-        await api.get('/notifications/read', {
-            toast: false
+        await api.get("/notifications/read", {
+            toast: false,
         });
 
-        notifications.value.forEach(n => {
+        notifications.value.forEach((n) => {
             if (!n.readAt) {
                 n.readAt = new Date().toISOString();
             }

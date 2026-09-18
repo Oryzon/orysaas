@@ -1,9 +1,7 @@
 <template>
     <v-row>
         <v-col md="12" class="d-flex justify-end mb-n2">
-            <portal-menus-add
-                @created="addToMenus"
-            ></portal-menus-add>
+            <portal-menus-add @created="addToMenus"></portal-menus-add>
         </v-col>
 
         <v-col md="12">
@@ -20,24 +18,18 @@
                                 items-per-page="25"
                             >
                                 <template v-slot:item.isActive="{ value }">
-                                    <v-chip v-if="value" label append-icon="mdi-check" color="success">Menu activé</v-chip>
+                                    <v-chip v-if="value" label append-icon="mdi-check" color="success"
+                                        >Menu activé</v-chip
+                                    >
                                     <v-chip v-else label append-icon="mdi-close" color="error">Menu désactivé</v-chip>
                                 </template>
 
                                 <template v-slot:item.actions="{ item }">
-                                    <v-btn
-                                        variant="text"
-                                        icon
-                                        color="info"
-                                        :to="`/portal/menus/${item.uuid}`"
-                                    >
+                                    <v-btn variant="text" icon color="info" :to="`/portal/menus/${item.uuid}`">
                                         <v-icon>mdi-pencil</v-icon>
                                     </v-btn>
 
-                                    <portal-menus-remove
-                                        :entity="item"
-                                        @removed="removeToMenus"
-                                    ></portal-menus-remove>
+                                    <portal-menus-remove :entity="item" @removed="removeToMenus"></portal-menus-remove>
                                 </template>
                             </v-data-table>
                         </v-col>
@@ -66,10 +58,10 @@ const isLoading = computed(() => {
 
 const headers = computed(() => {
     return [
-        { title: 'Titre', key: 'label' },
-        { title: 'Location / Clé', key: 'key' },
-        { title: "Menu actif ?", key: 'isActive', minWidth: 150 },
-        { title: 'Actions', key: 'actions', align: 'end', minWidth: 150 }
+        { title: "Titre", key: "label" },
+        { title: "Location / Clé", key: "key" },
+        { title: "Menu actif ?", key: "isActive", minWidth: 150 },
+        { title: "Actions", key: "actions", align: "end", minWidth: 150 },
     ];
 });
 
@@ -81,19 +73,17 @@ onMounted(async () => {
 });
 
 const handleSearch = async () => {
-    menus.value = await api.get<Array<Menu>>('menus', {
-        loadingKey: 'menus:list',
-        params: {
-
-        }
+    menus.value = await api.get<Array<Menu>>("menus", {
+        loadingKey: "menus:list",
+        params: {},
     });
 };
 
 const addToMenus = (data: Menu) => {
     menus.value.push(data);
-}
+};
 
 const removeToMenus = (data: Menu) => {
     menus.value = menus.value.filter((entity) => entity.uuid !== data.uuid);
-}
+};
 </script>

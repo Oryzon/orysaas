@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading" v-if="props.entity.isRegistered">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="text"
-                icon
-                color="info"
-            >
+            <v-btn v-bind="activatorProps" variant="text" icon color="info">
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </template>
@@ -24,10 +19,7 @@
                 </v-toolbar>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <v-text-field
@@ -35,7 +27,7 @@
                                     v-model="job.expression"
                                     label="Expression cron"
                                     placeholder="0 0 * * *"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     hint="Format : minute, heure, jour, mois, jour-semaine."
                                     persistent-hint
                                 ></v-text-field>
@@ -77,12 +69,7 @@
                 <v-card-actions class="bg-surface-light mt-n2">
                     <v-spacer />
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid"
-                        @click="handleUpdate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid" @click="handleUpdate">
                         Modifier
                     </v-btn>
                 </v-card-actions>
@@ -92,17 +79,17 @@
 </template>
 
 <script lang="ts" setup>
-import cronstrue from 'cronstrue/i18n';
-import type { JobSetting } from '~/models/JobSetting';
+import cronstrue from "cronstrue/i18n";
+import type { JobSetting } from "~/models/JobSetting";
 
 const props = defineProps<{
-    entity: JobSetting,
+    entity: JobSetting;
 }>();
 
-const emit = defineEmits(['updated']);
+const emit = defineEmits(["updated"]);
 
 const api = useApi();
-const rules  = useValidationRules();
+const rules = useValidationRules();
 
 const dialog = ref(false);
 const form = ref();
@@ -111,18 +98,18 @@ const isFormValid = ref(false);
 const job = ref<Partial<JobSetting>>({});
 
 watch(dialog, async (newVal) => {
-    job.value = {...props.entity};
+    job.value = { ...props.entity };
 });
 
 const readableExpression = computed(() => {
     try {
-        return cronstrue.toString(job.value.expression, { locale: 'fr' });
+        return cronstrue.toString(job.value.expression, { locale: "fr" });
     } catch {
         return null;
     }
 });
 
-const isLoading = computed(() => api.isLoading('jobs:edit'));
+const isLoading = computed(() => api.isLoading("jobs:edit"));
 
 const handleClose = () => {
     dialog.value = false;
@@ -135,13 +122,13 @@ const handleUpdate = async () => {
         return;
     }
 
-    const res = await api.put<{ message: string, entity: JobSetting }>(
+    const res = await api.put<{ message: string; entity: JobSetting }>(
         `job/${props.entity.uuid}`,
         { ...job.value },
-        { loadingKey: 'jobs:edit', toast: true }
+        { loadingKey: "jobs:edit", toast: true },
     );
 
-    emit('updated', res.entity);
+    emit("updated", res.entity);
     handleClose();
 };
 </script>

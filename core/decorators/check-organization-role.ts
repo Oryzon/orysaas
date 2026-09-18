@@ -14,9 +14,7 @@ export function CheckOrganizationRole(minRole: OrganizationMemberRole) {
             const member = res.locals.organizationMember as OrganizationMemberEntity | undefined;
 
             if (!member) {
-                return res
-                    .status(HttpCode.FORBIDDEN)
-                    .send({ message: Messages.ORGANIZATION_ROLE_INSUFFICIENT });
+                return res.status(HttpCode.FORBIDDEN).send({ message: Messages.ORGANIZATION_ROLE_INSUFFICIENT });
             }
 
             const memberLevel = ROLE_HIERARCHY.indexOf(member.role);

@@ -5,34 +5,36 @@ import { MenuRepository } from "../../../databases/repositories/menu.repository"
 import { PageRepository } from "../../../databases/repositories/page.repository";
 import { Equal } from "typeorm";
 
-@Controller('public')
+@Controller("public")
 export default class PublicController {
-    @Get('/')
+    @Get("/")
     @Error()
     async bootstrap(req: Request, res: Response) {
-        let headerMenu = await MenuRepository.getPublicWithKey('header');
-        let footerMenu = await MenuRepository.getPublicWithKey('footer');
+        let headerMenu = await MenuRepository.getPublicWithKey("header");
+        let footerMenu = await MenuRepository.getPublicWithKey("footer");
 
         return res.status(HttpCode.OK).send({
             menus: {
                 header: headerMenu,
-                footer: footerMenu
-            }
+                footer: footerMenu,
+            },
         });
     }
 
-    @Get('/sitemap')
+    @Get("/sitemap")
     @Error()
     async sitemap(req: Request, res: Response) {
         let pages = await PageRepository.find({
             where: {
-                isPublished: Equal(true)
-            }
+                isPublished: Equal(true),
+            },
         });
 
-        return res.status(HttpCode.OK).send(pages.map((page: any) => ({
-            loc: `/${page.slug}`,
-            lastmod: page.updatedAt,
-        })));
+        return res.status(HttpCode.OK).send(
+            pages.map((page: any) => ({
+                loc: `/${page.slug}`,
+                lastmod: page.updatedAt,
+            })),
+        );
     }
 }

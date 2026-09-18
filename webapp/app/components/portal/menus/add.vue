@@ -1,14 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="flat"
-                color="primary"
-                prepend-icon="mdi-plus"
-            >
-                Créer
-            </v-btn>
+            <v-btn v-bind="activatorProps" variant="flat" color="primary" prepend-icon="mdi-plus"> Créer </v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
@@ -24,10 +17,7 @@
                 </v-toolbar>
 
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <v-text-field
@@ -37,7 +27,7 @@
                                     v-model="menu.key"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required(), rules.minLength(3)]"
+                                    :rules="[rules.required(), rules.minLength(3)]"
                                 ></v-text-field>
                             </v-col>
 
@@ -49,7 +39,7 @@
                                     v-model="menu.label"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required(), rules.minLength(3)]"
+                                    :rules="[rules.required(), rules.minLength(3)]"
                                 ></v-text-field>
                             </v-col>
 
@@ -67,15 +57,10 @@
                     </v-form>
                 </v-card-text>
 
-                <v-card-actions class="bg-surface-light mt-n12" >
+                <v-card-actions class="bg-surface-light mt-n12">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        @click="handleCreate"
-                        :disabled="!isFormValid"
-                    >Créer</v-btn>
+                    <v-btn color="success" variant="flat" @click="handleCreate" :disabled="!isFormValid">Créer</v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -88,10 +73,10 @@ import { type Menu } from "~/models/Menu";
 const api = useApi();
 const dialog = ref(false);
 
-const emit = defineEmits(['created']);
+const emit = defineEmits(["created"]);
 
 const isLoading = computed(() => {
-    return api.isLoading('menu:create');
+    return api.isLoading("menu:create");
 });
 
 const form = ref();
@@ -102,7 +87,7 @@ let menu = ref<Partial<Menu>>({});
 const handleClose = () => {
     dialog.value = false;
     menu.value = {};
-}
+};
 
 const handleCreate = async () => {
     const { valid } = await form.value.validate();
@@ -112,14 +97,16 @@ const handleCreate = async () => {
         return;
     }
 
-    let res = await api.post<{ message: string, entity: Menu }>(`/menu`,
+    let res = await api.post<{ message: string; entity: Menu }>(
+        `/menu`,
         { ...menu.value },
         {
-            loadingKey: 'menu:create',
-            toast: true
-        });
+            loadingKey: "menu:create",
+            toast: true,
+        },
+    );
 
     emit("created", res.entity);
     handleClose();
-}
+};
 </script>

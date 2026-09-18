@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="640" :persistent="isLoading">
         <template #activator="{ props: activatorProps }">
-            <v-btn
-                prepend-icon="mdi-email-fast-outline"
-                variant="tonal"
-                color="primary"
-                v-bind="activatorProps"
-            >
+            <v-btn prepend-icon="mdi-email-fast-outline" variant="tonal" color="primary" v-bind="activatorProps">
                 Voir invitations
             </v-btn>
         </template>
@@ -14,8 +9,7 @@
         <v-card flat>
             <v-toolbar color="primary" flat>
                 <v-toolbar-title class="d-flex align-center ga-3">
-                    <v-icon>mdi-email-fast-outline</v-icon>&nbsp;
-                    Invitations en attente
+                    <v-icon>mdi-email-fast-outline</v-icon>&nbsp; Invitations en attente
                 </v-toolbar-title>
 
                 <v-btn icon @click="dialog = false">
@@ -28,10 +22,7 @@
                     <v-progress-circular indeterminate color="primary"></v-progress-circular>
                 </div>
 
-                <div
-                    v-else-if="invites.length === 0"
-                    class="pa-8 text-center text-medium-emphasis"
-                >
+                <div v-else-if="invites.length === 0" class="pa-8 text-center text-medium-emphasis">
                     Il n'y a aucune invitation en attente.
                 </div>
 
@@ -43,9 +34,15 @@
                                     size="36"
                                     rounded="lg"
                                     class="mr-3 text-caption font-weight-bold flex-shrink-0"
-                                    :color="OrganizationMemberRoleColor[invite.role as OrganizationMemberRole] ?? 'grey'"
+                                    :color="
+                                        OrganizationMemberRoleColor[invite.role as OrganizationMemberRole] ?? 'grey'
+                                    "
                                 >
-                                    {{ OrganizationMemberRoleLabel[invite.role as OrganizationMemberRole]?.charAt(0).toUpperCase() ?? '?' }}
+                                    {{
+                                        OrganizationMemberRoleLabel[invite.role as OrganizationMemberRole]
+                                            ?.charAt(0)
+                                            .toUpperCase() ?? "?"
+                                    }}
                                 </v-avatar>
                             </template>
 
@@ -95,12 +92,10 @@ const dialog = ref(false);
 const invites = ref<OrganizationInvite[]>([]);
 const cancellingUuid = ref<string | null>(null);
 
-const isLoading = computed(() => api.isLoading('invites:list'));
+const isLoading = computed(() => api.isLoading("invites:list"));
 
 const listEndpoint = computed(() =>
-    props.adminMode
-        ? `/organization/${props.slug}/invites`
-        : `/tenant/${props.slug}/member/invite/pending`
+    props.adminMode ? `/organization/${props.slug}/invites` : `/tenant/${props.slug}/member/invite/pending`,
 );
 
 watch(dialog, async (opened) => {
@@ -109,7 +104,7 @@ watch(dialog, async (opened) => {
     }
 
     invites.value = await api.get<OrganizationInvite[]>(listEndpoint.value, {
-        loadingKey: 'invites:list',
+        loadingKey: "invites:list",
         toast: false,
     });
 });
@@ -122,7 +117,7 @@ const handleCancel = async (invite: OrganizationInvite) => {
             toast: true,
         });
 
-        invites.value = invites.value.filter(i => i.uuid !== invite.uuid);
+        invites.value = invites.value.filter((i) => i.uuid !== invite.uuid);
     } finally {
         cancellingUuid.value = null;
     }

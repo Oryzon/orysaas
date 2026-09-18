@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="600" :persistent="isLoading" v-if="props.entity.isRegistered">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="text"
-                :color="props.entity.isEnabled ? 'error' : 'success'"
-                icon
-            >
+            <v-btn v-bind="activatorProps" variant="text" :color="props.entity.isEnabled ? 'error' : 'success'" icon>
                 <v-icon v-if="props.entity.isEnabled">mdi-sync-off</v-icon>
                 <v-icon v-else>mdi-sync</v-icon>
             </v-btn>
@@ -35,8 +30,11 @@
                             <br />
 
                             <p>
-                                Ce job est <strong>actuellement activé</strong> et <strong>tourne</strong> sur le serveur.<br /><br />
-                                Vous êtes sur le point de le désactivé, ce qui fait qu'il <strong>ne tournera plus jusqu'au moment ou il sera de nouveau activé</strong>.<br /><br />
+                                Ce job est <strong>actuellement activé</strong> et <strong>tourne</strong> sur le
+                                serveur.<br /><br />
+                                Vous êtes sur le point de le désactivé, ce qui fait qu'il
+                                <strong>ne tournera plus jusqu'au moment ou il sera de nouveau activé</strong
+                                >.<br /><br />
                                 Êtes-vous sur de vouloir réaliser cette action ?
                             </p>
                         </v-col>
@@ -47,8 +45,10 @@
                             <br />
 
                             <p>
-                                Ce job est <strong>actuellement désactivé</strong> et <strong>ne tourne pas</strong> sur le serveur.<br /><br />
-                                Vous êtes sur le point de le réactivé, ce qui fait qu'il <strong>va tourner a chaque période définie</strong>.<br /><br />
+                                Ce job est <strong>actuellement désactivé</strong> et <strong>ne tourne pas</strong> sur
+                                le serveur.<br /><br />
+                                Vous êtes sur le point de le réactivé, ce qui fait qu'il
+                                <strong>va tourner a chaque période définie</strong>.<br /><br />
                                 Êtes-vous sur de vouloir réaliser cette action ?
                             </p>
                         </v-col>
@@ -58,11 +58,7 @@
                 <v-card-actions class="bg-surface-light mt-n2">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        @click="handleUpdate"
-                    >Continuer</v-btn>
+                    <v-btn color="success" variant="flat" @click="handleUpdate">Continuer</v-btn>
                 </v-card-actions>
             </v-card>
         </template>
@@ -70,33 +66,33 @@
 </template>
 
 <script lang="ts" setup>
-import type { JobSetting } from '~/models/JobSetting';
+import type { JobSetting } from "~/models/JobSetting";
 
 const props = defineProps<{
-    entity: JobSetting,
+    entity: JobSetting;
 }>();
 
-const emit = defineEmits(['updated']);
+const emit = defineEmits(["updated"]);
 
 const api = useApi();
 const dialog = ref(false);
 
 const isLoading = computed(() => {
-    return api.isLoading('KEY');
+    return api.isLoading("KEY");
 });
 
 const handleClose = () => {
     dialog.value = false;
-}
+};
 
 const handleUpdate = async () => {
-    const res = await api.put<{message: string, entity: JobSetting}>(
+    const res = await api.put<{ message: string; entity: JobSetting }>(
         `job/${props.entity.uuid}`,
         { isEnabled: !props.entity.isEnabled },
-        { loadingKey: 'jobs:edit', toast: true }
+        { loadingKey: "jobs:edit", toast: true },
     );
 
-    emit('updated', res.entity);
+    emit("updated", res.entity);
     handleClose();
 };
 </script>

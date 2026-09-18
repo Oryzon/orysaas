@@ -12,9 +12,9 @@ const roleLabelMap: Record<OrganizationMemberRole, string> = {
     [OrganizationMemberRole.MEMBER]: "Membre",
 };
 
-@Controller('/tenant/:slugOrganization/members')
+@Controller("/tenant/:slugOrganization/members")
 export default class TenantMembersController {
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckOrganizationMember()
     @Error()
@@ -26,12 +26,10 @@ export default class TenantMembersController {
                 organizationUuid: Equal(organization.uuid),
             },
             relations: {
-                member: true
-            }
+                member: true,
+            },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send(members);
+        return res.status(HttpCode.OK).send(members);
     }
 }

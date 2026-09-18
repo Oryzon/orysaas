@@ -4,20 +4,19 @@
             <v-card flat>
                 <v-card-text>
                     <div class="d-flex align-center ga-4">
-                        <v-avatar size="64" rounded="lg" class="gradient-primary flex-shrink-0 text-h5 font-weight-bold">
-                            <span>{{ getInitials(user.firstname + ' ' + user.lastname) }}</span>
+                        <v-avatar
+                            size="64"
+                            rounded="lg"
+                            class="gradient-primary flex-shrink-0 text-h5 font-weight-bold"
+                        >
+                            <span>{{ getInitials(user.firstname + " " + user.lastname) }}</span>
                         </v-avatar>
 
                         <div class="flex-grow-1">
                             <div class="text-h4 font-weight-bold">{{ user.lastname }} {{ user.firstname }}</div>
 
                             <div class="d-flex align-center ga-2 mt-1 flex-wrap">
-                                <v-chip
-                                    color="primary"
-                                    variant="tonal"
-                                    label
-                                    prepend-icon="mdi-email"
-                                >
+                                <v-chip color="primary" variant="tonal" label prepend-icon="mdi-email">
                                     {{ user.email }}
                                 </v-chip>
 
@@ -36,7 +35,7 @@
                                     label
                                     :prepend-icon="user.isActive ? 'mdi-check' : 'mdi-close'"
                                 >
-                                    L'utilisateur est {{ user.isActive ? 'actif' : 'non-actif' }}.
+                                    L'utilisateur est {{ user.isActive ? "actif" : "non-actif" }}.
                                 </v-chip>
 
                                 <v-chip
@@ -45,15 +44,11 @@
                                     label
                                     :prepend-icon="user.isSaasAdmin ? 'mdi-shield-check-outline' : 'mdi-shield-alert'"
                                 >
-                                    L'utilisateur {{ user.isSaasAdmin ? "est administrateur" : "n'est pas administateur" }}.
+                                    L'utilisateur
+                                    {{ user.isSaasAdmin ? "est administrateur" : "n'est pas administateur" }}.
                                 </v-chip>
 
-                                <v-chip
-                                    color="info"
-                                    variant="tonal"
-                                    label
-                                    prepend-icon="mdi-calendar-clock-outline"
-                                >
+                                <v-chip color="info" variant="tonal" label prepend-icon="mdi-calendar-clock-outline">
                                     Dernière connexion {{ $date.french(user.lastLogin) }}
                                 </v-chip>
                             </div>
@@ -84,7 +79,11 @@
                                 items-per-page="25"
                             >
                                 <template v-slot:item.logoUrl="{ item, value }">
-                                    <v-avatar size="48" rounded="lg" class="gradient-primary flex-shrink-0 text-h5 font-weight-bold">
+                                    <v-avatar
+                                        size="48"
+                                        rounded="lg"
+                                        class="gradient-primary flex-shrink-0 text-h5 font-weight-bold"
+                                    >
                                         <v-img v-if="value" :src="value" />
                                         <span v-else>{{ getInitials(item.name) }}</span>
                                     </v-avatar>
@@ -119,7 +118,7 @@ import { getUserOriginColor, getUserOriginLabel, type User } from "~/models/User
 import {
     OrganizationMemberRole,
     OrganizationMemberRoleColor,
-    OrganizationMemberRoleLabel
+    OrganizationMemberRoleLabel,
 } from "#shared/organization-roles";
 
 const api = useApi();

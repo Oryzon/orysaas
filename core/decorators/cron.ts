@@ -1,6 +1,6 @@
-import 'reflect-metadata';
+import "reflect-metadata";
 
-export const CRON_METADATA_KEY = 'cron_jobs';
+export const CRON_METADATA_KEY = "cron_jobs";
 
 export interface CronJobMeta {
     name: string;
@@ -15,9 +15,9 @@ export function Cron(name: string, expression: string, options?: { runOnStart: b
         existings.push({
             name,
             expression,
-            handlerName: propertyKey
+            handlerName: propertyKey,
         });
 
-        Reflect.defineMetadata(CRON_METADATA_KEY, existings, target.constructor)
-    }
+        Reflect.defineMetadata(CRON_METADATA_KEY, existings, target.constructor);
+    };
 }

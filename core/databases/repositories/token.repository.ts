@@ -19,7 +19,7 @@ export const TokenRepository = dataSource.getRepository(TokenEntity).extend({
     async findValid(token: string, type: TokenType): Promise<TokenEntity | null> {
         return this.findOne({
             where: { token, type },
-            relations: ['user'],
+            relations: ["user"],
         });
     },
     async markAsUsed(token: TokenEntity): Promise<void> {
@@ -44,10 +44,10 @@ export const TokenRepository = dataSource.getRepository(TokenEntity).extend({
         return this.findOne({
             where: {
                 token: Equal(`${userUuid}:${code}`),
-                type: Equal(type)
+                type: Equal(type),
             },
             relations: {
-                user: true
+                user: true,
             },
         });
     },

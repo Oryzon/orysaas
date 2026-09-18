@@ -1,9 +1,7 @@
 <template>
     <v-row>
         <v-col md="12" class="d-flex justify-end ga-2 mb-n2">
-            <portal-tenant-members-view-invites
-                :slug="slugOrganization"
-            ></portal-tenant-members-view-invites>
+            <portal-tenant-members-view-invites :slug="slugOrganization"></portal-tenant-members-view-invites>
 
             <portal-tenant-members-invite></portal-tenant-members-invite>
         </v-col>
@@ -25,11 +23,12 @@
                                 <template v-slot:item.member="{ item }">
                                     <div class="d-flex align-center ga-3 py-2">
                                         <v-avatar size="36" rounded="lg" class="gradient-primary flex-shrink-0">
-                                            {{ getInitials(item.member.firstname + ' ' + item.member.lastname) }}
+                                            {{ getInitials(item.member.firstname + " " + item.member.lastname) }}
                                         </v-avatar>
 
                                         <div>
-                                            <div class="text-body-2 font-weight-medium">{{ item.member.lastname }}
+                                            <div class="text-body-2 font-weight-medium">
+                                                {{ item.member.lastname }}
                                                 {{ item.member.firstname }}
                                             </div>
                                             <div class="text-caption text-medium-emphasis">{{ item.member.email }}</div>
@@ -49,7 +48,9 @@
                                 </template>
 
                                 <template v-slot:item.createdAt="{ item }">
-                                    <span class="text-body-2 text-medium-emphasis">{{ $date.french(item.createdAt) }}</span>
+                                    <span class="text-body-2 text-medium-emphasis">{{
+                                        $date.french(item.createdAt)
+                                    }}</span>
                                 </template>
 
                                 <template v-slot:item.actions="{ item }">
@@ -78,7 +79,7 @@ import {
     type OrganizationMember,
     OrganizationMemberRole,
     OrganizationMemberRoleColor,
-    OrganizationMemberRoleLabel
+    OrganizationMemberRoleLabel,
 } from "~/models/OrganizationMember";
 import type { User } from "~/models/User";
 
@@ -105,7 +106,6 @@ const headers = computed(() => {
         { title: "Utilisateur", key: "member", sortable: false },
         { title: "Rôle", key: "role", sortable: false },
         { title: "Membre depuis", key: "createdAt" },
-
     ];
 
     if (canEdit.value || canDelete.value) {
@@ -123,5 +123,5 @@ onMounted(async () => {
 
 const removeToMembers = (data: OrganizationMember) => {
     members.value = members.value.filter((member) => member.uuid !== data.uuid);
-}
+};
 </script>

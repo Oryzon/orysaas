@@ -33,12 +33,25 @@
 
             <v-divider />
 
-            <portal-tenant-organization-switch v-if="!user?.isSaasAdmin" :is-collapsed="isCollapsed"></portal-tenant-organization-switch>
+            <portal-tenant-organization-switch
+                v-if="!user?.isSaasAdmin"
+                :is-collapsed="isCollapsed"
+            ></portal-tenant-organization-switch>
 
             <v-list color="primary" base-color="white" nav>
-                <v-list-item rounded="xl" prepend-icon="mdi-view-dashboard" title="Tableau de bord" to="/portal/dashboard" :active="isNavActive('/portal/dashboard')" />
+                <v-list-item
+                    rounded="xl"
+                    prepend-icon="mdi-view-dashboard"
+                    title="Tableau de bord"
+                    to="/portal/dashboard"
+                    :active="isNavActive('/portal/dashboard')"
+                />
 
-                <v-list-subheader v-if="user?.isSaasAdmin" class="mt-2 text-uppercase text-label-large" color="grey-lighten-2">
+                <v-list-subheader
+                    v-if="user?.isSaasAdmin"
+                    class="mt-2 text-uppercase text-label-large"
+                    color="grey-lighten-2"
+                >
                     Pilotage SaaS
                 </v-list-subheader>
 
@@ -202,7 +215,9 @@
 
         <v-main>
             <v-container fluid>
-                <portal-tenant-organization-onboarding-dashboard v-if="!user.isSaasAdmin && currentOrganization && currentOrganization.slug === null" />
+                <portal-tenant-organization-onboarding-dashboard
+                    v-if="!user?.isSaasAdmin && currentOrganization && currentOrganization.slug === null"
+                />
 
                 <slot v-else />
             </v-container>
@@ -242,9 +257,11 @@ onMounted(async () => {
 
 const isHovering = ref(false);
 const isCollapsed = computed(() => menuIsOpen.value && !isHovering.value);
-const showLeftMenu = computed(() => user.value?.isSaasAdmin || (currentOrganization.value !== null && currentOrganization.value.slug !== null));
+const showLeftMenu = computed(
+    () => user.value?.isSaasAdmin || (currentOrganization.value !== null && currentOrganization.value.slug !== null),
+);
 
-const isNavActive = (path: string) => route.path === path || route.path.startsWith(path + '/');
+const isNavActive = (path: string) => route.path === path || route.path.startsWith(path + "/");
 
 const userInitials = computed(() => {
     if (!user.value) {

@@ -3,8 +3,8 @@ import fs from "fs";
 import { CRON_METADATA_KEY, CronJobMeta } from "../decorators";
 
 export interface DiscoveredJobs {
-    instance: any,
-    meta: CronJobMeta
+    instance: any;
+    meta: CronJobMeta;
 }
 
 export async function discover() {
@@ -12,12 +12,12 @@ export async function discover() {
     const files = new Glob("jobs/**/*", {});
 
     for await (const file of files) {
-        if (file.toLowerCase().endsWith('jobs.ts')) {
-            const [exportName] = file.split('.ts');
+        if (file.toLowerCase().endsWith("jobs.ts")) {
+            const [exportName] = file.split(".ts");
             let tmp = await import(`../${exportName}`);
 
             for (const exported of Object.values(tmp)) {
-                if (typeof exported !== 'function') {
+                if (typeof exported !== "function") {
                     continue;
                 }
 

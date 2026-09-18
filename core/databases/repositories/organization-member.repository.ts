@@ -6,13 +6,13 @@ export const OrganizationMemberRepository = dataSource.getRepository(Organizatio
     async findLight(userUuid: string) {
         const orga = await this.findOne({
             where: {
-                memberUuid: Equal(userUuid)
+                memberUuid: Equal(userUuid),
             },
             order: {
-                createdAt: "ASC"
+                createdAt: "ASC",
             },
             relations: {
-                organization: true
+                organization: true,
             },
         });
 
@@ -21,8 +21,8 @@ export const OrganizationMemberRepository = dataSource.getRepository(Organizatio
         if (orga) {
             countMember = await OrganizationMemberRepository.count({
                 where: {
-                    organizationUuid: Equal(orga.organizationUuid)
-                }
+                    organizationUuid: Equal(orga.organizationUuid),
+                },
             });
         }
 
@@ -32,7 +32,7 @@ export const OrganizationMemberRepository = dataSource.getRepository(Organizatio
             logoUrl: orga?.organization?.logoUrl ?? null,
             nbMembers: countMember,
             role: orga?.role ?? null,
-        }
+        };
     },
     async findLightBySlug(userUuid: string, slug: string) {
         const orga = await this.findOne({
@@ -51,7 +51,7 @@ export const OrganizationMemberRepository = dataSource.getRepository(Organizatio
 
         const nbMembers = await OrganizationMemberRepository.count({
             where: {
-                organizationUuid: Equal(orga.organizationUuid)
+                organizationUuid: Equal(orga.organizationUuid),
             },
         });
 
@@ -66,31 +66,33 @@ export const OrganizationMemberRepository = dataSource.getRepository(Organizatio
     async findAll(userUuid: string) {
         const orgas = await this.find({
             where: {
-                memberUuid: Equal(userUuid)
+                memberUuid: Equal(userUuid),
             },
             order: {
-                createdAt: "ASC"
+                createdAt: "ASC",
             },
             relations: {
-                organization: true
+                organization: true,
             },
         });
 
-        return Promise.all(orgas.map(async (orga: OrganizationMemberEntity) => {
-            const nbMembers = await OrganizationMemberRepository.count({
-                where: {
-                    organizationUuid: Equal(orga.organizationUuid)
-                },
-            });
+        return Promise.all(
+            orgas.map(async (orga: OrganizationMemberEntity) => {
+                const nbMembers = await OrganizationMemberRepository.count({
+                    where: {
+                        organizationUuid: Equal(orga.organizationUuid),
+                    },
+                });
 
-            return {
-                uuid: orga.organization.uuid,
-                slug: orga.organization.slug,
-                name: orga.organization.name,
-                logoUrl: orga.organization.logoUrl,
-                role: orga.role,
-                nbMembers,
-            };
-        }));
-    }
-})
+                return {
+                    uuid: orga.organization.uuid,
+                    slug: orga.organization.slug,
+                    name: orga.organization.name,
+                    logoUrl: orga.organization.logoUrl,
+                    role: orga.role,
+                    nbMembers,
+                };
+            }),
+        );
+    },
+});

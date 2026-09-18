@@ -5,14 +5,14 @@ import { NotificationTypes, NotificationAction } from "../../../shared/notificat
 
 @Entity()
 export class NotificationEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn("uuid")
     uuid: string;
 
     @Column()
     userUuid: string;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'userUuid' })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "userUuid" })
     user: UserEntity;
 
     @Column()

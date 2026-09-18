@@ -11,7 +11,6 @@ import { archiveStripePrice, syncPlanByUuid } from "../../../../helpers/stripe.h
 
 @Controller("plan/:uuidPlan/price")
 export default class PlanPriceController {
-
     @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
@@ -21,13 +20,11 @@ export default class PlanPriceController {
 
         const prices = await PlanPriceRepository.find({
             where: {
-                planUuid: Equal(uuidPlan)
+                planUuid: Equal(uuidPlan),
             },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send(attachPlanPriceDiscounts(prices));
+        return res.status(HttpCode.OK).send(attachPlanPriceDiscounts(prices));
     }
 
     @Post("/")
@@ -37,19 +34,12 @@ export default class PlanPriceController {
     async create(req: Request, res: Response) {
         const uuidPlan = req.params.uuidPlan;
 
-        const {
-            billingInterval,
-            sellPrice,
-            purchasePrice,
-            trialPeriod,
-        } = req.body;
+        const { billingInterval, sellPrice, purchasePrice, trialPeriod } = req.body;
 
         if (!billingInterval || sellPrice === undefined || sellPrice === null) {
-            return res
-                .status(HttpCode.BAD_REQUEST)
-                .send({
-                    message: Messages.MISSING_PARAMETERS
-                });
+            return res.status(HttpCode.BAD_REQUEST).send({
+                message: Messages.MISSING_PARAMETERS,
+            });
         }
 
         const existing = await PlanPriceRepository.findOne({
@@ -60,11 +50,9 @@ export default class PlanPriceController {
         });
 
         if (existing) {
-            return res
-                .status(HttpCode.CONFLICT)
-                .send({
-                    message: Messages.PLAN_PRICE_ALREADY_EXISTS
-                });
+            return res.status(HttpCode.CONFLICT).send({
+                message: Messages.PLAN_PRICE_ALREADY_EXISTS,
+            });
         }
 
         const entity = new PlanPriceEntity();
@@ -86,7 +74,7 @@ export default class PlanPriceController {
         });
     }
 
-    @Put('/:uuidPlanPrice')
+    @Put("/:uuidPlanPrice")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -94,33 +82,26 @@ export default class PlanPriceController {
         const uuidPlanPrice = req.params.uuidPlanPrice;
         const uuidPlan = req.params.uuidPlan;
 
-        const {
-            billingInterval,
-            sellPrice,
-            purchasePrice,
-            trialPeriod,
-        } = req.body;
+        const { billingInterval, sellPrice, purchasePrice, trialPeriod } = req.body;
 
         const alreadyExist = await PlanPriceRepository.findOne({
             where: {
                 planUuid: Equal(uuidPlan),
                 billingInterval: Equal(billingInterval as BillingInterval),
-            }
+            },
         });
 
         if (alreadyExist && alreadyExist.uuid !== uuidPlanPrice) {
-            return res
-                .status(HttpCode.CONFLICT)
-                .send({
-                    message: Messages.PLAN_PRICE_ALREADY_EXISTS
-                });
+            return res.status(HttpCode.CONFLICT).send({
+                message: Messages.PLAN_PRICE_ALREADY_EXISTS,
+            });
         }
 
         let entity = await PlanPriceRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuidPlanPrice),
                 planUuid: Equal(uuidPlan),
-            }
+            },
         });
 
         entity.billingInterval = billingInterval;
@@ -151,7 +132,7 @@ export default class PlanPriceController {
             where: {
                 uuid: Equal(uuidPlanPrice),
                 planUuid: Equal(uuidPlan),
-            }
+            },
         });
 
         const stripePriceId = planPrice.stripePriceId;
@@ -164,7 +145,7 @@ export default class PlanPriceController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.PLAN_PRICE_DELETED,
-            entity: planPrice
-        })
+            entity: planPrice,
+        });
     }
 }

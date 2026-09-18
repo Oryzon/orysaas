@@ -16,20 +16,12 @@
 
         <v-divider class="flex-shrink-0"></v-divider>
 
-        <div
-            v-if="notifications.length === 0"
-            class="mt-6 text-center text-medium-emphasis"
-        >
+        <div v-if="notifications.length === 0" class="mt-6 text-center text-medium-emphasis">
             Vous n'avez pas de notification.
         </div>
 
         <div v-else class="overflow-y-auto flex-grow-1">
-            <transition-group
-                tag="div"
-                name="notif-list"
-                appear
-                class="pa-2"
-            >
+            <transition-group tag="div" name="notif-list" appear class="pa-2">
                 <notifications-item
                     v-for="(notif, i) in notifications"
                     :key="notif.uuid"
@@ -39,14 +31,7 @@
             </transition-group>
 
             <div v-if="nextCursor" class="px-2 pb-3">
-                <v-btn
-                    block
-                    variant="tonal"
-                    color="secondary"
-                    rounded="lg"
-                    :loading="isLoadingMore"
-                    @click="fetchMore"
-                >
+                <v-btn block variant="tonal" color="secondary" rounded="lg" :loading="isLoadingMore" @click="fetchMore">
                     Voir plus
                 </v-btn>
             </div>

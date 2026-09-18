@@ -1,11 +1,13 @@
 import {
-    BeforeInsert, BeforeSoftRemove,
+    BeforeInsert,
+    BeforeSoftRemove,
     BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, PrimaryGeneratedColumn,
-    UpdateDateColumn
+    Entity,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -24,7 +26,7 @@ export class JobSettingEntity {
     @Column({ default: true })
     isEnabled: boolean;
 
-    @Column({ type: 'json', nullable: true })
+    @Column({ type: "json", nullable: true })
     parameters: Record<string, any> | null;
 
     @Column()

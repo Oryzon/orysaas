@@ -16,57 +16,30 @@
                         </template>
 
                         <template v-slot:item.isEnabled="{ value }">
-                            <v-chip
-                                v-if="value"
-                                label
-                                append-icon="mdi-check"
-                                color="success"
-                                >Activé</v-chip
-                            >
-                            <v-chip
-                                v-else
-                                label
-                                append-icon="mdi-close"
-                                color="error"
-                                >Non activé</v-chip
-                            >
+                            <v-chip v-if="value" label append-icon="mdi-check" color="success">Activé</v-chip>
+                            <v-chip v-else label append-icon="mdi-close" color="error">Non activé</v-chip>
                         </template>
 
                         <template v-slot:item.isRegistered="{ value }">
-                            <v-chip
-                                v-if="value"
-                                label
-                                append-icon="mdi-check"
-                                color="success"
+                            <v-chip v-if="value" label append-icon="mdi-check" color="success"
                                 >Inscrit sur le serveur</v-chip
                             >
-                            <v-chip
-                                v-else
-                                label
-                                append-icon="mdi-close"
-                                color="error"
+                            <v-chip v-else label append-icon="mdi-close" color="error"
                                 >Non inscrit sur le serveur</v-chip
                             >
                         </template>
 
                         <template v-slot:item.actions="{ item }">
-                            <portal-jobs-run
-                                :entity="item"
-                            ></portal-jobs-run>
+                            <portal-jobs-run :entity="item"></portal-jobs-run>
 
-                            <portal-jobs-edit
-                                :entity="item"
-                                @updated="updateToJobs"
-                            ></portal-jobs-edit>
+                            <portal-jobs-edit :entity="item" @updated="updateToJobs"></portal-jobs-edit>
 
                             <portal-jobs-enable-disable
                                 :entity="item"
                                 @updated="updateToJobs"
                             ></portal-jobs-enable-disable>
-                            
-                            <portal-jobs-history
-                                :entity="item"
-                            ></portal-jobs-history>
+
+                            <portal-jobs-history :entity="item"></portal-jobs-history>
                         </template>
                     </v-data-table>
                 </v-card-text>

@@ -4,30 +4,18 @@
             <v-toolbar-title>Blocs de contenu</v-toolbar-title>
 
             <v-toolbar-items>
-                <portal-blocks-ui-selector
-                    @select="addBlock"
-                ></portal-blocks-ui-selector>
+                <portal-blocks-ui-selector @select="addBlock"></portal-blocks-ui-selector>
             </v-toolbar-items>
         </v-toolbar>
 
         <v-card-text>
             <v-row>
                 <v-col md="12">
-                    <v-alert
-                        v-if="localBlocks.length === 0"
-                        type="info"
-                        variant="tonal"
-                        class="mb-6"
-                    >
+                    <v-alert v-if="localBlocks.length === 0" type="info" variant="tonal" class="mb-6">
                         Aucun bloc pour le moment.
                     </v-alert>
 
-                    <draggable
-                        v-model="localBlocks"
-                        item-key="uuid"
-                        handle=".drag-handle"
-                        @end="onDragEnd"
-                    >
+                    <draggable v-model="localBlocks" item-key="uuid" handle=".drag-handle" @end="onDragEnd">
                         <template #item="{ element, index }">
                             <portal-blocks-ui-item
                                 :block="element"
@@ -41,10 +29,35 @@
             </v-row>
         </v-card-text>
     </v-card>
+
+    <v-dialog v-model="confirmDeleteDialog" max-width="600">
+        <v-card flat>
+            <v-toolbar color="error">
+                <v-toolbar-title>Supprimer le bloc</v-toolbar-title>
+
+                <v-toolbar-items>
+                    <v-btn @click="cancelDeleteBlock">
+                        <v-icon color="white">mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
+            <v-card-text>
+                <v-alert type="info">Cette opération est une opération définitive.</v-alert>
+
+                <p>Vous êtes sur le point de supprimer ce bloc de contenu.</p>
+                <p>Êtes-vous sur de vouloir continuer cette opération ?</p>
+            </v-card-text>
+
+            <v-card-actions class="bg-surface-light mt-n2">
+                <v-btn color="error" variant="flat" @click="confirmDeleteBlock"> Confirmer </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script setup lang="ts">
-import draggable from 'vuedraggable';
+import draggable from "vuedraggable";
 import type { Block } from "~/models/Block";
 
 interface Props {
@@ -53,19 +66,23 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    'update:modelValue': [value: Block[]];
+    "update:modelValue": [value: Block[]];
 }>();
 
 const { createNewBlock } = useCmsBlocks();
 
 const localBlocks = ref<Block[]>(JSON.parse(JSON.stringify(props.modelValue ?? [])));
 
-watch(() => props.modelValue, (newVal) => {
-    localBlocks.value = JSON.parse(JSON.stringify(newVal ?? []));
-}, { deep: true });
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        localBlocks.value = JSON.parse(JSON.stringify(newVal ?? []));
+    },
+    { deep: true },
+);
 
 const emitUpdate = () => {
-    emit('update:modelValue', JSON.parse(JSON.stringify(localBlocks.value)));
+    emit("update:modelValue", JSON.parse(JSON.stringify(localBlocks.value)));
 };
 
 const addBlock = (type: string) => {
@@ -90,10 +107,26 @@ const toggleBlockVisibility = (index: number) => {
     emitUpdate();
 };
 
+const confirmDeleteDialog = ref(false);
+const blockToDeleteIndex = ref<number | null>(null);
+
 const deleteBlock = (index: number) => {
-    // @ToDo : Add a confirm modal
-    localBlocks.value.splice(index, 1);
-    emitUpdate();
+    blockToDeleteIndex.value = index;
+    confirmDeleteDialog.value = true;
+};
+
+const confirmDeleteBlock = () => {
+    if (blockToDeleteIndex.value !== null) {
+        localBlocks.value.splice(blockToDeleteIndex.value, 1);
+        emitUpdate();
+    }
+
+    cancelDeleteBlock();
+};
+
+const cancelDeleteBlock = () => {
+    confirmDeleteDialog.value = false;
+    blockToDeleteIndex.value = null;
 };
 
 const onDragEnd = () => {

@@ -1,55 +1,41 @@
 import { Request, Response } from "express";
 import Stripe from "stripe";
-import { Equal, In } from "typeorm";
+import { Equal } from "typeorm";
 import HttpCode from "../config/http-code";
 import { getStripeClient, upsertSubscriptionFromStripe } from "../helpers/stripe.helper";
 import { OrganizationRepository } from "../databases/repositories/organization.repository";
-import { OrganizationMemberRepository } from "../databases/repositories/organization-member.repository";
-import { OrganizationMemberRole } from "../../shared/organization-roles";
-import { notificationService } from "../services/notification.service";
-import type { NotificationTypes } from "../../shared/notification-types";
+import { PlanPriceRepository } from "../databases/repositories/plan-price.repository";
+import { notifyOrganizationAdmins, emailOrganizationAdmins } from "../helpers/organization-notify.helper";
 import Messages from "../config/messages";
+import { DateTime } from "luxon";
 
 function resolveId(value: string | { id: string } | null | undefined): string | undefined {
     if (!value) {
         return undefined;
     }
 
-    return typeof value === 'string'
-        ? value
-        : value.id;
+    return typeof value === "string" ? value : value.id;
 }
 
-async function notifyOrganizationAdmins(organizationUuid: string, type: NotificationTypes): Promise<void> {
-    const members = await OrganizationMemberRepository.find({
-        where: {
-            organizationUuid: Equal(organizationUuid),
-            role: In([OrganizationMemberRole.OWNER, OrganizationMemberRole.ADMIN]),
-        },
-        relations: {
-            organization: true
-        }
+async function getPlanTitle(planPriceUuid: string): Promise<string> {
+    const planPrice = await PlanPriceRepository.findOne({
+        where: { uuid: Equal(planPriceUuid) },
+        relations: { plan: true },
     });
 
-    for (const member of members) {
-        await notificationService.send(
-            member.memberUuid,
-            type,
-            {
-                organizationName: member.organization.name
-            }
-        );
-    }
+    return planPrice?.plan?.title ?? "";
+}
+
+function manageSubscriptionUrl(organizationSlug: string): string {
+    return `${process.env.HTTP_URL}/portal/${organizationSlug}/subscription`;
 }
 
 export async function handleStripeWebhook(req: Request, res: Response) {
-    const signature = req.headers['stripe-signature'] as string | undefined;
+    const signature = req.headers["stripe-signature"] as string | undefined;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!signature || !webhookSecret) {
-        return res
-            .status(HttpCode.BAD_REQUEST)
-            .send({ message: Messages.MISSING_SIGNATURE });
+        return res.status(HttpCode.BAD_REQUEST).send({ message: Messages.MISSING_SIGNATURE });
     }
 
     let event: Stripe.Event;
@@ -59,18 +45,16 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         stripe = await getStripeClient();
         event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
     } catch (error) {
-        console.log('[Stripe webhook] Signature invalide', error);
+        console.log("[Stripe webhook] Signature invalide", error instanceof Error ? error.message : error);
 
-        return res
-            .status(HttpCode.BAD_REQUEST)
-            .send({
-                message: Messages.MISSING_SIGNATURE
-            });
+        return res.status(HttpCode.BAD_REQUEST).send({
+            message: Messages.MISSING_SIGNATURE,
+        });
     }
 
     try {
         switch (event.type) {
-            case 'checkout.session.completed': {
+            case "checkout.session.completed": {
                 const session = event.data.object as Stripe.Checkout.Session;
                 const subscriptionId = resolveId(session.subscription);
 
@@ -93,44 +77,72 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                     );
 
                     if (subscription) {
-                        await notifyOrganizationAdmins(
-                            subscription.organizationUuid,
-                            'SUBSCRIPTION_STARTED'
+                        await notifyOrganizationAdmins(subscription.organizationUuid, "SUBSCRIPTION_STARTED");
+
+                        const organization = await OrganizationRepository.findOne({
+                            where: { uuid: Equal(subscription.organizationUuid) },
+                        });
+
+                        if (organization) {
+                            const firstItem = stripeSubscription.items.data[0];
+
+                            await emailOrganizationAdmins(
+                                organization.uuid,
+                                "subscription-started",
+                                `Abonnement confirmé pour ${organization.name}`,
+                                {
+                                    organizationName: organization.name,
+                                    planTitle: await getPlanTitle(subscription.planPriceUuid),
+                                    price: firstItem
+                                        ? new Intl.NumberFormat("fr-FR", {
+                                              style: "currency",
+                                              currency: firstItem.price.currency,
+                                          }).format((firstItem.price.unit_amount ?? 0) / 100)
+                                        : "",
+                                    billingIntervalLabel:
+                                        firstItem?.price.recurring?.interval === "year" ? "/ an" : "/ mois",
+                                    manageUrl: manageSubscriptionUrl(organization.slug),
+                                },
+                            );
+                        }
+                    }
+                }
+                break;
+            }
+
+            case "customer.subscription.updated": {
+                await upsertSubscriptionFromStripe(event.data.object as Stripe.Subscription);
+                break;
+            }
+
+            case "customer.subscription.deleted": {
+                const subscription = await upsertSubscriptionFromStripe(event.data.object as Stripe.Subscription);
+
+                if (subscription) {
+                    await notifyOrganizationAdmins(subscription.organizationUuid, "SUBSCRIPTION_CANCELED");
+
+                    const organization = await OrganizationRepository.findOne({
+                        where: { uuid: Equal(subscription.organizationUuid) },
+                    });
+
+                    if (organization) {
+                        await emailOrganizationAdmins(
+                            organization.uuid,
+                            "subscription-cancelled",
+                            `Abonnement annulé pour ${organization.name}`,
+                            {
+                                organizationName: organization.name,
+                                planTitle: await getPlanTitle(subscription.planPriceUuid),
+                                cancelDate: DateTime.now().setLocale("fr").toLocaleString(DateTime.DATE_FULL),
+                                resubscribeUrl: manageSubscriptionUrl(organization.slug),
+                            },
                         );
                     }
                 }
                 break;
             }
 
-            case 'customer.subscription.updated': {
-                await upsertSubscriptionFromStripe(event.data.object as Stripe.Subscription);
-                break;
-            }
-
-            case 'customer.subscription.deleted': {
-                const subscription = await upsertSubscriptionFromStripe(event.data.object as Stripe.Subscription);
-
-                if (subscription) {
-                    await notifyOrganizationAdmins(
-                        subscription.organizationUuid,
-                        'SUBSCRIPTION_CANCELED'
-                    );
-                }
-                break;
-            }
-
-            case 'invoice.payment_succeeded': {
-                const invoice = event.data.object as Stripe.Invoice;
-                const subscriptionId = resolveId(invoice.parent?.subscription_details?.subscription);
-
-                if (subscriptionId) {
-                    const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
-                    await upsertSubscriptionFromStripe(stripeSubscription);
-                }
-                break;
-            }
-
-            case 'invoice.payment_failed': {
+            case "invoice.payment_succeeded": {
                 const invoice = event.data.object as Stripe.Invoice;
                 const subscriptionId = resolveId(invoice.parent?.subscription_details?.subscription);
 
@@ -139,20 +151,75 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                     const subscription = await upsertSubscriptionFromStripe(stripeSubscription);
 
                     if (subscription) {
-                        await notifyOrganizationAdmins(
-                            subscription.organizationUuid,
-                            'PAYMENT_FAILED'
-                        );
+                        const organization = await OrganizationRepository.findOne({
+                            where: { uuid: Equal(subscription.organizationUuid) },
+                        });
+
+                        if (organization) {
+                            await emailOrganizationAdmins(
+                                organization.uuid,
+                                "invoice",
+                                `Votre facture ${organization.name}`,
+                                {
+                                    organizationName: organization.name,
+                                    planTitle: await getPlanTitle(subscription.planPriceUuid),
+                                    invoiceNumber: invoice.number ?? invoice.id,
+                                    date: DateTime.fromSeconds(invoice.created)
+                                        .setLocale("fr")
+                                        .toLocaleString(DateTime.DATE_FULL),
+                                    amount: new Intl.NumberFormat("fr-FR", {
+                                        style: "currency",
+                                        currency: invoice.currency,
+                                    }).format((invoice.amount_paid ?? 0) / 100),
+                                    hostedInvoiceUrl:
+                                        invoice.hosted_invoice_url ?? manageSubscriptionUrl(organization.slug),
+                                },
+                            );
+                        }
+                    }
+                }
+                break;
+            }
+
+            case "invoice.payment_failed": {
+                const invoice = event.data.object as Stripe.Invoice;
+                const subscriptionId = resolveId(invoice.parent?.subscription_details?.subscription);
+
+                if (subscriptionId) {
+                    const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+                    const subscription = await upsertSubscriptionFromStripe(stripeSubscription);
+
+                    if (subscription) {
+                        await notifyOrganizationAdmins(subscription.organizationUuid, "PAYMENT_FAILED");
+
+                        const organization = await OrganizationRepository.findOne({
+                            where: { uuid: Equal(subscription.organizationUuid) },
+                        });
+
+                        if (organization) {
+                            await emailOrganizationAdmins(
+                                organization.uuid,
+                                "payment-failed",
+                                `Échec de paiement pour ${organization.name}`,
+                                {
+                                    organizationName: organization.name,
+                                    planTitle: await getPlanTitle(subscription.planPriceUuid),
+                                    manageUrl: manageSubscriptionUrl(organization.slug),
+                                },
+                            );
+                        }
                     }
                 }
                 break;
             }
         }
     } catch (error) {
-        console.log('[Stripe webhook] Failed to process event', event.type, error);
+        console.log(
+            "[Stripe webhook] Failed to process event",
+            event.type,
+            error instanceof Error ? error.message : error,
+        );
     }
 
-    return res
-        .status(HttpCode.OK)
-        .send({ received: true });
+    return res.status(HttpCode.OK).send({ received: true });
 }

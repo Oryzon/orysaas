@@ -1,8 +1,12 @@
 import {
-    BeforeInsert, BeforeUpdate,
+    BeforeInsert,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
-    Entity, Index, JoinColumn, ManyToOne,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
@@ -13,7 +17,7 @@ import { PlanPriceEntity } from "./plan-price.entity";
 import { SubscriptionStatus } from "../../../shared/subscription-status";
 
 @Entity()
-@Index(['stripeSubscriptionId'], { unique: true })
+@Index(["stripeSubscriptionId"], { unique: true })
 export class SubscriptionEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
@@ -28,16 +32,16 @@ export class SubscriptionEntity {
     @Index()
     organizationUuid: string;
 
-    @ManyToOne(() => OrganizationEntity, (organization) => organization.subscriptions, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'organizationUuid' })
+    @ManyToOne(() => OrganizationEntity, (organization) => organization.subscriptions, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "organizationUuid" })
     organization: OrganizationEntity;
 
     @Column()
     @Index()
     planPriceUuid: string;
 
-    @ManyToOne(() => PlanPriceEntity, (planPrice) => planPrice.subscriptions, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'planPriceUuid' })
+    @ManyToOne(() => PlanPriceEntity, (planPrice) => planPrice.subscriptions, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "planPriceUuid" })
     planPrice: PlanPriceEntity;
 
     @Column({ type: "enum", enum: SubscriptionStatus })
@@ -54,6 +58,11 @@ export class SubscriptionEntity {
 
     @Column({ nullable: true })
     canceledAt: Date | null;
+
+    // set once we've sent the trial ending email, so the cron doesn't send
+    // it again every day until the trial actually ends
+    @Column({ nullable: true })
+    trialEndingNotifiedAt: Date | null;
 
     @Column()
     @CreateDateColumn()

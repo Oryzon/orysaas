@@ -16,7 +16,12 @@
                                 <v-list-item>
                                     <template v-slot:prepend>
                                         <v-avatar size="48" rounded="lg" class="gradient-primary flex-shrink-0">
-                                            <v-img v-if="item?.logoUrl" :src="item.logoUrl!" :alt="item.name ?? ''" cover />
+                                            <v-img
+                                                v-if="item?.logoUrl"
+                                                :src="item.logoUrl!"
+                                                :alt="item.name ?? ''"
+                                                cover
+                                            />
                                             <span v-else>{{ getInitials(item.name) }}</span>
                                         </v-avatar>
                                     </template>
@@ -31,11 +36,7 @@
                         </template>
 
                         <template v-slot:item.slug="{ item }">
-                            <v-chip
-                                color="primary"
-                                variant="tonal"
-                                prepend-icon="mdi-pound"
-                            >
+                            <v-chip color="primary" variant="tonal" prepend-icon="mdi-pound">
                                 {{ item.slug }}
                             </v-chip>
                         </template>
@@ -51,14 +52,9 @@
                         </template>
 
                         <template v-slot:item.actions="{ item }">
-                                <v-btn
-                                    variant="text"
-                                    icon
-                                    color="info"
-                                    :to="`/portal/organizations/${item.slug}`"
-                                >
-                                    <v-icon>mdi-eye</v-icon>
-                                </v-btn>
+                            <v-btn variant="text" icon color="info" :to="`/portal/organizations/${item.slug}`">
+                                <v-icon>mdi-eye</v-icon>
+                            </v-btn>
                         </template>
                     </v-data-table>
                 </v-card-text>

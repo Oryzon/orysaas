@@ -1,12 +1,7 @@
 <template>
     <v-dialog v-model="dialog" max-width="500" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn
-                v-bind="activatorProps"
-                variant="tonal"
-                color="primary"
-                icon
-            >
+            <v-btn v-bind="activatorProps" variant="tonal" color="primary" icon>
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
         </template>
@@ -89,12 +84,7 @@
                 <v-card-actions class="bg-surface-light mt-n4">
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="success"
-                        variant="flat"
-                        :disabled="!isFormValid || isLoading"
-                        @click="handleCreate"
-                    >
+                    <v-btn color="success" variant="flat" :disabled="!isFormValid || isLoading" @click="handleCreate">
                         Créer
                     </v-btn>
                 </v-card-actions>
@@ -104,7 +94,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {ApiKey} from "~/models/ApiKey";
+import type { ApiKey } from "~/models/ApiKey";
 import { API_KEY_SYSTEMS } from "#shared/api-key-systems";
 
 const API_KEY_TYPES = [
@@ -122,14 +112,14 @@ const form = ref();
 const isFormValid = ref(false);
 const newKey = ref<Partial<ApiKey>>({});
 
-const emit = defineEmits(['created']);
+const emit = defineEmits(["created"]);
 
-const isLoading = computed(() => api.isLoading('api-key:create'));
+const isLoading = computed(() => api.isLoading("api-key:create"));
 
 const ApiKeySystemSelect = computed(() => {
-    return Object.entries(API_KEY_SYSTEMS).map(([key, {label}]) => ({
+    return Object.entries(API_KEY_SYSTEMS).map(([key, { label }]) => ({
         title: label,
-        value: key
+        value: key,
     }));
 });
 
@@ -146,11 +136,11 @@ const handleCreate = async () => {
     }
 
     const res = await api.post<{ entity: ApiKey }>(`/tenant/${slugOrganization}/setting/api-key`, newKey.value, {
-        loadingKey: 'api-key:create',
+        loadingKey: "api-key:create",
         toast: true,
     });
 
-    emit('created', res.entity);
+    emit("created", res.entity);
     handleClose();
 };
 </script>

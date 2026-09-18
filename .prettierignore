@@ -1,0 +1,20 @@
+# Generated / build output
+node_modules/
+core/build/
+webapp/.nuxt/
+webapp/.output/
+webapp/dist/
+
+# Static assets — not source to reformat
+webapp/public/
+core/uploads/
+
+# Handlebars templates — no Prettier parser for .hbs
+*.hbs
+
+# Lockfiles / logs
+package-lock.json
+*.log
+
+# Prose — left as authored, not reflowed by a code formatter
+*.md

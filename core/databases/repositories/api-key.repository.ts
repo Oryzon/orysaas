@@ -9,8 +9,8 @@ export const ApiKeyRepository = dataSource.getRepository(ApiKeyEntity).extend({
     async list(): Promise<ApiKeyEntity[]> {
         return this.find({
             where: {
-                type: Equal(ApiKeyType.INTEGRATION)
-            }
+                type: Equal(ApiKeyType.INTEGRATION),
+            },
         });
     },
     async findBySystemKey(systemKey: ApiKeySystem): Promise<string | null> {
@@ -22,5 +22,5 @@ export const ApiKeyRepository = dataSource.getRepository(ApiKeyEntity).extend({
         });
 
         return entity ? decrypt(entity.value) : null;
-    }
+    },
 });

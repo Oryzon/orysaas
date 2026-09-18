@@ -7,7 +7,6 @@ import {
     Error,
     Get,
     Post,
-    Put
 } from "../../../../decorators";
 import { Request, Response } from "express";
 import { OrganizationEntity } from "../../../../databases/entities/organization.entity";
@@ -26,25 +25,22 @@ import { getUserUuid } from "../../../../helpers/request-context.helper";
 import { notificationService } from "../../../../services/notification.service";
 import { MailService } from "../../../../services/mail.service";
 
-@Controller('/tenant/:slugOrganization/member/invite')
+@Controller("/tenant/:slugOrganization/member/invite")
 export default class TenantInviteController {
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
     @Error()
     async invite(req: Request, res: Response) {
-        const {
-            email,
-            role
-        } = req.body;
+        const { email, role } = req.body;
 
         const organization = res.locals.organization as OrganizationEntity;
 
         const existingUser = await UserRepository.findOne({
             where: {
-                email: Equal(email)
-            }
+                email: Equal(email),
+            },
         });
 
         if (existingUser) {
@@ -56,22 +52,18 @@ export default class TenantInviteController {
             });
 
             if (existingMember) {
-                return res
-                    .status(HttpCode.UNPROCESSABLE_ENTITY)
-                    .send({
-                        message: Messages.ORGANIZATION_INVITE_ALREADY_MEMBER
-                    });
+                return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({
+                    message: Messages.ORGANIZATION_INVITE_ALREADY_MEMBER,
+                });
             }
         }
 
         const pendingInvite = await OrganizationInviteRepository.findPending(email, organization.uuid);
 
         if (pendingInvite) {
-            return res
-                .status(HttpCode.UNPROCESSABLE_ENTITY)
-                .send({
-                    message: Messages.ORGANIZATION_INVITE_ALREADY_PENDING
-                });
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).send({
+                message: Messages.ORGANIZATION_INVITE_ALREADY_PENDING,
+            });
         }
 
         const invite = new OrganizationInviteEntity();
@@ -86,8 +78,8 @@ export default class TenantInviteController {
 
         const inviter = await UserRepository.findOne({
             where: {
-                uuid: Equal(getUserUuid())
-            }
+                uuid: Equal(getUserUuid()),
+            },
         });
 
         const inviterName = inviter ? `${inviter.firstname} ${inviter.lastname}`.trim() : "Un administrateur";
@@ -95,7 +87,7 @@ export default class TenantInviteController {
         if (existingUser) {
             await notificationService.send(
                 existingUser.uuid,
-                'ORGANIZATION_INVITE',
+                "ORGANIZATION_INVITE",
                 {
                     organizationName: organization.name,
                     organizationSlug: organization.slug,
@@ -109,7 +101,7 @@ export default class TenantInviteController {
                         endpoint: `/${organization.slug}/member/invite/accept/${invite.token}`,
                         redirect: `/portal/${organization.slug}/members`,
                         refreshOrganization: true,
-                    }
+                    },
                 ],
             );
         }
@@ -122,20 +114,20 @@ export default class TenantInviteController {
                 organizationName: organization.name,
                 inviterName,
                 roleLabel: OrganizationMemberRoleLabel[role as OrganizationMemberRole] ?? role,
-                inviteUrl: existingUser ? `${process.env.HTTP_URL}/login` : `${process.env.HTTP_URL}/register?inviteToken=${invite.token}`,
+                inviteUrl: existingUser
+                    ? `${process.env.HTTP_URL}/login`
+                    : `${process.env.HTTP_URL}/register?inviteToken=${invite.token}`,
                 btnLabel: existingUser ? "Se connecter pour accepter" : "Créer mon compte",
                 isExistingUser: !!existingUser,
             },
         });
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_INVITE_SENT
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_INVITE_SENT,
+        });
     }
 
-    @Get('/pending')
+    @Get("/pending")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -145,12 +137,10 @@ export default class TenantInviteController {
 
         const invites = await OrganizationInviteRepository.findPendingByOrganization(organization.uuid);
 
-        return res
-            .status(HttpCode.OK)
-            .send(invites);
+        return res.status(HttpCode.OK).send(invites);
     }
 
-    @Delete('/:uuid')
+    @Delete("/:uuid")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -158,9 +148,7 @@ export default class TenantInviteController {
     async cancel(req: Request, res: Response) {
         const organization = res.locals.organization as OrganizationEntity;
 
-        const {
-            uuid
-        } = req.params;
+        const { uuid } = req.params;
 
         let invite = await OrganizationInviteRepository.findOneOrFail({
             where: {
@@ -173,15 +161,13 @@ export default class TenantInviteController {
 
         await OrganizationInviteRepository.save(invite);
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_INVITE_CANCELLED,
-                entity: invite
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_INVITE_CANCELLED,
+            entity: invite,
+        });
     }
 
-    @Post('/accept/:token')
+    @Post("/accept/:token")
     @CheckJwt()
     @Error()
     async acceptInvite(req: Request, res: Response) {
@@ -190,9 +176,7 @@ export default class TenantInviteController {
         const invite = await OrganizationInviteRepository.findByToken(token);
 
         if (!invite || DateTime.now().toJSDate() > invite.expiresAt) {
-            return res
-                .status(HttpCode.NOT_FOUND)
-                .send({ message: Messages.ORGANIZATION_INVITE_NOT_FOUND });
+            return res.status(HttpCode.NOT_FOUND).send({ message: Messages.ORGANIZATION_INVITE_NOT_FOUND });
         }
 
         if (invite.acceptedAt) {

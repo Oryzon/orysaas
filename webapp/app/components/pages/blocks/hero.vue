@@ -1,8 +1,5 @@
 <template>
-    <section
-        class="hero-section mb-6"
-        :style="heroStyles"
-    >
+    <section class="hero-section mb-6" :style="heroStyles">
         <div class="hero-blob" :style="blobStyle"></div>
         <v-container class="hero-content">
             <v-row justify="center">
@@ -11,10 +8,7 @@
                         {{ data.title }}
                     </h1>
 
-                    <h2
-                        v-if="data.subtitle"
-                        class="text-headline-small text-medium-emphasis font-weight-regular mb-6"
-                    >
+                    <h2 v-if="data.subtitle" class="text-headline-small text-medium-emphasis font-weight-regular mb-6">
                         {{ data.subtitle }}
                     </h2>
 
@@ -36,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type { HeroData } from '~/models/Block';
+import type { HeroData } from "~/models/Block";
 
 const props = defineProps<{
     data: HeroData;
@@ -44,35 +38,35 @@ const props = defineProps<{
 }>();
 
 const BLOB_POSITIONS = [
-    { top: '-80px',  right: '-100px', bottom: 'auto', left: 'auto'  },
-    { top: '-80px',  left:  '-100px', bottom: 'auto', right: 'auto' },
-    { bottom: '-80px', right: '-100px', top: 'auto', left: 'auto'   },
-    { bottom: '-80px', left:  '-100px', top: 'auto', right: 'auto'  },
-    { top: '50%',    right: '-120px', bottom: 'auto', left: 'auto'  },
-    { top: '50%',    left:  '-120px', bottom: 'auto', right: 'auto' },
+    { top: "-80px", right: "-100px", bottom: "auto", left: "auto" },
+    { top: "-80px", left: "-100px", bottom: "auto", right: "auto" },
+    { bottom: "-80px", right: "-100px", top: "auto", left: "auto" },
+    { bottom: "-80px", left: "-100px", top: "auto", right: "auto" },
+    { top: "50%", right: "-120px", bottom: "auto", left: "auto" },
+    { top: "50%", left: "-120px", bottom: "auto", right: "auto" },
 ];
 
 const blobStyle = computed(() => {
-    const id = props.blockId ?? '';
-    const hash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const id = props.blockId ?? "";
+    const hash = id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
 
     return BLOB_POSITIONS[hash % BLOB_POSITIONS.length];
 });
 
 const heroStyles = computed(() => {
     const styles: any = {
-        minHeight: '35vh',
-        display: 'flex',
-        alignItems: 'center',
-        position: 'relative',
-        overflowX: 'clip',
+        minHeight: "35vh",
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        overflowX: "clip",
     };
 
     if (props.data.backgroundImage) {
         styles.backgroundImage = `url(${props.data.backgroundImage})`;
-        styles.backgroundPosition = props.data.backgroundPosition || 'center';
-        styles.backgroundSize = props.data.backgroundSize || 'cover';
-        styles.backgroundRepeat = 'no-repeat';
+        styles.backgroundPosition = props.data.backgroundPosition || "center";
+        styles.backgroundSize = props.data.backgroundSize || "cover";
+        styles.backgroundRepeat = "no-repeat";
     }
 
     return styles;

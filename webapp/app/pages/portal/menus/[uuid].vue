@@ -1,10 +1,7 @@
 <template>
     <v-row>
         <v-col md="12">
-            <v-form
-                ref="form"
-                v-model="isFormValid"
-            >
+            <v-form ref="form" v-model="isFormValid">
                 <v-row>
                     <v-col md="5">
                         <v-text-field
@@ -14,7 +11,7 @@
                             v-model="menu.label"
                             :loading="isLoading"
                             :disabled="isLoading"
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                         ></v-text-field>
                     </v-col>
 
@@ -26,7 +23,7 @@
                             v-model="menu.key"
                             :loading="isLoading"
                             disabled
-                            :rules="[ rules.required() ]"
+                            :rules="[rules.required()]"
                         ></v-text-field>
                     </v-col>
 
@@ -50,14 +47,10 @@
                 <v-col md="8">
                     <v-card flat>
                         <v-toolbar color="primary">
-                            <v-toolbar-title>
-                                Elément du menu
-                            </v-toolbar-title>
+                            <v-toolbar-title> Elément du menu </v-toolbar-title>
 
                             <v-toolbar-items>
-                                <portal-menus-items-add
-                                    @created="addToItems"
-                                ></portal-menus-items-add>
+                                <portal-menus-items-add @created="addToItems"></portal-menus-items-add>
                             </v-toolbar-items>
                         </v-toolbar>
 
@@ -87,13 +80,13 @@
                         </v-toolbar>
 
                         <v-card-text>
-                            <v-form
-                                ref="formMenuItem"
-                                v-model="isFormMenuItemValid"
-                            >
+                            <v-form ref="formMenuItem" v-model="isFormMenuItemValid">
                                 <v-row>
                                     <v-col md="12" v-if="selectedMenuItem.uuid === ''">
-                                        <v-alert type="warning">Merci de sélectionner l'élément a modifier en cliquant sur le stylo.</v-alert>
+                                        <v-alert type="warning"
+                                            >Merci de sélectionner l'élément a modifier en cliquant sur le
+                                            stylo.</v-alert
+                                        >
                                     </v-col>
 
                                     <v-col md="12" class="mt-n2">
@@ -117,7 +110,7 @@
                                             v-model="selectedMenuItem.label"
                                             :loading="isLoading"
                                             :disabled="isLoading || selectedMenuItem.uuid === ''"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                         ></v-text-field>
                                     </v-col>
 
@@ -129,7 +122,7 @@
                                             v-model="selectedMenuItem.target"
                                             :loading="isLoading"
                                             :disabled="isLoading || selectedMenuItem.uuid === ''"
-                                            :rules="[ rules.required() ]"
+                                            :rules="[rules.required()]"
                                             :items="targets"
                                         ></v-select>
                                     </v-col>
@@ -156,7 +149,7 @@
                                         >
                                             <template v-slot:append-inner>
                                                 <portal-pages-search-for-menu
-                                                    @selected="(data) => selectedMenuItem.url = data"
+                                                    @selected="(data) => (selectedMenuItem.url = data)"
                                                 ></portal-pages-search-for-menu>
                                             </template>
                                         </v-text-field>
@@ -165,7 +158,7 @@
                             </v-form>
                         </v-card-text>
 
-                        <v-card-actions class="bg-surface-light mt-n2" >
+                        <v-card-actions class="bg-surface-light mt-n2">
                             <v-spacer></v-spacer>
 
                             <v-btn
@@ -187,12 +180,7 @@
 
 <script setup lang="ts">
 import type { Menu } from "~/models/Menu";
-import {
-    buildMenuTree,
-    flattenMenuTreeForSelect,
-    type MenuItem,
-    type MenuItemNode, targets
-} from "~/models/MenuItem";
+import { buildMenuTree, flattenMenuTreeForSelect, type MenuItem, type MenuItemNode, targets } from "~/models/MenuItem";
 
 const api = useApi();
 
@@ -207,16 +195,16 @@ const rules = useValidationRules();
 const route = useRoute();
 
 const isLoading = computed(() => {
-    return api.isLoading('menu:detail') || api.isLoading('menu-item:update') || api.isLoading('menu:update');
+    return api.isLoading("menu:detail") || api.isLoading("menu-item:update") || api.isLoading("menu:update");
 });
 
 let menu = ref<Partial<Menu>>({});
 const openedGroups = ref<string[]>([]);
 
 onMounted(async () => {
-    menu.value = <Menu><unknown>await api.get(`menu/${<string>route.params.uuid}`, {
-        loadingKey: 'menu:detail'
-    });
+    menu.value = <Menu>(<unknown>await api.get(`menu/${<string>route.params.uuid}`, {
+        loadingKey: "menu:detail",
+    }));
 });
 
 const form = ref();
@@ -230,11 +218,11 @@ const formatedAvailableParents = computed(() => {
     return flattenMenuTreeForSelect(buildMenuTree(menu.value.items ?? []));
 });
 
-let selectedMenuItem = ref<Partial<MenuItem>>({ uuid: '' });
+let selectedMenuItem = ref<Partial<MenuItem>>({ uuid: "" });
 
 const selectToUpdate = (data: MenuItemNode) => {
-    selectedMenuItem.value = {...<MenuItem>menu.value.items?.find((item) => item.uuid === data.uuid)}; // cut reactivity
-}
+    selectedMenuItem.value = { ...(<MenuItem>menu.value.items?.find((item) => item.uuid === data.uuid)) }; // cut reactivity
+};
 
 const handleUpdateItem = async () => {
     const { valid } = await formMenuItem.value.validate();
@@ -244,12 +232,14 @@ const handleUpdateItem = async () => {
         return;
     }
 
-    let res = await api.put<{ entity: MenuItem }>(`/menu/${<string>route.params.uuid}/item/${selectedMenuItem.value.uuid}`,
+    let res = await api.put<{ entity: MenuItem }>(
+        `/menu/${<string>route.params.uuid}/item/${selectedMenuItem.value.uuid}`,
         { ...selectedMenuItem.value },
         {
-            loadingKey: 'menu-item:update',
-            toast: true
-        });
+            loadingKey: "menu-item:update",
+            toast: true,
+        },
+    );
 
     menu.value.items = (menu.value.items ?? []).map((item) => {
         if (item.uuid === res?.entity.uuid) {
@@ -258,19 +248,21 @@ const handleUpdateItem = async () => {
 
         return item;
     });
-}
+};
 
 const addToItems = (data: MenuItem) => {
     menu.value.items?.push(data);
 };
 
 const moveItems = async (order: string, uuidItem: string) => {
-    let res = await api.put<{ entity: MenuItem[] }>(`/menu/${<string>route.params.uuid}/item/${uuidItem}/${order}`,
-        { },
+    let res = await api.put<{ entity: MenuItem[] }>(
+        `/menu/${<string>route.params.uuid}/item/${uuidItem}/${order}`,
+        {},
         {
-            loadingKey: 'menu-item:update',
-            toast: true
-        });
+            loadingKey: "menu-item:update",
+            toast: true,
+        },
+    );
 
     menu.value.items = (menu.value.items ?? []).map((item) => {
         let isFinded = res.entity.find((ent: MenuItem) => ent.uuid === item.uuid);
@@ -281,9 +273,9 @@ const moveItems = async (order: string, uuidItem: string) => {
 
         return item;
     });
-}
+};
 
 const removeToItems = (data: Array<MenuItem>) => {
     menu.value.items = data;
-}
+};
 </script>

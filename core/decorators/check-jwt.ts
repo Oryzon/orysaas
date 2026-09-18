@@ -18,11 +18,9 @@ export function CheckJwt() {
             let token: string = <string>req.headers["authorization"];
 
             if (token === undefined) {
-                return res
-                    .status(HttpCode.FORBIDDEN)
-                    .send({
-                        message: Messages.USER_NOT_AUTHED
-                    });
+                return res.status(HttpCode.FORBIDDEN).send({
+                    message: Messages.USER_NOT_AUTHED,
+                });
             }
 
             token = token.replace("Bearer ", "");
@@ -33,7 +31,7 @@ export function CheckJwt() {
 
                 const user = await UserRepository.findOneOrFail({
                     where: {
-                        uuid: Equal(jwtPayload.uuid)
+                        uuid: Equal(jwtPayload.uuid),
                     },
                     select: {
                         uuid: true,
@@ -57,6 +55,6 @@ export function CheckJwt() {
             }
 
             return originalMethod.apply(this, args);
-        }
-    }
+        };
+    };
 }

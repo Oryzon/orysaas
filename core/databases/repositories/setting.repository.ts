@@ -6,15 +6,15 @@ export const SettingRepository = dataSource.getRepository(SettingEntity).extend(
     async getValue(key: string) {
         let entity = await this.findOne({
             where: {
-                key: Equal(key)
-            }
+                key: Equal(key),
+            },
         });
 
         if (!entity) {
             entity = new SettingEntity();
 
             entity.key = key;
-            entity.value = '';
+            entity.value = "";
 
             await this.insert(entity);
         }

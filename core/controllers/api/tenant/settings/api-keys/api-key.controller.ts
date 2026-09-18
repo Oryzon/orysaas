@@ -2,25 +2,28 @@ import {
     CheckJwt,
     CheckOrganizationMember,
     CheckOrganizationRole,
-    Controller, Delete,
-    Error, Get,
-    Post
+    Controller,
+    Delete,
+    Error,
+    Get,
+    Post,
 } from "../../../../../decorators";
-import {Request, Response} from "express";
-import {OrganizationMemberRole} from "../../../../../../shared/organization-roles";
-import {ApiKeyEntity, ApiKeyType} from "../../../../../databases/entities/api-key.entity";
+import { Request, Response } from "express";
+import { OrganizationMemberRole } from "../../../../../../shared/organization-roles";
+import { QuotaKey } from "../../../../../../shared/quota";
+import { ApiKeyEntity, ApiKeyType } from "../../../../../databases/entities/api-key.entity";
 import HttpCode from "../../../../../config/http-code";
 import Messages from "../../../../../config/messages";
-import {decrypt, encrypt} from "../../../../../helpers/crypto.helper";
-import {ApiKeyRepository} from "../../../../../databases/repositories/api-key.repository";
-import {OrganizationRepository} from "../../../../../databases/repositories/organization.repository";
-import {Equal} from "typeorm";
-import {randomBytes} from "crypto";
+import { decrypt, encrypt } from "../../../../../helpers/crypto.helper";
+import { ApiKeyRepository } from "../../../../../databases/repositories/api-key.repository";
+import { OrganizationRepository } from "../../../../../databases/repositories/organization.repository";
+import { checkQuota } from "../../../../../helpers/quota.helper";
+import { Equal } from "typeorm";
+import { randomBytes } from "crypto";
 
-@Controller('/tenant/:slugOrganization/setting/api-key')
+@Controller("/tenant/:slugOrganization/setting/api-key")
 export default class TenantSettingApiKeyController {
-
-    @Get('/:uuid')
+    @Get("/:uuid")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -33,8 +36,8 @@ export default class TenantSettingApiKeyController {
         const apiKey = await ApiKeyRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuidKey),
-                organizationUuid: Equal(organization.uuid)
-            }
+                organizationUuid: Equal(organization.uuid),
+            },
         });
 
         const decrypted = decrypt(apiKey.value);
@@ -42,7 +45,7 @@ export default class TenantSettingApiKeyController {
         return res.status(HttpCode.OK).send(decrypted);
     }
 
-    @Post('/')
+    @Post("/")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -50,38 +53,37 @@ export default class TenantSettingApiKeyController {
     async create(req: Request, res: Response) {
         const slugOrganization = req.params.slugOrganization;
 
-        const {
-            label,
-            type,
-            value,
-            expiresAt,
-            systemKey
-        } = req.body;
+        const { label, type, value, expiresAt, systemKey } = req.body;
 
         if (!label || !type || !Object.values(ApiKeyType).includes(type)) {
-            return res
-                .status(HttpCode.BAD_REQUEST)
-                .send({
-                    message: Messages.MISSING_PARAMETERS
-                });
+            return res.status(HttpCode.BAD_REQUEST).send({
+                message: Messages.MISSING_PARAMETERS,
+            });
         }
 
         let organization = await OrganizationRepository.getOrganizationBySlug(slugOrganization);
 
-        if (systemKey) {
+        if (type === ApiKeyType.CONSUMER) {
+            const result = await checkQuota(organization.uuid, QuotaKey.API_KEYS);
+
+            if (!result.allowed) {
+                throw result.message;
+            }
+        }
+
+        if (systemKey && type === ApiKeyType.INTEGRATION) {
             const existing = await ApiKeyRepository.findOne({
                 where: {
                     systemKey: Equal(systemKey),
                     organizationUuid: Equal(organization.uuid),
+                    type: Equal(type),
                 },
             });
 
             if (existing) {
-                return res
-                    .status(HttpCode.CONFLICT)
-                    .send({
-                        message: Messages.API_KEY_ALREADY_EXISTS
-                    });
+                return res.status(HttpCode.CONFLICT).send({
+                    message: Messages.API_KEY_ALREADY_EXISTS,
+                });
             }
         }
 
@@ -103,7 +105,7 @@ export default class TenantSettingApiKeyController {
         });
     }
 
-    @Delete('/:uuid')
+    @Delete("/:uuid")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -116,8 +118,8 @@ export default class TenantSettingApiKeyController {
         const apiKey = await ApiKeyRepository.findOneOrFail({
             where: {
                 uuid: Equal(uuidKey),
-                organizationUuid: Equal(organization.uuid)
-            }
+                organizationUuid: Equal(organization.uuid),
+            },
         });
 
         apiKey.setDeletedAt();
@@ -126,7 +128,7 @@ export default class TenantSettingApiKeyController {
 
         return res.status(HttpCode.OK).send({
             message: Messages.API_KEY_DELETED,
-            entity: apiKey
+            entity: apiKey,
         });
     }
 }

@@ -1,4 +1,4 @@
-import type { NotificationTypes, NotificationAction } from '#shared/notification-types';
+import type { NotificationTypes, NotificationAction } from "#shared/notification-types";
 
 export interface Notification {
     uuid: string;

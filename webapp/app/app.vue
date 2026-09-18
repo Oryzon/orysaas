@@ -5,11 +5,12 @@
 </template>
 
 <script setup lang="ts">
-import { brand } from '~/config/brand';
+import { brand } from "~/config/brand";
 
 useHead({
-    style: [{
-        innerHTML: `
+    style: [
+        {
+            innerHTML: `
             :root {
                 --brand-primary: ${brand.primary};
                 --brand-accent:  ${brand.accent};
@@ -18,6 +19,7 @@ useHead({
                 --brand-bg-deep: ${brand.bgDeep};
             }
         `,
-    }],
+        },
+    ],
 });
 </script>

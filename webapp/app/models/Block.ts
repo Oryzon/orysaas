@@ -39,24 +39,24 @@ export interface HeroData {
 
 export interface SuperHeroData {
     lastChanges: {
-        versionNo: string,
-        title: string,
-        url: string
-    },
-    title: string,
-    subtitle: string,
+        versionNo: string;
+        title: string;
+        url: string;
+    };
+    title: string;
+    subtitle: string;
     image?: string;
     primaryButton: {
-        text: string,
-        url: string,
-        variant: string
-    },
+        text: string;
+        url: string;
+        variant: string;
+    };
     secondaryButton: {
-        text: string,
-        url: string,
-        variant: string
-    },
-    conditions: Array<{ text: string }>,
+        text: string;
+        url: string;
+        variant: string;
+    };
+    conditions: Array<{ text: string }>;
 }
 
 export interface OneColumnsData {
@@ -67,40 +67,40 @@ export interface OneColumnsData {
 
 export interface TwoColumnsData {
     leftColumn: {
-        title: string,
-        content: string,
-        width: number,
-    },
+        title: string;
+        content: string;
+        width: number;
+    };
     rightColumn: {
-        title: string,
-        content: string,
-        width: number,
-    }
+        title: string;
+        content: string;
+        width: number;
+    };
 }
 
 export interface ThreeColumnsData {
     leftColumn: {
-        title: string,
-        content: string,
-        width: number,
-    },
+        title: string;
+        content: string;
+        width: number;
+    };
     middleColumn: {
-        title: string,
-        content: string,
-        width: number,
-    },
+        title: string;
+        content: string;
+        width: number;
+    };
     rightColumn: {
-        title: string,
-        content: string,
-        width: number,
-    }
+        title: string;
+        content: string;
+        width: number;
+    };
 }
 
 export interface GalleryData {
     title?: string;
     isOpenable: boolean;
     showRightColumn?: boolean;
-    layout?: 'grid' | 'masonry' | 'slider';
+    layout?: "grid" | "masonry" | "slider";
     images?: GalleryImage[];
 }
 
@@ -115,11 +115,11 @@ export interface GalleryImage {
 }
 
 export interface SeparatorData {
-    style?: 'line' | 'gradient' | 'dots' | 'wave' | 'ornament';
-    thickness?: 'thin' | 'medium' | 'thick';
+    style?: "line" | "gradient" | "dots" | "wave" | "ornament";
+    thickness?: "thin" | "medium" | "thick";
     color?: string;
-    spacing?: 'small' | 'medium' | 'large';
-    width?: 'full' | 'narrow' | 'ultranarrow';
+    spacing?: "small" | "medium" | "large";
+    width?: "full" | "narrow" | "ultranarrow";
 }
 
 export interface MultiCardItem {
@@ -143,7 +143,7 @@ export interface FaqData {
 }
 
 export interface CtaBlockData {
-    layout: 'centered' | 'split' | 'banner' | 'card';
+    layout: "centered" | "split" | "banner" | "card";
     preTitle?: string;
     title: string;
     subtitle?: string;
@@ -156,5 +156,5 @@ export interface CtaBlockData {
         text: string;
         url: string;
     };
-    background: 'primary' | 'secondary' | 'gradient';
+    background: "primary" | "secondary" | "gradient";
 }

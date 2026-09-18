@@ -5,9 +5,7 @@
                 Sécurité avant tout.
             </h2>
 
-            <h1 class="mt-n4 text-white font-weight-bold text-display-large">
-                Un nouveau départ, en toute sécurité.
-            </h1>
+            <h1 class="mt-n4 text-white font-weight-bold text-display-large">Un nouveau départ, en toute sécurité.</h1>
 
             <h3 class="mt-n2 text-blue-grey-lighten-3">
                 Choisissez un mot de passe fort.<br />
@@ -19,9 +17,7 @@
             <template v-if="!token">
                 <h1>Lien invalide</h1>
 
-                <h4 class="mb-6 text-blue-grey-lighten-3">
-                    Ce lien de réinitialisation est invalide ou a expiré.
-                </h4>
+                <h4 class="mb-6 text-blue-grey-lighten-3">Ce lien de réinitialisation est invalide ou a expiré.</h4>
 
                 <v-alert
                     type="error"
@@ -48,9 +44,7 @@
             <template v-else-if="done">
                 <h1>Mot de passe mis à jour</h1>
 
-                <h4 class="mb-6 text-blue-grey-lighten-3">
-                    Votre mot de passe a été réinitialisé avec succès.
-                </h4>
+                <h4 class="mb-6 text-blue-grey-lighten-3">Votre mot de passe a été réinitialisé avec succès.</h4>
 
                 <v-alert
                     type="success"
@@ -90,7 +84,7 @@
                                 label="Nouveau mot de passe"
                                 variant="outlined"
                                 :type="showPassword ? 'text' : 'password'"
-                                :rules="[ rules.required() ]"
+                                :rules="[rules.required()]"
                                 v-model="newPassword"
                                 :loading="isLoading"
                                 :disabled="isLoading"
@@ -108,7 +102,7 @@
                                 label="Confirmer le mot de passe"
                                 variant="outlined"
                                 :type="showConfPassword ? 'text' : 'password'"
-                                :rules="[ rules.required() ]"
+                                :rules="[rules.required()]"
                                 v-model="confNewPassword"
                                 :loading="isLoading"
                                 :disabled="isLoading"
@@ -145,7 +139,7 @@ definePageMeta({
     layout: false,
 });
 
-useConfigPage('Réinitialisation du mot de passe');
+useConfigPage("Réinitialisation du mot de passe");
 
 const { resetPassword } = useAuth();
 
@@ -158,14 +152,14 @@ const form = ref();
 const isFormValid = ref(false);
 const rules = useValidationRules();
 
-const newPassword = ref('');
-const confNewPassword = ref('');
+const newPassword = ref("");
+const confNewPassword = ref("");
 const showPassword = ref(false);
 const showConfPassword = ref(false);
 
 const done = ref(false);
 
-const isLoading = computed(() => api.isLoading('auth:reset-password'));
+const isLoading = computed(() => api.isLoading("auth:reset-password"));
 
 const handleSubmit = async () => {
     if (!token.value) {

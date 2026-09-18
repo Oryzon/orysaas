@@ -4,18 +4,15 @@
             <v-card flat :loading="isLoading">
                 <div class="px-6 pt-6 pb-1">
                     <div class="text-h6 font-weight-bold">Paramètres de la plateforme</div>
-                    <div class="text-body-2 text-medium-emphasis mt-1">Informations légales et de contact de votre société.</div>
+                    <div class="text-body-2 text-medium-emphasis mt-1">
+                        Informations légales et de contact de votre société.
+                    </div>
                 </div>
 
                 <v-divider class="mt-4" />
 
                 <v-card-text class="pa-6">
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
-
-
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="12">
                                 <div class="text-subtitle-2 font-weight-bold">Informations légales</div>
@@ -27,7 +24,7 @@
                                     variant="outlined"
                                     hide-details="auto"
                                     v-model="settings.legalForm"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     :disabled="isLoading"
                                 ></v-text-field>
                             </v-col>
@@ -169,66 +166,62 @@
             <v-card flat :loading="isLoading">
                 <div class="px-6 pt-6 pb-1 d-flex align-center justify-space-between">
                     <div>
-                        <div class="text-h6 font-weight-bold">
-                          Clés d'API
-                        </div>
+                        <div class="text-h6 font-weight-bold">Clés d'API</div>
 
-                        <div class="text-body-2 text-medium-emphasis mt-1">Les clés nécessaires au bon fonctionnement du SaaS.</div>
+                        <div class="text-body-2 text-medium-emphasis mt-1">
+                            Les clés nécessaires au bon fonctionnement du SaaS.
+                        </div>
                     </div>
 
-                  <portal-settings-api-key-add
-                      @created="addToApiKeys"
-                  ></portal-settings-api-key-add>
+                    <portal-settings-api-key-add @created="addToApiKeys"></portal-settings-api-key-add>
                 </div>
 
                 <v-divider class="mt-4" />
 
-              <v-card-text>
-                <v-row>
-                  <v-col md="12">
-                    <v-data-table
-                        :headers="headers"
-                        :items="apiKeys"
-                        :items-per-page="100"
-                        hide-default-footer
-                        density="compact"
-                        no-data-text="Aucune clé d'API configurée."
-                    >
-                      <template v-slot:item.type="{ item }">
-                        <v-chip
-                            variant="tonal"
-                            :color="(item as ApiKey).type === 'INTEGRATION' ? 'info' : 'secondary'"
-                        >
-                          {{ (item as ApiKey).type === 'INTEGRATION' ? 'Intégration' : 'Consommateur' }}
-                        </v-chip>
-                      </template>
+                <v-card-text>
+                    <v-row>
+                        <v-col md="12">
+                            <v-data-table
+                                :headers="headers"
+                                :items="apiKeys"
+                                :items-per-page="100"
+                                hide-default-footer
+                                density="compact"
+                                no-data-text="Aucune clé d'API configurée."
+                            >
+                                <template v-slot:item.type="{ item }">
+                                    <v-chip
+                                        variant="tonal"
+                                        :color="(item as ApiKey).type === 'INTEGRATION' ? 'info' : 'secondary'"
+                                    >
+                                        {{ (item as ApiKey).type === "INTEGRATION" ? "Intégration" : "Consommateur" }}
+                                    </v-chip>
+                                </template>
 
-                      <template v-slot:item.expiresAt="{ item }">
-                        <v-chip
-                            v-if="item.expiresAt"
-                            variant="tonal"
-                            :color="isExpired(item.expiresAt) ? 'error' : 'warning'"
-                        >
-                          {{ isExpired(item.expiresAt) ? 'Expirée' : $date.frenchDate(item.expiresAt) }}
-                        </v-chip>
+                                <template v-slot:item.expiresAt="{ item }">
+                                    <v-chip
+                                        v-if="item.expiresAt"
+                                        variant="tonal"
+                                        :color="isExpired(item.expiresAt) ? 'error' : 'warning'"
+                                    >
+                                        {{ isExpired(item.expiresAt) ? "Expirée" : $date.frenchDate(item.expiresAt) }}
+                                    </v-chip>
 
-                        <span v-else class="text-medium-emphasis text-caption">-</span>
-                      </template>
+                                    <span v-else class="text-medium-emphasis text-caption">-</span>
+                                </template>
 
-                      <template v-slot:item.actions="{ item }">
-                          <portal-settings-api-key-view
-                              :entity="item"
-                          ></portal-settings-api-key-view>
+                                <template v-slot:item.actions="{ item }">
+                                    <portal-settings-api-key-view :entity="item"></portal-settings-api-key-view>
 
-                          <portal-settings-api-key-remove
-                              :entity="item"
-                              @removed="removeToApiKey"
-                          ></portal-settings-api-key-remove>
-                      </template>
-                    </v-data-table>
-                  </v-col>
-                </v-row>
-              </v-card-text>
+                                    <portal-settings-api-key-remove
+                                        :entity="item"
+                                        @removed="removeToApiKey"
+                                    ></portal-settings-api-key-remove>
+                                </template>
+                            </v-data-table>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
             </v-card>
         </v-col>
     </v-row>
@@ -237,7 +230,7 @@
 <script lang="ts" setup>
 import type { Setting } from "~/models/Setting";
 import type { ApiKey } from "~/models/ApiKey";
-import type {ApiKeySystem} from "#shared/api-key-systems";
+import type { ApiKeySystem } from "#shared/api-key-systems";
 
 const api = useApi();
 const rules = useValidationRules();
@@ -254,11 +247,11 @@ const isFormValid = ref(false);
 const settings = ref<Partial<Setting>>({});
 const apiKeys = ref<ApiKey[]>([]);
 
-const isLoading = computed(() => api.isLoading('settings:list') || api.isLoading('settings:update'));
+const isLoading = computed(() => api.isLoading("settings:list") || api.isLoading("settings:update"));
 
 onMounted(async () => {
-    const data = await api.get<Setting>('settings', {
-        loadingKey: 'settings:list',
+    const data = await api.get<Setting>("settings", {
+        loadingKey: "settings:list",
         toast: false,
     });
 
@@ -273,17 +266,17 @@ const handleSave = async () => {
         return;
     }
 
-    await api.put('settings', settings.value, {
-        loadingKey: 'settings:update',
+    await api.put("settings", settings.value, {
+        loadingKey: "settings:update",
         toast: true,
     });
 };
 
 const headers = [
-    { title: 'Label', key: 'label' },
-    { title: 'Type', key: 'type' },
-    { title: 'Expiration', key: 'expiresAt' },
-    { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+    { title: "Label", key: "label" },
+    { title: "Type", key: "type" },
+    { title: "Expiration", key: "expiresAt" },
+    { title: "Actions", key: "actions", sortable: false, align: "end" as const },
 ];
 
 const addToApiKeys = (data: ApiKey) => {
@@ -292,7 +285,7 @@ const addToApiKeys = (data: ApiKey) => {
 
 const removeToApiKey = (data: ApiKey) => {
     apiKeys.value = apiKeys.value.filter((entity) => entity.uuid !== data.uuid);
-}
+};
 
 const isExpired = (date: string) => new Date(date) < new Date();
 </script>

@@ -1,11 +1,16 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, Index, JoinColumn, ManyToOne,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from "typeorm";
 import { DateTime } from "luxon";
 import { getUserUuid } from "../../helpers/request-context.helper";
@@ -15,7 +20,7 @@ import { OrganizationMemberRole } from "../../../shared/organization-roles";
 export { OrganizationMemberRole };
 
 @Entity()
-@Index(['organizationUuid', 'uniqueKey'], { unique: true })
+@Index(["organizationUuid", "uniqueKey"], { unique: true })
 export class OrganizationMemberEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
@@ -24,25 +29,25 @@ export class OrganizationMemberEntity {
     @Index()
     organizationUuid: string;
 
-    @ManyToOne(() => OrganizationEntity, (o) => o.members, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'organizationUuid' })
+    @ManyToOne(() => OrganizationEntity, (o) => o.members, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "organizationUuid" })
     organization: OrganizationEntity;
 
     @Column()
     @Index()
     memberUuid: string;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'memberUuid' })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "memberUuid" })
     member: UserEntity;
 
-    @Column({ type: 'enum', enum: OrganizationMemberRole })
+    @Column({ type: "enum", enum: OrganizationMemberRole })
     role: OrganizationMemberRole;
 
     @Column({
-        type: 'varchar',
+        type: "varchar",
         length: 36,
-        generatedType: 'STORED',
+        generatedType: "STORED",
         asExpression: `IF(deletedAt IS NULL, memberUuid, uuid)`,
     })
     uniqueKey: string;
@@ -54,18 +59,18 @@ export class OrganizationMemberEntity {
     @Column()
     createdBy: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     updatedBy: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     @DeleteDateColumn()
     deletedAt: Date;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     deletedBy: string;
 
     @BeforeInsert()

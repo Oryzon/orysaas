@@ -6,7 +6,7 @@ import {
     Controller,
     Delete,
     Error,
-    Put
+    Put,
 } from "../../../../decorators";
 import { Request, Response } from "express";
 import Messages from "../../../../config/messages";
@@ -15,9 +15,9 @@ import { OrganizationMemberRepository } from "../../../../databases/repositories
 import { Equal } from "typeorm";
 import { OrganizationMemberRole } from "../../../../databases/entities/organization-member.entity";
 
-@Controller('/tenant/:slugOrganization/member')
+@Controller("/tenant/:slugOrganization/member")
 export default class TenantMemberController {
-    @Put('/:memberUuid')
+    @Put("/:memberUuid")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -35,9 +35,7 @@ export default class TenantMemberController {
         });
 
         if (!target) {
-            return res
-                .status(HttpCode.NOT_FOUND)
-                .send({ message: Messages.ORGANIZATION_MEMBER_NOT_FOUND });
+            return res.status(HttpCode.NOT_FOUND).send({ message: Messages.ORGANIZATION_MEMBER_NOT_FOUND });
         }
 
         if (target.role === OrganizationMemberRole.OWNER) {
@@ -49,12 +47,10 @@ export default class TenantMemberController {
         target.role = role;
         await OrganizationMemberRepository.save(target);
 
-        return res
-            .status(HttpCode.OK)
-            .send({ message: Messages.ORGANIZATION_MEMBER_UPDATED });
+        return res.status(HttpCode.OK).send({ message: Messages.ORGANIZATION_MEMBER_UPDATED });
     }
 
-    @Delete('/:memberUuid')
+    @Delete("/:memberUuid")
     @CheckJwt()
     @CheckOrganizationMember()
     @CheckOrganizationRole(OrganizationMemberRole.ADMIN)
@@ -72,24 +68,18 @@ export default class TenantMemberController {
         });
 
         if (!target) {
-            return res
-                .status(HttpCode.NOT_FOUND)
-                .send({ message: Messages.ORGANIZATION_MEMBER_NOT_FOUND });
+            return res.status(HttpCode.NOT_FOUND).send({ message: Messages.ORGANIZATION_MEMBER_NOT_FOUND });
         }
 
         if (target.role === OrganizationMemberRole.OWNER) {
-            return res
-                .status(HttpCode.FORBIDDEN)
-                .send({ message: Messages.ORGANIZATION_MEMBER_OWNER_CANT_BE_EDITED });
+            return res.status(HttpCode.FORBIDDEN).send({ message: Messages.ORGANIZATION_MEMBER_OWNER_CANT_BE_EDITED });
         }
 
         await OrganizationMemberRepository.softRemove(target);
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.ORGANIZATION_MEMBER_REMOVED,
-                entity: target
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.ORGANIZATION_MEMBER_REMOVED,
+            entity: target,
+        });
     }
 }

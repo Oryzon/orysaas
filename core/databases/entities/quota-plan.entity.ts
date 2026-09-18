@@ -1,9 +1,14 @@
 import {
-    BeforeInsert, BeforeSoftRemove, BeforeUpdate,
+    BeforeInsert,
+    BeforeSoftRemove,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity, Index, JoinColumn, ManyToOne,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
@@ -14,7 +19,7 @@ import { PlanEntity } from "./plan.entity";
 import { NumericTransformer } from "../transformers/number.transformer";
 
 @Entity()
-@Index(['quotaUuid', 'planUuid', 'deletedAt'], { unique: true })
+@Index(["quotaUuid", "planUuid", "deletedAt"], { unique: true })
 export class QuotaPlanEntity {
     @PrimaryGeneratedColumn("uuid")
     uuid: string;
@@ -23,16 +28,16 @@ export class QuotaPlanEntity {
     @Index()
     quotaUuid: string;
 
-    @ManyToOne(() => QuotaEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'quotaUuid' })
+    @ManyToOne(() => QuotaEntity, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "quotaUuid" })
     quota: QuotaEntity;
 
     @Column()
     @Index()
     planUuid: string;
 
-    @ManyToOne(() => PlanEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'planUuid' })
+    @ManyToOne(() => PlanEntity, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "planUuid" })
     plan: PlanEntity;
 
     @Column({

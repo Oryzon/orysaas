@@ -107,24 +107,22 @@
 </template>
 
 <script setup lang="ts">
-import type { SuperHeroData } from '~/models/Block';
+import type { SuperHeroData } from "~/models/Block";
 
 const props = defineProps<{
     data: SuperHeroData;
 }>();
 
-const hasLastChanges = computed(
-    () => props.data.lastChanges?.title || props.data.lastChanges?.versionNo,
-);
+const hasLastChanges = computed(() => props.data.lastChanges?.title || props.data.lastChanges?.versionNo);
 
-const isExternal = (url: string | undefined) => !!url && (url.startsWith('http://') || url.startsWith('https://'));
+const isExternal = (url: string | undefined) => !!url && (url.startsWith("http://") || url.startsWith("https://"));
 
 const buildTo = (url: string | undefined) => {
     if (!url || isExternal(url)) {
         return undefined;
     }
 
-    return url.startsWith('/') ? url : `/${url}`;
+    return url.startsWith("/") ? url : `/${url}`;
 };
 </script>
 
@@ -209,9 +207,15 @@ const buildTo = (url: string | undefined) => {
     border-radius: 50%;
 }
 
-.mac-dot--red    { background: #ff5f57; }
-.mac-dot--yellow { background: #febc2e; }
-.mac-dot--green  { background: #28c840; }
+.mac-dot--red {
+    background: #ff5f57;
+}
+.mac-dot--yellow {
+    background: #febc2e;
+}
+.mac-dot--green {
+    background: #28c840;
+}
 
 .mac-screenshot {
     display: block;

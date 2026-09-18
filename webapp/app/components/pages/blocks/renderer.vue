@@ -1,17 +1,12 @@
 <template>
-    <component
-        :is="getBlockComponent(block.type)"
-        v-if="block.visible"
-        :data="block.data"
-        :block-id="block.uuid"
-    />
+    <component :is="getBlockComponent(block.type)" v-if="block.visible" :data="block.data" :block-id="block.uuid" />
 </template>
 
 <script setup lang="ts">
 import type { Block } from "~/models/Block";
 
 const props = defineProps<{
-    block: Block
+    block: Block;
 }>();
 
 import { PagesBlocksHero } from "#components";
@@ -27,18 +22,18 @@ import { PagesBlocksMultiCards } from "#components";
 
 const getBlockComponent = (type: string) => {
     const components: Record<string, any> = {
-        'hero': PagesBlocksHero,
-        'super-hero': PagesBlocksSuperHero,
-        'one-columns': PagesBlocksOneColumns,
-        'two-columns': PagesBlocksTwoColumns,
-        'three-columns': PagesBlocksThreeColumns,
-        'gallery': PagesBlocksGallery,
-        'separator': PagesBlocksSeparator,
-        'cta': PagesBlocksCta,
-        'faq': PagesBlocksFaq,
-        'multi-cards': PagesBlocksMultiCards,
+        hero: PagesBlocksHero,
+        "super-hero": PagesBlocksSuperHero,
+        "one-columns": PagesBlocksOneColumns,
+        "two-columns": PagesBlocksTwoColumns,
+        "three-columns": PagesBlocksThreeColumns,
+        gallery: PagesBlocksGallery,
+        separator: PagesBlocksSeparator,
+        cta: PagesBlocksCta,
+        faq: PagesBlocksFaq,
+        "multi-cards": PagesBlocksMultiCards,
     };
 
-    return components[type] || 'div';
+    return components[type] || "div";
 };
 </script>

@@ -4,7 +4,11 @@
             <v-card flat>
                 <v-card-text>
                     <div class="d-flex align-center ga-4">
-                        <v-avatar size="64" rounded="lg" class="gradient-primary flex-shrink-0 text-h5 font-weight-bold">
+                        <v-avatar
+                            size="64"
+                            rounded="lg"
+                            class="gradient-primary flex-shrink-0 text-h5 font-weight-bold"
+                        >
                             <v-img v-if="organization.logoUrl" :src="organization.logoUrl" />
                             <span v-else>{{ getInitials(organization.name) }}</span>
                         </v-avatar>
@@ -13,12 +17,7 @@
                             <div class="text-h4 font-weight-bold">{{ organization.name }}</div>
 
                             <div class="d-flex align-center ga-2 mt-1 flex-wrap">
-                                <v-chip
-                                    color="primary"
-                                    variant="tonal"
-                                    label
-                                    prepend-icon="mdi-pound"
-                                >
+                                <v-chip color="primary" variant="tonal" label prepend-icon="mdi-pound">
                                     {{ organization.slug }}
                                 </v-chip>
                             </div>
@@ -143,8 +142,16 @@
                                         <template v-for="(member, index) in organization.members" :key="member.uuid">
                                             <v-list-item :prepend-avatar="undefined">
                                                 <template #prepend>
-                                                    <v-avatar size="36" rounded="lg" class="gradient-primary mr-3 text-caption font-weight-bold">
-                                                        {{ getInitials(member.member.firstname + ' ' + member.member.lastname) }}
+                                                    <v-avatar
+                                                        size="36"
+                                                        rounded="lg"
+                                                        class="gradient-primary mr-3 text-caption font-weight-bold"
+                                                    >
+                                                        {{
+                                                            getInitials(
+                                                                member.member.firstname + " " + member.member.lastname,
+                                                            )
+                                                        }}
                                                     </v-avatar>
                                                 </template>
 
@@ -157,7 +164,10 @@
                                                 </v-list-item-subtitle>
 
                                                 <template #append>
-                                                    <v-chip :color="OrganizationMemberRoleColor[member.role]" variant="tonal">
+                                                    <v-chip
+                                                        :color="OrganizationMemberRoleColor[member.role]"
+                                                        variant="tonal"
+                                                    >
                                                         {{ OrganizationMemberRoleLabel[member.role] }}
                                                     </v-chip>
                                                 </template>
@@ -167,7 +177,9 @@
                                         </template>
                                     </v-list>
 
-                                    <v-card-text v-else class="text-medium-emphasis text-caption"> Aucun membre. </v-card-text>
+                                    <v-card-text v-else class="text-medium-emphasis text-caption">
+                                        Aucun membre.
+                                    </v-card-text>
                                 </v-col>
                             </v-row>
                         </v-card-text>
@@ -208,6 +220,14 @@ const handleSearch = async () => {
 };
 
 const completeAdress = computed(() => {
-    return (organization.value.address ?? 'N.R') + ', ' + (organization.value.postalCode ?? 'N.R') + ' - ' + (organization.value.city ?? 'N.R') + ' - ' + (organization.value.country ?? 'N.R')
+    return (
+        (organization.value.address ?? "N.R") +
+        ", " +
+        (organization.value.postalCode ?? "N.R") +
+        " - " +
+        (organization.value.city ?? "N.R") +
+        " - " +
+        (organization.value.country ?? "N.R")
+    );
 });
 </script>

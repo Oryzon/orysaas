@@ -3,10 +3,7 @@
         <v-col md="12">
             <v-card flat :loading="isLoading">
                 <v-card-text>
-                    <v-form
-                        ref="form"
-                        v-model="isFormValid"
-                    >
+                    <v-form ref="form" v-model="isFormValid">
                         <v-row>
                             <v-col md="3">
                                 <v-text-field
@@ -16,7 +13,7 @@
                                     v-model="page.title"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -28,7 +25,7 @@
                                     v-model="page.slug"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -40,7 +37,7 @@
                                     v-model="page.metaTitle"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                 ></v-text-field>
                             </v-col>
 
@@ -64,7 +61,7 @@
                                     v-model="page.metaDescription"
                                     :loading="isLoading"
                                     :disabled="isLoading"
-                                    :rules="[ rules.required() ]"
+                                    :rules="[rules.required()]"
                                     rows="3"
                                 ></v-textarea>
                             </v-col>
@@ -104,7 +101,7 @@ definePageMeta({
 const route = useRouter().currentRoute.value;
 
 const isLoading = computed(() => {
-    return api.isLoading('page:detail');
+    return api.isLoading("page:detail");
 });
 
 const form = ref();
@@ -116,7 +113,7 @@ let originalPage = ref<Partial<Page>>({});
 
 onMounted(async () => {
     page.value = await api.get<Page>(`page/${<string>route.params.uuid}`, {
-        loadingKey: 'page:detail'
+        loadingKey: "page:detail",
     });
 
     originalPage.value = JSON.parse(JSON.stringify(page.value));
@@ -131,12 +128,12 @@ const handleUpdate = async () => {
     }
 
     let res = await api.put(`/page/${<string>route.params.uuid}`, page.value, {
-        loadingKey: 'page:detail',
-        toast: true
+        loadingKey: "page:detail",
+        toast: true,
     });
 
     if (res) {
         originalPage.value = JSON.parse(JSON.stringify(page.value));
     }
-}
+};
 </script>

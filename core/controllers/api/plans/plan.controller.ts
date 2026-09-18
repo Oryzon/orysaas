@@ -10,7 +10,6 @@ import { archiveStripeProduct, syncPlanByUuid } from "../../../helpers/stripe.he
 
 @Controller("plan")
 export default class PlanController {
-
     @Get("/:uuid")
     @CheckJwt()
     @CheckIsSaasAdmin()
@@ -30,13 +29,9 @@ export default class PlanController {
             },
         });
 
-        const prices = plan.prices
-            ? attachPlanPriceDiscounts(plan.prices)
-            : plan.prices;
+        const prices = plan.prices ? attachPlanPriceDiscounts(plan.prices) : plan.prices;
 
-        return res
-            .status(HttpCode.OK)
-            .send({ ...plan, prices });
+        return res.status(HttpCode.OK).send({ ...plan, prices });
     }
 
     @Post("/")
@@ -44,12 +39,7 @@ export default class PlanController {
     @CheckIsSaasAdmin()
     @Error()
     async create(req: Request, res: Response) {
-        const {
-            title,
-            description,
-            isActive,
-            isPopular,
-        } = req.body;
+        const { title, description, isActive, isPopular } = req.body;
 
         const newPlan = new PlanEntity();
 
@@ -63,13 +53,11 @@ export default class PlanController {
 
         const stripeSyncError = await syncPlanByUuid(newPlan.uuid);
 
-        return res
-            .status(HttpCode.CREATED)
-            .send({
-                message: Messages.PLAN_CREATED,
-                entity: newPlan,
-                stripeSyncError,
-            });
+        return res.status(HttpCode.CREATED).send({
+            message: Messages.PLAN_CREATED,
+            entity: newPlan,
+            stripeSyncError,
+        });
     }
 
     @Put("/:uuid")
@@ -117,11 +105,9 @@ export default class PlanController {
 
         await archiveStripeProduct(existingPlan.stripeProductId);
 
-        return res
-            .status(HttpCode.OK)
-            .send({
-                message: Messages.PLAN_DELETED,
-                entity: existingPlan
-            });
+        return res.status(HttpCode.OK).send({
+            message: Messages.PLAN_DELETED,
+            entity: existingPlan,
+        });
     }
 }

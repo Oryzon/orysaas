@@ -1,0 +1,17 @@
+services:
+    mariadb-test:
+        image: mariadb:latest
+        ports:
+            - "3307:3306"
+        environment:
+            MARIADB_USER: orysaas_test
+            MARIADB_PASSWORD: orysaas_test
+            MARIADB_DATABASE: orysaas_test
+            MARIADB_ROOT_PASSWORD: root
+        tmpfs:
+            - /var/lib/mysql
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 3s
+            timeout: 5s
+            retries: 20

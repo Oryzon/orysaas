@@ -1,7 +1,14 @@
 <template>
     <v-dialog v-model="dialog" max-width="1000" :persistent="isLoading">
         <template v-slot:activator="{ props: activatorProps }">
-            <v-card v-if="isSimpleButton" v-bind="activatorProps" variant="outlined" color="primary" class="mt-2" rounded="lg">
+            <v-card
+                v-if="isSimpleButton"
+                v-bind="activatorProps"
+                variant="outlined"
+                color="primary"
+                class="mt-2"
+                rounded="lg"
+            >
                 <v-card-text>
                     <v-row justify="center" align="center" class="mt-n1 mb-n1">
                         <v-col md="2">
@@ -121,7 +128,13 @@
                 </v-card-text>
 
                 <v-card-actions class="bg-surface-light mt-n2">
-                    <v-btn color="primary" variant="flat" :loading="isLoading" :disabled="!isFormValid || isLoading" @click="handleCreate">
+                    <v-btn
+                        color="primary"
+                        variant="flat"
+                        :loading="isLoading"
+                        :disabled="!isFormValid || isLoading"
+                        @click="handleCreate"
+                    >
                         Créer l'organisation
                     </v-btn>
                 </v-card-actions>
@@ -182,14 +195,10 @@ const handleCreate = async () => {
         formData.append("logo", logoFile.value);
     }
 
-    const res = await api.post<{ message: string; entity: Organization }>(
-        '/tenant/organizations',
-        formData,
-        {
-            loadingKey: "organization:create",
-            toast: true,
-        },
-    );
+    const res = await api.post<{ message: string; entity: Organization }>("/tenant/organizations", formData, {
+        loadingKey: "organization:create",
+        toast: true,
+    });
 
     if (res?.entity) {
         emit("created", res.entity);

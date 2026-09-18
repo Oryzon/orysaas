@@ -18,18 +18,13 @@
             rounded="lg"
             class="mr-2"
         >
-            <v-icon
-                size="32"
-                :class="{ 'bell-ring': ringing }"
-            >
-                mdi-bell-outline
-            </v-icon>
+            <v-icon size="32" :class="{ 'bell-ring': ringing }"> mdi-bell-outline </v-icon>
         </v-btn>
     </v-badge>
 </template>
 
 <script setup lang="ts">
-const drawerOpen = useState('notif:drawer:open', () => false);
+const drawerOpen = useState("notif:drawer:open", () => false);
 const { unreadCount } = useNotifications();
 
 const ringing = ref(false);
@@ -40,8 +35,12 @@ watch(unreadCount, (newVal, oldVal) => {
         ringing.value = true;
         badgePulse.value = true;
 
-        setTimeout(() => { ringing.value = false; }, 800);
-        setTimeout(() => { badgePulse.value = false; }, 600);
+        setTimeout(() => {
+            ringing.value = false;
+        }, 800);
+        setTimeout(() => {
+            badgePulse.value = false;
+        }, 600);
     }
 });
 </script>

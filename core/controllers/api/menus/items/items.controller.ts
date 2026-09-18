@@ -4,9 +4,9 @@ import { MenuItemRepository } from "../../../../databases/repositories/menu-item
 import { Equal } from "typeorm";
 import HttpCode from "../../../../config/http-code";
 
-@Controller('/menu/:uuidMenu/items')
+@Controller("/menu/:uuidMenu/items")
 export default class MenuItemsController {
-    @Get('/')
+    @Get("/")
     @CheckJwt()
     @CheckIsSaasAdmin()
     @Error()
@@ -15,11 +15,11 @@ export default class MenuItemsController {
 
         let items = await MenuItemRepository.find({
             where: {
-                menuUuid: Equal(uuidMenu)
+                menuUuid: Equal(uuidMenu),
             },
             order: {
-                position: 'ASC'
-            }
+                position: "ASC",
+            },
         });
 
         return res.status(HttpCode.OK).send(items);

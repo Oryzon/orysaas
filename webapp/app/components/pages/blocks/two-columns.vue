@@ -18,7 +18,7 @@
 import type { TwoColumnsData } from "~/models/Block";
 
 defineProps<{
-    data: TwoColumnsData,
-    blockId?: string
+    data: TwoColumnsData;
+    blockId?: string;
 }>();
 </script>
