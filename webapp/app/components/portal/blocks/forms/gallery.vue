@@ -261,6 +261,31 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+
+    <v-dialog v-model="confirmDeleteDialog" max-width="600">
+        <v-card flat>
+            <v-toolbar color="error">
+                <v-toolbar-title>Supprimer l'image</v-toolbar-title>
+
+                <v-toolbar-items>
+                    <v-btn @click="cancelRemoveImage">
+                        <v-icon color="white">mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
+            <v-card-text>
+                <v-alert type="info">Cette opération est une opération définitive.</v-alert>
+
+                <p>Vous êtes sur le point de supprimer cette image de la galerie.</p>
+                <p>Êtes-vous sur de vouloir continuer cette opération ?</p>
+            </v-card-text>
+
+            <v-card-actions class="bg-surface-light mt-n2">
+                <v-btn color="error" variant="flat" @click="confirmRemoveImage"> Confirmer </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -374,11 +399,26 @@ const handleFileUpload = async (event: Event) => {
     }
 };
 
-const removeImage = (index: number) => {
-    // @ToDo : add a nice dialog
-    localData.value.images?.splice(index, 1);
+const confirmDeleteDialog = ref(false);
+const imageToRemoveIndex = ref<number | null>(null);
 
-    emitUpdate();
+const removeImage = (index: number) => {
+    imageToRemoveIndex.value = index;
+    confirmDeleteDialog.value = true;
+};
+
+const confirmRemoveImage = () => {
+    if (imageToRemoveIndex.value !== null) {
+        localData.value.images?.splice(imageToRemoveIndex.value, 1);
+        emitUpdate();
+    }
+
+    cancelRemoveImage();
+};
+
+const cancelRemoveImage = () => {
+    confirmDeleteDialog.value = false;
+    imageToRemoveIndex.value = null;
 };
 
 const editImage = (index: number) => {

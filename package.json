@@ -15,7 +15,11 @@
         "lint": "npm --workspace core run lint && npm --workspace webapp run lint",
         "seed": "npm --workspace core run seed --",
         "format": "prettier --write .",
-        "format:check": "prettier --check ."
+        "format:check": "prettier --check .",
+        "test": "node scripts/run-tests.js",
+        "test:watch": "npm --workspace core run test:watch",
+        "test:db:up": "docker compose -f docker-compose.test.yml up -d --wait",
+        "test:db:down": "docker compose -f docker-compose.test.yml down"
     },
     "devDependencies": {
         "concurrently": "^9.0.0",

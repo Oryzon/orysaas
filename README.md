@@ -168,6 +168,9 @@ npm run seed -- showcase
 | `npm run dev:webapp`       | Run frontend only                    |
 | `npm run build`            | Build backend and frontend           |
 | `npm run seed -- <name>`   | Execute a backend seeder             |
+| `npm run test:db:up`       | Start the disposable test MariaDB (see `how-to-test.md`) |
+| `npm test`                 | Run the backend test suite (Vitest)  |
+| `npm run test:db:down`     | Stop the test database               |
 
 Workspace-scoped commands:
 

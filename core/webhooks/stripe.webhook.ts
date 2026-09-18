@@ -45,7 +45,7 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         stripe = await getStripeClient();
         event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
     } catch (error) {
-        console.log("[Stripe webhook] Signature invalide", error);
+        console.log("[Stripe webhook] Signature invalide", error instanceof Error ? error.message : error);
 
         return res.status(HttpCode.BAD_REQUEST).send({
             message: Messages.MISSING_SIGNATURE,
@@ -214,7 +214,11 @@ export async function handleStripeWebhook(req: Request, res: Response) {
             }
         }
     } catch (error) {
-        console.log("[Stripe webhook] Failed to process event", event.type, error);
+        console.log(
+            "[Stripe webhook] Failed to process event",
+            event.type,
+            error instanceof Error ? error.message : error,
+        );
     }
 
     return res.status(HttpCode.OK).send({ received: true });

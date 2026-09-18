@@ -77,6 +77,10 @@ export class MailService {
     }
 
     public async send({ to, subject, template, variables, attachments, variant }: Options): Promise<void> {
+        if (process.env.NODE_ENV === "test") {
+            return;
+        }
+
         try {
             this.ensureLayoutRegistered();
 

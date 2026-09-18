@@ -38,6 +38,7 @@ pids/
 .env
 .env.*
 !.env.example
+!.env.test.example
 
 # --- Build / dist / cache ---
 build/

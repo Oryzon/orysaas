@@ -29,6 +29,31 @@
             </v-row>
         </v-card-text>
     </v-card>
+
+    <v-dialog v-model="confirmDeleteDialog" max-width="600">
+        <v-card flat>
+            <v-toolbar color="error">
+                <v-toolbar-title>Supprimer le bloc</v-toolbar-title>
+
+                <v-toolbar-items>
+                    <v-btn @click="cancelDeleteBlock">
+                        <v-icon color="white">mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
+            <v-card-text>
+                <v-alert type="info">Cette opération est une opération définitive.</v-alert>
+
+                <p>Vous êtes sur le point de supprimer ce bloc de contenu.</p>
+                <p>Êtes-vous sur de vouloir continuer cette opération ?</p>
+            </v-card-text>
+
+            <v-card-actions class="bg-surface-light mt-n2">
+                <v-btn color="error" variant="flat" @click="confirmDeleteBlock"> Confirmer </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -82,10 +107,26 @@ const toggleBlockVisibility = (index: number) => {
     emitUpdate();
 };
 
+const confirmDeleteDialog = ref(false);
+const blockToDeleteIndex = ref<number | null>(null);
+
 const deleteBlock = (index: number) => {
-    // @ToDo : Add a confirm modal
-    localBlocks.value.splice(index, 1);
-    emitUpdate();
+    blockToDeleteIndex.value = index;
+    confirmDeleteDialog.value = true;
+};
+
+const confirmDeleteBlock = () => {
+    if (blockToDeleteIndex.value !== null) {
+        localBlocks.value.splice(blockToDeleteIndex.value, 1);
+        emitUpdate();
+    }
+
+    cancelDeleteBlock();
+};
+
+const cancelDeleteBlock = () => {
+    confirmDeleteDialog.value = false;
+    blockToDeleteIndex.value = null;
 };
 
 const onDragEnd = () => {
