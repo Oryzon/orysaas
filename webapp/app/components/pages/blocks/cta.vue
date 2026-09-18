@@ -17,7 +17,7 @@
                     </p>
 
                     <div v-if="data.description" class="cta-description">
-                        <div v-html="data.description"></div>
+                        <div v-html="sanitizeHtml(data.description)"></div>
                     </div>
 
                     <div class="cta-buttons">
@@ -58,7 +58,7 @@
                         </p>
 
                         <div v-if="data.description" class="cta-description">
-                            <div v-html="data.description"></div>
+                            <div v-html="sanitizeHtml(data.description)"></div>
                         </div>
                     </div>
 
@@ -145,7 +145,7 @@
                             </p>
 
                             <div v-if="data.description" class="cta-description">
-                                <div v-html="data.description"></div>
+                                <div v-html="sanitizeHtml(data.description)"></div>
                             </div>
 
                             <div class="cta-buttons">

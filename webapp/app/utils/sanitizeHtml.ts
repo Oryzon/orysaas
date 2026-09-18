@@ -1,0 +1,9 @@
+import DOMPurify from "isomorphic-dompurify";
+
+export function sanitizeHtml(input: string | null | undefined): string {
+    if (!input) {
+        return "";
+    }
+
+    return DOMPurify.sanitize(input);
+}

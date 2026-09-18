@@ -86,13 +86,16 @@ export class UserEntity {
 
     @BeforeSoftRemove()
     setDeletedAt() {
-        this.email = `deleted_${this.uuid}_${this.email}`;
+        // true anonymaszion
+        this.email = `deleted-${this.uuid}@deleted.local`;
+        this.firstname = "Deleted";
+        this.lastname = "User";
         this.deletedAt = DateTime.now().toJSDate();
         this.deletedBy = getUserUuid();
     }
 
     hashPassword() {
-        this.password = bcrypt.hashSync(this.password, 8);
+        this.password = bcrypt.hashSync(this.password, 12);
     }
 
     checkIfUnencryptedPasswordIsValid(unecryptedPassword: string) {

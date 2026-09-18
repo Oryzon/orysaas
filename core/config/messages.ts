@@ -47,6 +47,9 @@ export default class Messages {
         "Cet utilisateur ne peut pas être réinitialisé, il s'agit d'un super-administrateur.";
     static USER_ALREADY_IN_ROLE = "L'utilisateur possède déjà ce rôle.";
     static USER_ADDED_IN_ROLE = "Rôle assigné avec succès.";
+    static USER_DELETE_CODE_SENT = "Un code de confirmation a été envoyé à votre adresse e-mail.";
+    static USER_DELETE_CODE_INVALID = "Le code saisi est invalide ou a expiré.";
+    static USER_DELETED = "Votre compte a été supprimé.";
 
     // -------------------------
     // Abonnements
@@ -108,6 +111,7 @@ export default class Messages {
     static ORGANIZATION_MEMBER_UPDATED = "Le rôle du membre a été mis à jour.";
     static ORGANIZATION_MEMBER_REMOVED = "Le membre a été retiré de l'organisation.";
     static ORGANIZATION_MEMBER_OWNER_CANT_BE_EDITED = "Le rôle du propriétaire ne peut pas être modifié.";
+    static ORGANIZATION_MEMBER_ROLE_INVALID = "Le rôle demandé est invalide.";
     static ORGANIZATION_DELETE_CODE_SENT = "Un code de confirmation a été envoyé à votre adresse e-mail.";
     static ORGANIZATION_DELETE_CODE_INVALID = "Le code saisi est invalide ou a expiré.";
     static ORGANIZATION_DELETED = "L'organisation a été supprimée.";
@@ -194,4 +198,9 @@ export default class Messages {
     // -------------------------
     static QUOTA_EXCEEDED = "Le quota de votre abonnement est atteint.";
     static QUOTA_NO_SUBSCRIPTION = "Vous n'avez pas d'abonnement qui permet cette action.";
+
+    // -------------------------
+    // Rate limiting
+    // -------------------------
+    static TOO_MANY_REQUESTS = "Trop de tentatives. Merci de réessayer dans quelques instants.";
 }

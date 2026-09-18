@@ -2,6 +2,7 @@ import { Controller, Error, CheckJwt, Post, Get } from "../../../../decorators";
 import { Request, Response } from "express";
 import Messages from "../../../../config/messages";
 import HttpCode from "../../../../config/http-code";
+import { dataSource } from "../../../../config/datasource";
 import { OrganizationEntity } from "../../../../databases/entities/organization.entity";
 import { OrganizationRepository } from "../../../../databases/repositories/organization.repository";
 import { OrganizationMemberEntity } from "../../../../databases/entities/organization-member.entity";
@@ -32,33 +33,41 @@ export default class TenantOrganizationController {
         const country = fields.country?.[0];
 
         const slug = await OrganizationRepository.getSlug(name);
-
-        const entity = new OrganizationEntity();
-
-        entity.name = name;
-        entity.slug = slug;
-        entity.address = address;
-        entity.postalCode = postalCode;
-        entity.city = city;
-        entity.country = country;
-        entity.logoUrl = null;
-
-        await OrganizationRepository.insert(entity);
-
         const logoFile = files.logo?.[0];
+        const memberUuid = getUserUuid();
 
-        if (logoFile) {
-            entity.logoUrl = await organizationLogoService.save(logoFile, entity.uuid, req);
-            await OrganizationRepository.save(entity);
-        }
+        // make an transac, because if one step fail, we fix it for avoid empty org
+        const entity = await dataSource.transaction(async (manager) => {
+            const organizationRepository = manager.withRepository(OrganizationRepository);
+            const organizationMemberRepository = manager.withRepository(OrganizationMemberRepository);
 
-        const member = new OrganizationMemberEntity();
+            const entity = new OrganizationEntity();
 
-        member.organizationUuid = entity.uuid;
-        member.memberUuid = getUserUuid();
-        member.role = OrganizationMemberRole.OWNER;
+            entity.name = name;
+            entity.slug = slug;
+            entity.address = address;
+            entity.postalCode = postalCode;
+            entity.city = city;
+            entity.country = country;
+            entity.logoUrl = null;
 
-        await OrganizationMemberRepository.save(member);
+            await organizationRepository.insert(entity);
+
+            if (logoFile) {
+                entity.logoUrl = await organizationLogoService.save(logoFile, entity.uuid, req);
+                await organizationRepository.save(entity);
+            }
+
+            const member = new OrganizationMemberEntity();
+
+            member.organizationUuid = entity.uuid;
+            member.memberUuid = memberUuid;
+            member.role = OrganizationMemberRole.OWNER;
+
+            await organizationMemberRepository.save(member);
+
+            return entity;
+        });
 
         const tmpEntity = {
             ...entity,

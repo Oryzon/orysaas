@@ -19,7 +19,9 @@ export const TokenRepository = dataSource.getRepository(TokenEntity).extend({
     async findValid(token: string, type: TokenType): Promise<TokenEntity | null> {
         return this.findOne({
             where: { token, type },
-            relations: ["user"],
+            relations: {
+                user: true
+            },
         });
     },
     async markAsUsed(token: TokenEntity): Promise<void> {

@@ -2,9 +2,17 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { Application } from "express";
 import supertest from "supertest";
 import * as jwt from "jsonwebtoken";
+import { Equal } from "typeorm";
 import { buildTestApp, authed } from "./helpers/request";
-import { createUser } from "./helpers/fixtures";
+import { createUser, createOrganization, createMembership } from "./helpers/fixtures";
 import { UserOrigin } from "../build/core/databases/entities/user.entity";
+import { OrganizationMemberRole } from "../build/core/databases/entities/organization-member.entity";
+import { TokenType } from "../build/core/databases/entities/token.entity";
+import { TokenRepository } from "../build/core/databases/repositories/token.repository";
+import { UserRepository } from "../build/core/databases/repositories/user.repository";
+import { OrganizationMemberRepository } from "../build/core/databases/repositories/organization-member.repository";
+import { OrganizationRepository } from "../build/core/databases/repositories/organization.repository";
+import { RefreshTokenRepository } from "../build/core/databases/repositories/refresh-token.repository";
 
 describe("[ User Profile ]", () => {
     let app: Application;
@@ -62,5 +70,92 @@ describe("[ User Profile ]", () => {
         const res = await request.get("/v1/settings/").set("Authorization", `Bearer ${forgedToken}`);
 
         expect(res.status).toBe(403);
+    });
+
+    it("requesting account deletion succeeds when the user owns no organization exclusively", async () => {
+        const user = await createUser();
+
+        const res = await authed(request, user).delete("/v1/user/me/request");
+
+        expect(res.status).toBe(200);
+    });
+
+    it("requesting account deletion is blocked (409) when sole owner of an org that has other members", async () => {
+        const user = await createUser();
+        const teammate = await createUser();
+        const org = await createOrganization();
+        await createMembership(user, org, OrganizationMemberRole.OWNER);
+        await createMembership(teammate, org, OrganizationMemberRole.MEMBER);
+
+        const res = await authed(request, user).delete("/v1/user/me/request");
+
+        expect(res.status).toBe(409);
+    });
+
+    it("requesting account deletion is not blocked when sole owner and sole member of an org", async () => {
+        const user = await createUser();
+        const org = await createOrganization();
+        await createMembership(user, org, OrganizationMemberRole.OWNER);
+
+        const res = await authed(request, user).delete("/v1/user/me/request");
+
+        expect(res.status).toBe(200);
+    });
+
+    it("requesting account deletion is not blocked when there's a co-owner", async () => {
+        const user = await createUser();
+        const coOwner = await createUser();
+        const org = await createOrganization();
+        await createMembership(user, org, OrganizationMemberRole.OWNER);
+        await createMembership(coOwner, org, OrganizationMemberRole.OWNER);
+
+        const res = await authed(request, user).delete("/v1/user/me/request");
+
+        expect(res.status).toBe(200);
+    });
+
+    it("confirming with an unknown code is rejected (422)", async () => {
+        const user = await createUser();
+
+        const res = await authed(request, user).delete("/v1/user/me/confirm").send({ code: "000000" });
+
+        expect(res.status).toBe(422);
+    });
+
+    it("confirming with a valid code deletes the account: user, memberships and refresh tokens", async () => {
+        const user = await createUser();
+        const org = await createOrganization();
+        await createMembership(user, org, OrganizationMemberRole.MEMBER);
+
+        const clientRefreshToken = await RefreshTokenRepository.createToken(user.uuid);
+        const code = await TokenRepository.createCodeToken(user, TokenType.delete_account, 15);
+
+        const res = await authed(request, user).delete("/v1/user/me/confirm").send({ code });
+
+        expect(res.status).toBe(200);
+
+        const deletedUser = await UserRepository.findOne({ where: { uuid: Equal(user.uuid) } });
+        expect(deletedUser).toBeNull();
+
+        const membership = await OrganizationMemberRepository.findOne({ where: { memberUuid: Equal(user.uuid) } });
+        expect(membership).toBeNull();
+
+        const stillValidToken = await RefreshTokenRepository.findValid(clientRefreshToken);
+        expect(stillValidToken).toBeNull();
+    });
+
+    it("confirming deletes an org too when the user was its sole owner and sole member", async () => {
+        const user = await createUser();
+        const org = await createOrganization();
+        await createMembership(user, org, OrganizationMemberRole.OWNER);
+
+        const code = await TokenRepository.createCodeToken(user, TokenType.delete_account, 15);
+
+        const res = await authed(request, user).delete("/v1/user/me/confirm").send({ code });
+
+        expect(res.status).toBe(200);
+
+        const deletedOrg = await OrganizationRepository.findOne({ where: { uuid: Equal(org.uuid) } });
+        expect(deletedOrg).toBeNull();
     });
 });

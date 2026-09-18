@@ -187,13 +187,104 @@
                 </v-col>
             </v-row>
         </v-col>
+
+        <v-col md="5">
+            <v-row>
+                <v-col md="12">
+                    <v-card flat>
+                        <v-card-title class="text-subtitle-1 font-weight-bold pt-4 px-4">
+                            <v-icon start color="primary">mdi-crown-outline</v-icon>
+
+                            Abonnement
+                        </v-card-title>
+
+                        <v-divider />
+
+                        <v-card-text v-if="subscription" class="d-flex align-center justify-space-between flex-wrap ga-3">
+                            <div>
+                                <v-chip :color="statusColor" label size="small">
+                                    {{ SubscriptionStatusLabel[subscription.status] }}
+                                </v-chip>
+                                <div class="text-subtitle-1 font-weight-bold mt-1">
+                                    {{ subscription.planPrice?.plan?.title ?? "N.R" }}
+                                </div>
+                            </div>
+
+                            <div class="text-body-2 text-medium-emphasis">
+                                {{ $price(subscription.planPrice?.sellPrice ?? 0) }} /
+                                {{ subscription.planPrice?.billingInterval === BillingInterval.MONTH ? "mois" : "an" }}
+                            </div>
+                        </v-card-text>
+
+                        <v-card-text v-else class="text-medium-emphasis text-caption">
+                            Aucun abonnement actif.
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+
+                <v-col md="12">
+                    <v-card flat>
+                        <v-card-title class="text-subtitle-1 font-weight-bold pt-4 px-4">
+                            <v-icon start color="primary">mdi-receipt-text-outline</v-icon>
+                            Dernières factures
+                        </v-card-title>
+
+                        <v-divider />
+
+                        <v-card-text v-if="invoices.length">
+                            <v-row>
+                                <v-col md="12">
+                                    <v-list density="compact" class="py-0">
+                                        <v-list-item
+                                            v-for="invoice in invoices"
+                                            :key="invoice.id"
+                                            :href="invoice.hostedInvoiceUrl ?? undefined"
+                                            target="_blank"
+                                            rel="noopener"
+                                        >
+                                            <template #prepend>
+                                                <v-icon size="18" color="medium-emphasis">mdi-receipt-text-outline</v-icon>
+                                            </template>
+
+                                            <v-list-item-title class="text-body-2">
+                                                {{ $date.frenchDate(invoice.date) }}
+                                            </v-list-item-title>
+
+                                            <v-list-item-subtitle v-if="invoice.number" class="text-caption">
+                                                {{ invoice.number }}
+                                            </v-list-item-subtitle>
+
+                                            <template #append>
+                                                <div class="d-flex align-center ga-2">
+                                                    <span class="text-body-2 font-weight-medium">{{ $price(invoice.amount) }}</span>
+                                                    <v-chip :color="getColor(invoice.status as string)" size="x-small" label>
+                                                        {{ getLabel(invoice.status as string) }}
+                                                    </v-chip>
+                                                </div>
+                                            </template>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+
+                        <v-card-text v-else class="text-medium-emphasis text-caption">
+                            Aucune facture pour le moment.
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </v-col>
     </v-row>
 </template>
 
 <script setup lang="ts">
 import { type Organization } from "~/models/Organization";
 import { OrganizationMemberRoleLabel, OrganizationMemberRoleColor } from "~/models/OrganizationMember";
-import type { User } from "~/models/User";
+import type { Subscription } from "~/models/Subscription";
+import { type Invoice, getColor, getLabel } from "~/models/Invoice";
+import { BillingInterval } from "#shared/billing-interval";
+import { SubscriptionStatusLabel } from "#shared/subscription-status";
 
 const api = useApi();
 
@@ -208,9 +299,11 @@ const isLoading = computed(() => api.isLoading("organizations:list"));
 
 const slug = useRoute().params.slug as string;
 const organization = ref<Partial<Organization>>({});
+const subscription = ref<Subscription | null>(null);
+const invoices = ref<Invoice[]>([]);
 
 onMounted(async () => {
-    await handleSearch();
+    await Promise.all([handleSearch(), handleBillingSearch()]);
 });
 
 const handleSearch = async () => {
@@ -218,6 +311,28 @@ const handleSearch = async () => {
         loadingKey: "organizations:list",
     });
 };
+
+const handleBillingSearch = async () => {
+    const billing = await api.get<{ subscription: Subscription | null; invoices: Invoice[] }>(
+        `organization/${slug}/billing`,
+        { loadingKey: "organizations:billing" },
+    );
+
+    subscription.value = billing.subscription;
+    invoices.value = billing.invoices;
+};
+
+const statusColor = computed(() => {
+    switch (subscription.value?.status) {
+        case "active":
+        case "trialing":
+            return "success";
+        case "past_due":
+            return "warning";
+        default:
+            return "error";
+    }
+});
 
 const completeAdress = computed(() => {
     return (

@@ -21,6 +21,8 @@ const TEMPLATE_VARIANTS: Record<string, EmailVariant> = {
     invite: "brand",
     "reset-password": "brand",
     "delete-organization": "danger",
+    "delete-account-code": "danger",
+    "account-deleted": "brand",
     welcome: "success",
     "subscription-started": "success",
     "subscription-cancelled": "brand",
@@ -37,21 +39,17 @@ export class MailService {
     private transporter;
 
     constructor() {
-        this.transporter = nodemailer.createTransport(
-            {
-                host: process.env.MAIL_HOST || "smtp.example.com",
-                port: parseInt(process.env.MAIL_PORT || "587", 10),
-                secure: process.env.MAIL_SECURE === "true" || process.env.MAIL_PORT === "465", // safer default
-                auth: {
-                    user: process.env.MAIL_USER || "email@example.com",
-                    pass: process.env.MAIL_PASS || "password",
-                },
+        this.transporter = nodemailer.createTransport({
+            host: process.env.MAIL_HOST || "smtp.example.com",
+            port: parseInt(process.env.MAIL_PORT || "587", 10),
+            secure: process.env.MAIL_SECURE === "true" || process.env.MAIL_PORT === "465", // safer default
+            auth: {
+                user: process.env.MAIL_USER || "email@example.com",
+                pass: process.env.MAIL_PASS || "password",
             },
-            {
-                debug: true,
-                logger: true,
-            },
-        );
+            debug: true,
+            logger: true,
+        });
     }
 
     // shared layout every email wraps itself in with {{#> layout}} ... {{/layout}},

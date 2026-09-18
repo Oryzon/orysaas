@@ -8,6 +8,7 @@ export enum TokenType {
     invite = "invite",
     social_login = "social_login",
     delete_organization = "delete_organization",
+    delete_account = "delete_account",
 }
 
 @Entity()

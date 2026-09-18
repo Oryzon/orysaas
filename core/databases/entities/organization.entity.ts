@@ -15,6 +15,7 @@ import { getUserUuid } from "../../helpers/request-context.helper";
 import { OrganizationMemberEntity } from "./organization-member.entity";
 import { OrganizationInviteEntity } from "./organization-invite.entity";
 import { SubscriptionEntity } from "./subscription.entity";
+import { InvoiceEntity } from "./invoice.entity";
 
 @Entity()
 export class OrganizationEntity {
@@ -75,6 +76,9 @@ export class OrganizationEntity {
 
     @OneToMany(() => SubscriptionEntity, (s) => s.organization)
     subscriptions: SubscriptionEntity[];
+
+    @OneToMany(() => InvoiceEntity, (i) => i.organization)
+    invoices: InvoiceEntity[];
 
     @Column()
     @CreateDateColumn()
