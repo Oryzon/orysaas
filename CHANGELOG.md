@@ -29,4 +29,4 @@ OrySaaS is a full-stack SaaS starter/boilerplate (Node.js + Express + TypeORM + 
 - Database migrations workflow on top of TypeORM (`synchronize` stays for development/test only)
 - Full integration test suite (Vitest) running against a disposable, containerized MariaDB
 
-[0.1.0]: https://github.com/Oryzon/orysaas/releases/tag/v0.1.0
+[0.1.0]: https://github.com/Oryzon/orysaas/releases/tag/0.1.0
