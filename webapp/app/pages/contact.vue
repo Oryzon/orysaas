@@ -183,9 +183,7 @@
                                 <v-col md="12" class="mt-n8 ml-n3">
                                     <v-checkbox color="primary" :rules="[rules.required()]" hide-details="auto">
                                         <template #label>
-                                            J'accepte la&nbsp;<a href="" class="text-primary"
-                                                >politique de confidentialité</a
-                                            >&nbsp;<span class="font-weight-black text-error">*</span>
+                                            J'accepte la&nbsp;<a href="confidentialite" target="_blank" class="text-primary">politique de confidentialité</a>&nbsp;<span class="font-weight-black text-error">*</span>
                                         </template>
                                     </v-checkbox>
                                 </v-col>

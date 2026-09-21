@@ -95,7 +95,11 @@
                             color="primary"
                             :loading="isLoading"
                             :disabled="isLoading"
-                        ></v-checkbox>
+                        >
+                            <template #label>
+                                J'accepte les&nbsp;<a href="conditions-generales-d-utilisations" target="_blank" class="text-primary">CGU</a>&nbsp;et la&nbsp;<a href="confidentialite" target="_blank" class="text-primary">politique de confidentialité.</a>
+                            </template>
+                        </v-checkbox>
                     </v-col>
 
                     <v-col md="12" class="mt-n8">

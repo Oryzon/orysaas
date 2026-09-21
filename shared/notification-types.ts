@@ -48,6 +48,13 @@ export const NOTIFICATION_TYPES = {
         template: (payload: { organizationName: string }) =>
             `Le paiement de votre abonnement a échoué sur l'organization ${payload.organizationName}. Merci de mettre à jour votre moyen de paiement.`,
     },
+    SAAS_OWNER_SUBSCRIPTION_STARTED: {
+        icon: "mdi-check-decagram",
+        color: "success",
+        label: "Un nouvel abonnement",
+        template: (payload: { organizationName: string, planName: string }) =>
+            `${payload.organizationName} vient de s'abonner au plan '${payload.planName}'.`,
+    }
 } as const;
 
 export type NotificationTypes = keyof typeof NOTIFICATION_TYPES;

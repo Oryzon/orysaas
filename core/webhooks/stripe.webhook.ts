@@ -9,6 +9,7 @@ import { PlanPriceRepository } from "../databases/repositories/plan-price.reposi
 import { notifyOrganizationAdmins, emailOrganizationAdmins } from "../helpers/organization-notify.helper";
 import Messages from "../config/messages";
 import { DateTime } from "luxon";
+import {notifySaasOwners} from "../helpers/saas-owners-notify.helper";
 
 function resolveId(value: string | { id: string } | null | undefined): string | undefined {
     if (!value) {
@@ -89,11 +90,18 @@ export async function handleStripeWebhook(req: Request, res: Response) {
                         await notifyOrganizationAdmins(subscription.organizationUuid, "SUBSCRIPTION_STARTED");
 
                         const organization = await OrganizationRepository.findOne({
-                            where: { uuid: Equal(subscription.organizationUuid) },
+                            where: {
+                                uuid: Equal(subscription.organizationUuid)
+                            },
                         });
 
                         if (organization) {
                             const firstItem = stripeSubscription.items.data[0];
+
+                            await notifySaasOwners("SAAS_OWNER_SUBSCRIPTION_STARTED", {
+                                organizationName: organization.name,
+                                planName: await getPlanTitle(subscription.planPriceUuid),
+                            });
 
                             await emailOrganizationAdmins(
                                 organization.uuid,
