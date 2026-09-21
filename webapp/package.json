@@ -1,6 +1,7 @@
 {
     "name": "webapp",
     "type": "module",
+    "version": "0.1.1",
     "private": true,
     "scripts": {
         "build": "nuxt build",
